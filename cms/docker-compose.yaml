@@ -1,0 +1,37 @@
+services:
+  cms:
+    image: registry.ap-southeast-1.aliyuncs.com/whitedit/ai-visa-cms
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
+      update_config:
+        order: start-first
+    ports:
+      - "1338:1338"
+    environment:
+      HOST: 0.0.0.0
+      PORT: 1338
+      APP_KEYS: JS6zRecusZKS4FjNu5NEag==,0rIEYKYcs5vgprp2QucsRw==,ep2T7nGWWljFLv4MgQusgg==,17y4PNiSMEiQbAn3D3q5HA==
+      API_TOKEN_SALT: bDjRHGFVoXqJDLyN61uAUA==
+      ADMIN_JWT_SECRET: cllGXhdNQYqK0DoH23K8Eg==
+      TRANSFER_TOKEN_SALT: mYzweo+WRkB54zx7Myoh2Q==
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: 172.17.0.1
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ai-visa
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: difyai123456
+      DATABASE_SSL: false
+      DATABASE_FILENAME: .tmp/data.db
+      JWT_SECRET: uELsWmwfjMGMN0/FGj6E9Q==
+      ALIYUN_ACCESS_KEY_ID: LTAI5tLEZ2rQhV4mMD69XnVj
+      ALIYUN_ACCESS_KEY_SECRET: xxxx
+      ALIYUN_BUCKET_NAME: ai-visa
+      ALIYUN_BUCKET_REGION: ap-southeast-1
+      UPLOAD_PATH: cms
+      REDIS_URL: redis://:xxxx@192.168.50.24:6379/2

@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_sections_case_study_group_s",
+  "info": {
+    "displayName": "Case study group "
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 120,
+      "minLength": 1
+    },
+    "caseStudies": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::case-study.case-study"
+    }
+  }
+}

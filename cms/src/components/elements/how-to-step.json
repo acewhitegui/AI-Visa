@@ -1,0 +1,29 @@
+{
+  "collectionName": "components_elements_how_to_steps",
+  "info": {
+    "displayName": "How to Step"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 120,
+      "minLength": 1
+    },
+    "description": {
+      "type": "text",
+      "maxLength": 10240,
+      "minLength": 1
+    },
+    "image": {
+      "allowedTypes": [
+        "images",
+        "files"
+      ],
+      "type": "media",
+      "multiple": false,
+      "required": false
+    }
+  }
+}

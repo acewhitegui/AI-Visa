@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_sections_products",
+  "info": {
+    "displayName": "Product Group",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 120,
+      "minLength": 1
+    },
+    "products": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product.product"
+    },
+    "anchor": {
+      "type": "string",
+      "maxLength": 32
+    }
+  }
+}

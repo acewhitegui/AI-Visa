@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_sections_certification_groups",
+  "info": {
+    "displayName": "Certification group"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 1024,
+      "minLength": 1
+    },
+    "certifications": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::certification.certification"
+    }
+  }
+}

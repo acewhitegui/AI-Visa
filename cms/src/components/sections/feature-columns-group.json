@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_slices_feature_columns_groups",
+  "info": {
+    "name": "FeatureColumnsGroup",
+    "displayName": "Feature columns group",
+    "icon": "star-of-life",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "features": {
+      "type": "component",
+      "repeatable": true,
+      "component": "elements.feature-column"
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 120,
+      "minLength": 1
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "collectionName": "components_sections_how_to_groups",
+  "info": {
+    "displayName": "How to Group",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 120,
+      "minLength": 1
+    },
+    "description": {
+      "type": "text",
+      "required": false,
+      "maxLength": 10240,
+      "minLength": 1
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "files",
+        "images"
+      ]
+    },
+    "totalTime": {
+      "type": "string",
+      "required": true,
+      "maxLength": 64,
+      "minLength": 1
+    },
+    "step": {
+      "type": "component",
+      "repeatable": true,
+      "component": "elements.how-to-step"
+    },
+    "tool": {
+      "type": "component",
+      "repeatable": true,
+      "component": "elements.how-to-step"
+    }
+  }
+}

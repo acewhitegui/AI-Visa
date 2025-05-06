@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_sections_featured_ons",
+  "info": {
+    "displayName": "Featured on"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 70
+    },
+    "logos": {
+      "type": "component",
+      "repeatable": true,
+      "component": "elements.logos"
+    }
+  }
+}
