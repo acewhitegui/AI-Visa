@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
 } from "@/app/components/ui/shadcn/sidebar"
 import {DropdownMenu} from "@radix-ui/react-dropdown-menu"
-import {Calendar, ChevronDown, ChevronUp, Home, Inbox, Search, Settings, User2} from "lucide-react"
+import {ChevronDown, ChevronUp, Home, Search, User2} from "lucide-react"
 import {DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/app/components/ui/shadcn/dropdown-menu";
 
 
@@ -22,26 +22,6 @@ export function AppSidebar() {
       title: "Home",
       url: "#",
       icon: Home,
-    },
-    {
-      title: "Inbox",
-      url: "#",
-      icon: Inbox,
-    },
-    {
-      title: "Calendar",
-      url: "#",
-      icon: Calendar,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: Search,
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings,
     },
   ]
 
@@ -70,6 +50,34 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <a href="/search">
+                    <Search/>
+                    <span>Search</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>History</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <a href="#">
+                    <span>Conversation1</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
