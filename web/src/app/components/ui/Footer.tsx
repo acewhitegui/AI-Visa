@@ -70,7 +70,7 @@ export default function Footer({
   const t = useTranslations('common');
 
   return (
-    <footer className="py-6 bg-gray-900">
+    <footer className="py-6">
       <div className="container px-6 mx-auto space-y-6 divide-y divide-gray-400 md:space-y-12 divide-opacity-50">
         <div className="grid grid-cols-12 mb-2 pb-2">
           <div className="pb-6 col-span-full md:pb-0 md:col-span-4 pr-24">

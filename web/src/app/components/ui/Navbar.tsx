@@ -62,7 +62,7 @@ export default function Navbar({
   }, [closeMenu]);
 
   return (
-    <div id="nav-bar" className="p-1 lg:p-4 sticky top-0 z-50 bg-gray-900">
+    <div id="nav-bar" className="p-1 lg:p-4 sticky top-0 z-50 ">
       <div className="container flex justify-between h-12 lg:h-16 mx-auto px-0 sm:px-6">
         <Logo src={logoUrl} onClick={closeMenu}>
           {logoText && <h2 className="text-2xl font-bold">{logoText}</h2>}
