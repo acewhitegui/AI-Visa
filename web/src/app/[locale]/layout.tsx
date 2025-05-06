@@ -16,6 +16,7 @@ import {logger} from "@/app/library/common/logger";
 import {Props} from "@/app/library/objects/props";
 import {SidebarProvider, SidebarTrigger} from "@/app/components/ui/shadcn/sidebar";
 import {AppSidebar} from "../components/ui/shadcn/app-sidebar";
+import {cookies} from "next/headers";
 
 export default async function RootLayout({
                                            children,
@@ -48,6 +49,9 @@ export default async function RootLayout({
 
   const session = await auth()
 
+  const cookieStore = await cookies()
+  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
+
   return (
     <html lang={locale}>
     <head>
@@ -56,10 +60,10 @@ export default async function RootLayout({
     <body>
     <NextIntlClientProvider locale={locale} messages={messages}>
       <SessionProvider session={session}>
-        <SidebarProvider>
-          <SidebarTrigger/>
+        <SidebarProvider defaultOpen={defaultOpen}>
           <AppSidebar/>
           <main className="min-h-screen">
+            <SidebarTrigger/>
             {children}
           </main>
         </SidebarProvider>
