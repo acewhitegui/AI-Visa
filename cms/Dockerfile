@@ -19,7 +19,7 @@ ENV NODE_ENV=${NODE_ENV}
 
 # install curl
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-HEALTHCHECK --interval=30s --timeout=5s --retries=5 --start-period=10s CMD curl -fs http://localhost:1338/_health || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --retries=5 --start-period=10s CMD curl -fs http://localhost:1339/_health || exit 1
 
 WORKDIR /opt/
 COPY --from=build /opt/node_modules ./node_modules
