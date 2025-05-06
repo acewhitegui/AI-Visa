@@ -44,6 +44,7 @@ import {
   SheetTitle,
   SheetTrigger
 } from "@/app/components/ui/shadcn/sheet";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/app/components/ui/shadcn/tooltip";
 
 export default async function Components() {
 
@@ -288,6 +289,24 @@ export default async function Components() {
                 </SheetHeader>
               </SheetContent>
             </Sheet>
+          </CardContent>
+        </Card>
+        {/* 提示语 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Tooltip</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline">Hover</Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Add to library</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </CardContent>
         </Card>
         {/* 输入框 */}
