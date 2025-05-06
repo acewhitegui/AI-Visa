@@ -2,6 +2,7 @@
 import React, {useState} from "react";
 import {Language} from "@/app/library/objects/props";
 import {LOCALE_DISPLAY_MAP} from "@/app/library/common/constants";
+import {Button} from "@/app/components/ui/shadcn/button";
 
 
 export function LanguageSelect({
@@ -16,13 +17,12 @@ export function LanguageSelect({
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div className="relative min-w-20">
-      <button
-        type="button"
-        className="flex items-center rounded px-2 py-1 text-white bg-gray-700"
+      <Button
+        className="flex items-center rounded px-2 py-1"
         onClick={() => setIsOpen((open) => !open)}
       >
         <span>{LOCALE_DISPLAY_MAP.get(locale)}</span>
-      </button>
+      </Button>
       {isOpen && (
         <div className="absolute right-0 mt-1 bg-gray-700 rounded shadow-lg z-10">
           {languages.map((lang) => (
