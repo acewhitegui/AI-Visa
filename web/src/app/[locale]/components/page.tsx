@@ -80,6 +80,19 @@ export default async function Components() {
       <div className="container mx-auto py-12 ">
         <h1 className="text-3xl font-bold mb-8">Components</h1>
         <section className="grid grid-cols-3 gap-6">
+          {/* 卡片按钮 */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Card</CardTitle>
+              <CardDescription>Card Description</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Card Content</p>
+            </CardContent>
+            <CardFooter>
+              <p>Card Footer</p>
+            </CardFooter>
+          </Card>
           {/* 导航菜单 */}
           <Card>
             <CardHeader>
@@ -139,10 +152,8 @@ export default async function Components() {
                     </NavigationMenuContent>
                   </NavigationMenuItem>
                   <NavigationMenuItem>
-                    <Link href="/docs" passHref>
-                      <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    <Link href="/docs">
                         Documentation
-                      </NavigationMenuLink>
                     </Link>
                   </NavigationMenuItem>
                 </NavigationMenuList>
@@ -213,19 +224,6 @@ export default async function Components() {
               </DropdownMenu>
             </CardContent>
           </Card>
-          {/* 卡片按钮 */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Card</CardTitle>
-              <CardDescription>Card Description</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>Card Content</p>
-            </CardContent>
-            <CardFooter>
-              <p>Card Footer</p>
-            </CardFooter>
-          </Card>
           {/* 按钮组件 */}
           <Card>
             <CardHeader>
@@ -275,7 +273,7 @@ const ListItem = React.forwardRef<
 >(({className, title, children, ...props}, ref) => {
   return (
     <li>
-      <NavigationMenuLink asChild>
+      <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
         <a
           ref={ref}
           className={cn(
