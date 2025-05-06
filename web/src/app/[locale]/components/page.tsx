@@ -28,6 +28,7 @@ export default async function Components() {
               <p>Card Footer</p>
             </CardFooter>
           </Card>
+          {/* 按钮组件 */}
           <Card>
             <CardHeader>
               <CardTitle>Buttons</CardTitle>
@@ -41,6 +42,7 @@ export default async function Components() {
               <Button variant="secondary">secondary</Button>
             </CardContent>
           </Card>
+          {/* 面包屑 */}
           <Card>
             <CardHeader>
               <CardTitle>Breadcrumb</CardTitle>
