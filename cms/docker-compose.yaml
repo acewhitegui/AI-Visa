@@ -12,10 +12,10 @@ services:
       update_config:
         order: start-first
     ports:
-      - "1338:1338"
+      - "1339:1339"
     environment:
       HOST: 0.0.0.0
-      PORT: 1338
+      PORT: 1339
       APP_KEYS: JS6zRecusZKS4FjNu5NEag==,0rIEYKYcs5vgprp2QucsRw==,ep2T7nGWWljFLv4MgQusgg==,17y4PNiSMEiQbAn3D3q5HA==
       API_TOKEN_SALT: bDjRHGFVoXqJDLyN61uAUA==
       ADMIN_JWT_SECRET: cllGXhdNQYqK0DoH23K8Eg==

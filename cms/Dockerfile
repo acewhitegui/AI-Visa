@@ -31,5 +31,5 @@ ENV PATH=/opt/node_modules/.bin:$PATH
 RUN npm install -g pnpm
 RUN chown -R node:node /opt/app
 USER node
-EXPOSE 1338
+EXPOSE 1339
 CMD ["pnpm", "start"]
