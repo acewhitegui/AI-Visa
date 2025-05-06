@@ -1,40 +1,36 @@
+import {Button} from "@/app/components/ui/shadcn/button";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/app/components/ui/shadcn/card";
+
 export default async function Components() {
   return (
     <>
-      <div className="container mx-auto py-12">
-        <h1 className="text-3xl font-bold mb-8">组件库</h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* 按钮组件 */}
-          <div className="border rounded-lg p-6 hover:shadow-lg transition-shadow">
-            <h2 className="text-xl font-semibold mb-4">按钮组件</h2>
-            <div className="space-y-3">
-              <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-                默认按钮
-              </button>
-              <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
-                成功按钮
-              </button>
-              <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
-                危险按钮
-              </button>
-            </div>
-          </div>
-
-          {/* 卡片组件 */}
-          <div className="border rounded-lg p-6 hover:shadow-lg transition-shadow">
-            <h2 className="text-xl font-semibold mb-4">卡片组件</h2>
-            <div className="border rounded-lg overflow-hidden">
-              <div className="bg-gray-200 h-40 flex items-center justify-center">
-                图片区域
-              </div>
-              <div className="p-4">
-                <h3 className="font-medium">卡片标题</h3>
-                <p className="text-gray-600 text-sm mt-2">卡片描述文字，内容展示区域。</p>
-              </div>
-            </div>
-          </div>
-
+      <div className="container mx-auto py-12 ">
+        <h1 className="text-3xl font-bold mb-8">Components</h1>
+        <div className="grid grid-cols-3 gap-6">
+          {/* 卡片按钮 */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Card Title</CardTitle>
+              <CardDescription>Card Description</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Card Content</p>
+            </CardContent>
+            <CardFooter>
+              <p>Card Footer</p>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Buttons</CardTitle>
+            </CardHeader>
+            <Button variant="default">default</Button>
+            <Button variant="link">link</Button>
+            <Button variant="ghost">ghost</Button>
+            <Button variant="destructive">destructive</Button>
+            <Button variant="outline">outline</Button>
+            <Button variant="secondary">secondary</Button>
+          </Card>
           {/* 表单组件 */}
           <div className="border rounded-lg p-6 hover:shadow-lg transition-shadow">
             <h2 className="text-xl font-semibold mb-4">表单组件</h2>

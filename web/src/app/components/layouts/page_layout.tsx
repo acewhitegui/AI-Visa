@@ -10,7 +10,7 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
-} from "@/app/components/ui/breadcrumb"
+} from "@/app/components/ui/shadcn/breadcrumb"
 import {getPageBySlug} from "@/app/library/services/page_service";
 
 export async function PageLayout({

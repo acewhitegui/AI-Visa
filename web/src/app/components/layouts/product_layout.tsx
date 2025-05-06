@@ -13,7 +13,7 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
-} from "@/app/components/ui/breadcrumb"
+} from "@/app/components/ui/shadcn/breadcrumb"
 
 export async function ProductLayout({
                                       params,

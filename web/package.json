@@ -13,6 +13,7 @@
     "@headlessui/react": "^2.2.1",
     "@heroicons/react": "^2.2.0",
     "@next/third-parties": "^15.3.0",
+    "@radix-ui/react-slot": "^1.2.2",
     "@types/negotiator": "^0.6.3",
     "@types/prop-types": "^15.7.14",
     "@types/qs": "^6.9.16",
