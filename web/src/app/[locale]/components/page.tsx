@@ -34,6 +34,7 @@ import {
 import {Link} from "@/i18n/routing";
 import {cn} from "@/app/library/common/utils";
 import React from "react";
+import {Input} from "@/app/components/ui/shadcn/input";
 
 export default async function Components() {
 
@@ -76,10 +77,9 @@ export default async function Components() {
   ]
 
   return (
-    <>
-      <div className="container mx-auto py-12 ">
+    <div className="mx-auto py-12">
         <h1 className="text-3xl font-bold mb-8">Components</h1>
-        <section className="grid grid-cols-3 gap-6">
+      <section className="grid grid-cols-4 gap-6">
           {/* 卡片按钮 */}
           <Card>
             <CardHeader>
@@ -105,7 +105,7 @@ export default async function Components() {
                   <NavigationMenuItem>
                     <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
                     <NavigationMenuContent>
-                      <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                      <ul className="grid gap-3 p-6">
                         <li className="row-span-3">
                           <NavigationMenuLink asChild>
                             <a
@@ -153,7 +153,7 @@ export default async function Components() {
                   </NavigationMenuItem>
                   <NavigationMenuItem>
                     <Link href="/docs">
-                        Documentation
+                      Documentation
                     </Link>
                   </NavigationMenuItem>
                 </NavigationMenuList>
@@ -242,28 +242,36 @@ export default async function Components() {
           <Card>
             <CardHeader>
               <CardTitle>Breadcrumb</CardTitle>
-              <CardContent>
-                <Breadcrumb>
-                  <BreadcrumbList>
-                    <BreadcrumbItem>
-                      <BreadcrumbLink href="/">Home</BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator/>
-                    <BreadcrumbItem>
-                      <BreadcrumbLink href="/components">Components</BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator/>
-                    <BreadcrumbItem>
-                      <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
-                    </BreadcrumbItem>
-                  </BreadcrumbList>
-                </Breadcrumb>
-              </CardContent>
             </CardHeader>
+            <CardContent>
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator/>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/components">Components</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator/>
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </CardContent>
           </Card>
+        {/* 输入框 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Input</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Input/>
+          </CardContent>
+        </Card>
         </section>
       </div>
-    </>
   );
 }
 
