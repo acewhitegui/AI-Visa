@@ -10,9 +10,13 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/app/components/ui/shadcn/sidebar"
-import {DropdownMenu} from "@radix-ui/react-dropdown-menu"
 import {ChevronDown, ChevronUp, Home, Search, User2} from "lucide-react"
-import {DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/app/components/ui/shadcn/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/app/components/ui/shadcn/dropdown-menu";
 
 
 export function AppSidebar() {
@@ -33,16 +37,16 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  Select Products
+                  UK Student Visa
                   <ChevronDown className="ml-auto"/>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
                 <DropdownMenuItem>
-                  <span>Acme Inc</span>
+                  <span>UK Student Visa</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <span>Acme Corp.</span>
+                  <span>UK Tourist Visa</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
