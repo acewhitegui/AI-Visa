@@ -1,0 +1,32 @@
+{
+  "common": {
+    "menu": "Menu",
+    "my-account": "My Account",
+    "login": "Login"
+  },
+  "products": {
+    "try-now": "Try Now"
+  },
+  "markdown": {
+    "markdown-input": "Markdown Input",
+    "html-output": "HTML Output",
+    "copy-html": "Copy HTML",
+    "copied": "Copied!",
+    "html-preview": "HTML Preview",
+    "copy-text": "Copy Only Text"
+  },
+  "image": {
+    "upload-images": "Upload Images",
+    "upload-image-tips": "Click to upload or drag and drop",
+    "upload-allow-types": "PNG, JPG, GIF up to 10MB",
+    "input-urls-tips": "Enter image URLs (one per line)",
+    "selected-images": "Selected Images",
+    "add-image-urls": "Add Image URLs",
+    "add-urls": "Add URLs",
+    "drop-tips": "Drop here",
+    "generating": "Generating...",
+    "generate-pdf": "Generate PDF",
+    "download": "Download PDF",
+    "tool-tips": "Download link will expire in 24h"
+  }
+}
