@@ -1,0 +1,32 @@
+{
+  "common": {
+    "menu": "菜單",
+    "my-account": "我的賬戶",
+    "login": "登錄"
+  },
+  "products": {
+    "try-now": "現在試試"
+  },
+  "markdown": {
+    "markdown-input": "Markdown輸入",
+    "html-output": "HTML輸出",
+    "copy-html": "點擊複製",
+    "copied": "複製成功",
+    "html-preview": "HTML效果預覽",
+    "copy-text": "複製純文本"
+  },
+  "image": {
+    "upload-images": "上傳圖片",
+    "upload-image-tips": "點擊上傳或拖放",
+    "upload-allow-types": "支持PNG、JPG、GIF格式，最大10MB",
+    "input-urls-tips": "輸入圖片URL（每行一個）",
+    "selected-images": "已選擇的圖片",
+    "add-image-urls": "添加圖片URL",
+    "add-urls": "添加URL",
+    "drop-tips": "放到這裡",
+    "generating": "生成中...",
+    "generate-pdf": "生成PDF",
+    "download": "下載PDF",
+    "tool-tips": "下載鏈接將在24小時後失效"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "common": {
+    "menu": "菜单",
+    "my-account": "我的账户",
+    "login": "登录"
+  },
+  "products": {
+    "try-now": "现在试试"
+  },
+  "markdown": {
+    "markdown-input": "Markdown输入",
+    "html-output": "HTML输出",
+    "copy-html": "点击复制",
+    "copied": "复制成功",
+    "html-preview": "HTML效果预览",
+    "copy-text": "复制纯文本"
+  },
+  "image": {
+    "upload-images": "上传图片",
+    "upload-image-tips": "点击上传或拖放",
+    "upload-allow-types": "支持PNG、JPG、GIF格式，最大10MB",
+    "input-urls-tips": "输入图片URL（每行一个）",
+    "selected-images": "已选择的图片",
+    "add-image-urls": "添加图片URL",
+    "add-urls": "添加URL",
+    "drop-tips": "放到这里",
+    "generating": "生成中...",
+    "generate-pdf": "生成PDF",
+    "download": "下载PDF",
+    "tool-tips": "下载链接将在24小时后失效"
+  }
+}

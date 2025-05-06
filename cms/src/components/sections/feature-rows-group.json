@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_slices_feature_rows_groups",
+  "info": {
+    "name": "FeatureRowsGroup",
+    "displayName": "Feaures row group",
+    "icon": "bars",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "features": {
+      "type": "component",
+      "repeatable": true,
+      "component": "elements.feature-row"
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 120,
+      "minLength": 1
+    },
+    "anchor": {
+      "type": "string",
+      "maxLength": 32,
+      "minLength": 1
+    }
+  }
+}

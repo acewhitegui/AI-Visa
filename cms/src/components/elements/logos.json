@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_elements_logos",
+  "info": {
+    "name": "logos",
+    "displayName": "Logos",
+    "icon": "apple-alt",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "url": {
+      "type": "text",
+      "maxLength": 1024
+    }
+  }
+}
