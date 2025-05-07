@@ -9,18 +9,22 @@
 from fastapi import APIRouter
 
 from common import utils
+from models.db import Conversation
+from models.view.conversation import ConversationVO
+from services import conversation_service
 
 router = APIRouter()
 
 
 @router.post("/conversation")
-async def create_conversation(conversation):
+async def create_conversation(conversation: ConversationVO):
     """
         创建会话
     :param conversation:
     :return:
     """
-    return utils.resp_success()
+    db_data: Conversation = await conversation_service.create_conversation(conversation)
+    return utils.resp_success(data=db_data.to_dict())
 
 
 @router.put("/conversation")
@@ -28,7 +32,7 @@ async def update_conversation(conversation):
     pass
 
 
-@router.get("/conversation")
+@router.get("/conversations")
 async def get_conversation_list():
     return {"message": "Hello World"}
 

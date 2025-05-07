@@ -43,7 +43,7 @@ class _Const(object):
 
     HOST = os.getenv("HOST", "localhost")
     PORT = int(os.getenv("PORT", 8000))
-    ANY_CONVERTERS_WEB_URL = os.getenv("ANY_CONVERTERS_WEB_URL", "https://anyconverters.com")
+    WEB_SERVER_URL = os.getenv("WEB_SERVER_URL", "http://localhost:8001")
 
     POSTGRES_URL = os.getenv("POSTGRES_URL")
     POSTGRES_ECHO = bool(int(os.getenv("POSTGRES_ECHO", 0)))
@@ -83,6 +83,8 @@ class _Const(object):
     SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
 
     TITLE = "title"
+
+    VERIFY_URL = "verify_url"
 
     # assembly ai
     LANGUAGE_CODE = "language_code"

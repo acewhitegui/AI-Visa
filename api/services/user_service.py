@@ -6,6 +6,8 @@
 @Date  : 2025/4/12
 @Desc :
 """
+import datetime
+
 from common.const import CONST
 from common.globals import GLOBALS
 from models import User
@@ -33,6 +35,15 @@ def get_user(username_or_email: str) -> User:
 
 def register_email_confirmed_user(user_info: dict) -> User:
     with GLOBALS.get_postgres_wrapper().session_scope() as session:
+        user = session.query(User).filter(User.email == user_info.get(CONST.EMAIL)).first()
+        if user:
+            user.status = CONST.ACTIVATED
+            user.updated_at = datetime.datetime.now()
+            session.commit()
+            session.refresh(user)
+            session.expunge(user)
+            return user
+
         user = User(**user_info)
         user.is_active = True
         user.status = CONST.ACTIVATED
