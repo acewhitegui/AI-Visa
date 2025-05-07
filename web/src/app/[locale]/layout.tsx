@@ -17,6 +17,8 @@ import {Props} from "@/app/library/objects/props";
 import {SidebarProvider, SidebarTrigger} from "@/app/components/ui/shadcn/sidebar";
 import {AppSidebar} from "../components/ui/shadcn/app-sidebar";
 import {cookies} from "next/headers";
+import {getProductList} from "@/app/library/services/product_service";
+import {getConversationList} from "@/app/library/services/conversation_service";
 
 export default async function RootLayout({
                                            children,
@@ -40,11 +42,12 @@ export default async function RootLayout({
 
   const {navbar, footer} = global.data;
   // Fetch required data in parallel for better performance
-  const [navbarMenu, footerMenu, languages, messages] = await Promise.all([
+  const [navbarMenu, footerMenu, languages, messages, products] = await Promise.all([
     getNavbarMenu(locale),
     getFooterMenu(locale),
     getLanguageList(),
-    getMessages()
+    getMessages(),
+    getProductList(locale),
   ]);
 
   const session = await auth()
@@ -52,17 +55,25 @@ export default async function RootLayout({
   const cookieStore = await cookies()
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
 
+  const defaultProductId = products?.[0]?.id
+  const defaultProductName = products?.[0]?.title
+
+  const conversations = await getConversationList(defaultProductId)
+  const defaultConversationId = conversations?.[0]?.id
+
   return (
     <html lang={locale}>
     <head>
+      <title></title>
       <PublicEnvScript/>
     </head>
     <body>
     <NextIntlClientProvider locale={locale} messages={messages}>
       <SessionProvider session={session}>
-        <SidebarProvider defaultOpen={defaultOpen}>
-          <AppSidebar/>
-          <main className="min-h-screen">
+        <SidebarProvider defaultOpen={defaultOpen} defaultProductId={defaultProductId}
+                         defaultConversationId={defaultConversationId}>
+          <AppSidebar defaultProductName={defaultProductName} productList={products} conversationList={conversations}/>
+          <main className="min-h-screen w-full">
             <SidebarTrigger/>
             {children}
           </main>

@@ -1,3 +1,4 @@
+"use client"
 import {
   Sidebar,
   SidebarContent,
@@ -9,6 +10,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/app/components/ui/shadcn/sidebar"
 import {ChevronDown, ChevronUp, Home, Search, User2} from "lucide-react"
 import {
@@ -17,17 +19,36 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/app/components/ui/shadcn/dropdown-menu";
+import {useCallback, useState} from "react";
+import {Link} from "@/i18n/routing";
+import {Conversation, Product} from "@/app/library/objects/types";
+import {createNewConversation} from "@/app/library/services/conversation_service";
 
 
-export function AppSidebar() {
+export function AppSidebar({defaultProductName, productList, conversationList}: {
+  defaultProductName: string;
+  productList: Product[];
+  conversationList: Conversation[]
+}) {
+  const {setConversationId, productId, setProductId} = useSidebar()
+  const [productName, setProductName] = useState(defaultProductName)
   // Menu items.
   const items = [
     {
       title: "Home",
-      url: "#",
+      url: "/",
       icon: Home,
     },
   ]
+
+  function changeProduct(id: string, name: string) {
+    setProductId(id);
+    setProductName(name)
+  }
+
+  const createConversation = useCallback(async (name: string) => {
+    await createNewConversation(productId, name)
+  }, []);
 
   return (
     <Sidebar>
@@ -37,17 +58,22 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  UK Student Visa
+                  {productName}
                   <ChevronDown className="ml-auto"/>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
-                <DropdownMenuItem>
-                  <span>UK Student Visa</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>UK Tourist Visa</span>
-                </DropdownMenuItem>
+                {
+                  productList.map(product => {
+                    const productId = product.id;
+                    const productName = product.title;
+                    return (
+                      <DropdownMenuItem id={productId} onSelect={() => changeProduct(productId, productName)}>
+                        <span id={productId}>{productName}</span>
+                      </DropdownMenuItem>
+                    )
+                  })
+                }
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
@@ -73,12 +99,29 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="#">
-                    <span>Conversation1</span>
-                  </a>
+                <SidebarMenuButton onClick={async () =>
+                  createConversation("New Conversation")
+                }>
+                  <span>New Conversation</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              {
+                conversationList.map(conversation => {
+                  const conversationId = conversation.id
+                  const conversationName = conversation.title
+                  return (
+                    <SidebarMenuItem id={conversationId}>
+                      <SidebarMenuButton asChild onClick={async () => {
+                        setConversationId(conversationId)
+                      }}>
+                        <Link id={conversationId} href={`/steps/${productId}/${conversationId}`}>
+                          <span id={conversationId}>{conversationName}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                })
+              }
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -89,10 +132,10 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                    <Link href={item.url}>
                       <item.icon/>
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
