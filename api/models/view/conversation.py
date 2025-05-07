@@ -23,3 +23,7 @@ class ModifyConversationVO(BaseModel):
     conversation_id: str
     name: str
     answers: dict
+
+
+class DeleteConversationVO(BaseModel):
+    conversation_id: str

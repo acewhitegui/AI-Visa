@@ -10,7 +10,7 @@ from typing import List
 
 from common.globals import GLOBALS
 from models.db import Conversation
-from models.view.conversation import ConversationVO, ModifyConversationVO, ConversationListVO
+from models.view.conversation import ConversationVO, ModifyConversationVO, ConversationListVO, DeleteConversationVO
 
 
 async def create_conversation(user_id: int, conversation: ConversationVO) -> Conversation:
@@ -45,3 +45,13 @@ async def update_conversation(user_id: int, conversation: ModifyConversationVO):
         session.commit()
 
     return update_result
+
+
+async def delete_conversation(user_id: int, conversation: DeleteConversationVO):
+    with GLOBALS.get_postgres_wrapper().session_scope() as session:
+        conversation_id = conversation.conversation_id
+        delete_result = session.query(Conversation).filter(Conversation.user_id == user_id,
+                                                           Conversation.conversation_id == conversation_id).delete()
+        session.commit()
+
+    return delete_result

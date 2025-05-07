@@ -13,7 +13,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from common import utils
 from models import User
 from models.db import Conversation
-from models.view.conversation import ConversationVO, ModifyConversationVO, ConversationListVO
+from models.view.conversation import ConversationVO, ModifyConversationVO, ConversationListVO, DeleteConversationVO
 from services import conversation_service
 from services.auth_service import get_current_user
 
@@ -52,5 +52,11 @@ async def update_conversation(conversation: ModifyConversationVO,
 
 
 @router.delete("/conversation")
-async def delete_conversation(conversation_id):
-    pass
+async def delete_conversation(conversation: DeleteConversationVO,
+                              current_user: Annotated[User, Depends(get_current_user)]):
+    user_id = current_user.id
+    row_count = await conversation_service.delete_conversation(user_id, conversation)
+    if row_count <= 0:
+        raise HTTPException(status_code=404, detail="Item not found")
+
+    return utils.resp_success()
