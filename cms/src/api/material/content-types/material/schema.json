@@ -1,0 +1,72 @@
+{
+  "kind": "collectionType",
+  "collectionName": "materials",
+  "info": {
+    "singularName": "material",
+    "pluralName": "materials",
+    "displayName": "Material",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "passport",
+        "application_form",
+        "BRP",
+        "eVisa",
+        "CAS",
+        "financial_evidence",
+        "parents_evidence",
+        "parents_signed",
+        "residence_evidence",
+        "other"
+      ],
+      "required": true
+    },
+    "standard": {
+      "type": "text",
+      "minLength": 1,
+      "maxLength": 20480,
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "products": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::product.product",
+      "inversedBy": "materials"
+    },
+    "title": {
+      "type": "string",
+      "unique": true,
+      "required": true,
+      "maxLength": 120,
+      "minLength": 1,
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "limits": {
+      "type": "integer",
+      "required": true,
+      "default": 1,
+      "unique": false,
+      "max": 15,
+      "min": 1
+    }
+  }
+}

@@ -1,5 +1,24 @@
 import type {Schema, Struct} from '@strapi/strapi';
 
+export interface ElementsChoice extends Struct.ComponentSchema {
+  collectionName: 'components_elements_choices';
+  info: {
+    description: '';
+    displayName: 'Choice';
+  };
+  attributes: {
+    action: Schema.Attribute.Enumeration<['contact']>;
+    materials: Schema.Attribute.Relation<'oneToMany', 'api::material.material'>;
+    question: Schema.Attribute.Relation<'oneToOne', 'api::question.question'>;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+        minLength: 1;
+      }>;
+  };
+}
+
 export interface ElementsFaq extends Struct.ComponentSchema {
   collectionName: 'components_elements_faqs';
   info: {
@@ -629,6 +648,7 @@ export interface SharedVideoEmbed extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
+      'elements.choice': ElementsChoice;
       'elements.faq': ElementsFaq;
       'elements.feature': ElementsFeature;
       'elements.feature-column': ElementsFeatureColumn;
