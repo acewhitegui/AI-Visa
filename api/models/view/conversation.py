@@ -13,3 +13,13 @@ class ConversationVO(BaseModel):
     product_id: str
     name: str
     answers: dict
+
+
+class ConversationListVO(BaseModel):
+    product_id: str
+
+
+class ModifyConversationVO(BaseModel):
+    conversation_id: str
+    name: str
+    answers: dict

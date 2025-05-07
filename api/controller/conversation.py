@@ -8,12 +8,12 @@
 """
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from common import utils
 from models import User
 from models.db import Conversation
-from models.view.conversation import ConversationVO
+from models.view.conversation import ConversationVO, ModifyConversationVO, ConversationListVO
 from services import conversation_service
 from services.auth_service import get_current_user
 
@@ -32,14 +32,23 @@ async def create_conversation(conversation: ConversationVO, current_user: Annota
     return utils.resp_success(data=db_data.to_dict())
 
 
-@router.put("/conversation")
-async def update_conversation(conversation):
-    pass
-
-
 @router.get("/conversations")
-async def get_conversation_list():
-    return {"message": "Hello World"}
+async def get_conversation_list(params: Annotated[ConversationListVO, Query()],
+                                current_user: Annotated[User, Depends(get_current_user)]):
+    user_id = current_user.id
+    conversation_list = await conversation_service.get_conversation_list(user_id, params)
+    return utils.resp_success(data=conversation_list)
+
+
+@router.put("/conversation")
+async def update_conversation(conversation: ModifyConversationVO,
+                              current_user: Annotated[User, Depends(get_current_user)]):
+    user_id = current_user.id
+    row_count: int = await conversation_service.update_conversation(user_id, conversation)
+    if row_count <= 0:
+        raise HTTPException(status_code=404, detail="Item not found")
+
+    return utils.resp_success()
 
 
 @router.delete("/conversation")

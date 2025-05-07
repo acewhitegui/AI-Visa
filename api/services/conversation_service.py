@@ -6,9 +6,11 @@
 @Date  : 2025/5/7
 @Desc :
 """
+from typing import List
+
 from common.globals import GLOBALS
 from models.db import Conversation
-from models.view.conversation import ConversationVO
+from models.view.conversation import ConversationVO, ModifyConversationVO, ConversationListVO
 
 
 async def create_conversation(user_id: int, conversation: ConversationVO) -> Conversation:
@@ -21,3 +23,25 @@ async def create_conversation(user_id: int, conversation: ConversationVO) -> Con
         session.expunge(conversation)
 
     return conversation
+
+
+async def get_conversation_list(user_id: int, params: ConversationListVO) -> List[dict]:
+    with GLOBALS.get_postgres_wrapper().session_scope() as session:
+        product_id = params.product_id
+        obj_list = session.query(Conversation).filter(Conversation.user_id == user_id,
+                                                      Conversation.product_id == product_id).all()
+        if not obj_list:
+            return []
+
+        return [x.to_dict() for x in obj_list]
+
+
+async def update_conversation(user_id: int, conversation: ModifyConversationVO):
+    with GLOBALS.get_postgres_wrapper().session_scope() as session:
+        conversation_id = conversation.conversation_id
+        update_result = session.query(Conversation).filter(Conversation.user_id == user_id,
+                                                           Conversation.conversation_id == conversation_id).update(
+            conversation.model_dump())
+        session.commit()
+
+    return update_result
