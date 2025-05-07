@@ -1,3 +1,4 @@
+"use client"
 import {
   Sidebar,
   SidebarContent,
@@ -9,6 +10,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/app/components/ui/shadcn/sidebar"
 import {ChevronDown, ChevronUp, Home, Search, User2} from "lucide-react"
 import {
@@ -17,17 +19,27 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/app/components/ui/shadcn/dropdown-menu";
+import {useState} from "react";
+import {Link, useRouter} from "@/i18n/routing";
 
 
 export function AppSidebar() {
+  const router = useRouter();
+  const {setConversationId, productId, setProductId} = useSidebar()
+  const [productName, setProductName] = useState("UK Student Visa")
   // Menu items.
   const items = [
     {
       title: "Home",
-      url: "#",
+      url: "/",
       icon: Home,
     },
   ]
+
+  function changeProduct(id: string, name: string) {
+    setProductId(id);
+    setProductName(name)
+  }
 
   return (
     <Sidebar>
@@ -37,15 +49,15 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  UK Student Visa
+                  {productName}
                   <ChevronDown className="ml-auto"/>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
-                <DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => changeProduct("uk-student-visa", "UK Student Visa")}>
                   <span>UK Student Visa</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => changeProduct("uk-tourist-visa", "UK Tourist Visa")}>
                   <span>UK Tourist Visa</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -73,10 +85,12 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <a href="#">
+                <SidebarMenuButton asChild onClick={async () => {
+                  setConversationId("tourist-history")
+                }}>
+                  <Link href={`/steps/${productId}/tourist-history`}>
                     <span>Conversation1</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -89,10 +103,10 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                    <Link href={item.url}>
                       <item.icon/>
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

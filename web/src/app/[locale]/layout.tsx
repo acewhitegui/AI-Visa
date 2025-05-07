@@ -60,7 +60,7 @@ export default async function RootLayout({
     <body>
     <NextIntlClientProvider locale={locale} messages={messages}>
       <SessionProvider session={session}>
-        <SidebarProvider defaultOpen={defaultOpen}>
+        <SidebarProvider defaultOpen={defaultOpen} defaultProductId={"123"} defaultConversationId={"123"}>
           <AppSidebar/>
           <main className="min-h-screen w-full">
             <SidebarTrigger/>

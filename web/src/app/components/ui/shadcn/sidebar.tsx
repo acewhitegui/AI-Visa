@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import {useCallback, useEffect, useState} from "react"
 import {Slot} from "@radix-ui/react-slot"
 import {cva, VariantProps} from "class-variance-authority"
 import {PanelLeftIcon} from "lucide-react"
@@ -29,6 +30,10 @@ type SidebarContextProps = {
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
   toggleSidebar: () => void
+  productId: string;
+  setProductId: (productId: string) => void;
+  conversationId: string;
+  setConversationId: (conversationId: string) => void;
 }
 
 const SidebarContext = React.createContext<SidebarContextProps | null>(null)
@@ -44,6 +49,8 @@ function useSidebar() {
 
 function SidebarProvider({
                            defaultOpen = true,
+                           defaultProductId = "",
+                           defaultConversationId = "",
                            open: openProp,
                            onOpenChange: setOpenProp,
                            className,
@@ -52,17 +59,21 @@ function SidebarProvider({
                            ...props
                          }: React.ComponentProps<"div"> & {
   defaultOpen?: boolean
+  defaultProductId?: string
+  defaultConversationId?: string
   open?: boolean
   onOpenChange?: (open: boolean) => void
 }) {
   const isMobile = useIsMobile()
-  const [openMobile, setOpenMobile] = React.useState(false)
+  const [openMobile, setOpenMobile] = useState(false)
+  const [productId, setProductId] = useState(defaultProductId)
+  const [conversationId, setConversationId] = useState(defaultConversationId)
 
   // This is the internal state of the sidebar.
   // We use openProp and setOpenProp for control from outside the component.
-  const [_open, _setOpen] = React.useState(defaultOpen)
+  const [_open, _setOpen] = useState(defaultOpen)
   const open = openProp ?? _open
-  const setOpen = React.useCallback(
+  const setOpen = useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
       const openState = typeof value === "function" ? value(open) : value
       if (setOpenProp) {
@@ -83,7 +94,7 @@ function SidebarProvider({
   }, [isMobile, setOpen, setOpenMobile])
 
   // Adds a keyboard shortcut to toggle the sidebar.
-  React.useEffect(() => {
+  useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (
         event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
@@ -111,8 +122,12 @@ function SidebarProvider({
       openMobile,
       setOpenMobile,
       toggleSidebar,
+      productId,
+      setProductId,
+      conversationId,
+      setConversationId,
     }),
-    [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+    [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar, productId, setProductId, conversationId, setConversationId]
   )
 
   return (

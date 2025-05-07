@@ -5,10 +5,11 @@ import {Stepper} from "@/app/components/ui/shadcn/stepper";
 export default function StepsPage({params}: {
   params: {
     locale: string;
-    id: string;
+    productId: string;
+    conversationId: string;
   }
 }) {
-  const {locale, id} = params;
+  const {locale, productId, conversationId} = params;
 
   const [currentStep, setCurrentStep] = useState(0)
 
