@@ -1,3 +1,4 @@
+"use client"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -33,7 +34,7 @@ import {
 } from "@/app/components/ui/shadcn/navigation-menu";
 import {Link} from "@/i18n/routing";
 import {cn} from "@/app/library/common/utils";
-import React from "react";
+import React, {useState} from "react";
 import {Input} from "@/app/components/ui/shadcn/input";
 import {Separator} from "@/app/components/ui/shadcn/separator";
 import {
@@ -45,8 +46,9 @@ import {
   SheetTrigger
 } from "@/app/components/ui/shadcn/sheet";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/app/components/ui/shadcn/tooltip";
+import {Stepper} from "@/app/components/ui/shadcn/stepper";
 
-export default async function Components() {
+export default function Components() {
 
   const components: { title: string; href: string; description: string }[] = [
     {
@@ -84,6 +86,14 @@ export default async function Components() {
       description:
         "A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.",
     },
+  ]
+
+  const [currentStep, setCurrentStep] = useState(0)
+
+  const steps = [
+    {title: "Step 1", description: "Create your account"},
+    {title: "Step 2", description: "Verify your email"},
+    {title: "Step 3", description: "Confirm and finish"},
   ]
 
   return (
@@ -233,6 +243,19 @@ export default async function Components() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+            </CardContent>
+          </Card>
+          {/* 步骤组件 */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Steps</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col space-y-2">
+              <Stepper steps={steps} currentStep={currentStep} onStepChange={setCurrentStep}/>
+              <div className="mt-8 p-4 border rounded-md">
+                <h2 className="text-lg font-semibold mb-2">Current Step Content</h2>
+                <p>{steps[currentStep].description}</p>
+              </div>
             </CardContent>
           </Card>
           {/* 按钮组件 */}
