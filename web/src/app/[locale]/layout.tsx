@@ -64,6 +64,7 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
     <head>
+      <title></title>
       <PublicEnvScript/>
     </head>
     <body>
@@ -71,7 +72,7 @@ export default async function RootLayout({
       <SessionProvider session={session}>
         <SidebarProvider defaultOpen={defaultOpen} defaultProductId={defaultProductId}
                          defaultConversationId={defaultConversationId}>
-          <AppSidebar defaultProductName={defaultProductName} productList={products}/>
+          <AppSidebar defaultProductName={defaultProductName} productList={products} conversationList={conversations}/>
           <main className="min-h-screen w-full">
             <SidebarTrigger/>
             {children}

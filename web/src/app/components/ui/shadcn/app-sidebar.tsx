@@ -21,10 +21,14 @@ import {
 } from "@/app/components/ui/shadcn/dropdown-menu";
 import {useState} from "react";
 import {Link} from "@/i18n/routing";
-import {Product} from "@/app/library/objects/types";
+import {Conversation, Product} from "@/app/library/objects/types";
 
 
-export function AppSidebar({defaultProductName, productList}: { defaultProductName: string; productList: Product[] }) {
+export function AppSidebar({defaultProductName, productList, conversationList}: {
+  defaultProductName: string;
+  productList: Product[];
+  conversationList: Conversation[]
+}) {
   const {setConversationId, productId, setProductId} = useSidebar()
   const [productName, setProductName] = useState(defaultProductName)
   // Menu items.
@@ -89,15 +93,23 @@ export function AppSidebar({defaultProductName, productList}: { defaultProductNa
           <SidebarGroupLabel>History</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild onClick={async () => {
-                  setConversationId("tourist-history")
-                }}>
-                  <Link href={`/steps/${productId}/tourist-history`}>
-                    <span>Conversation1</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              {
+                conversationList.map(conversation => {
+                  const conversationId = conversation.id
+                  const conversationName = conversation.title
+                  return (
+                    <SidebarMenuItem id={conversationId}>
+                      <SidebarMenuButton asChild onClick={async () => {
+                        setConversationId(conversationId)
+                      }}>
+                        <Link href={`/steps/${productId}/${conversationId}`}>
+                          <span id={conversationId}>{conversationName}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                })
+              }
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
