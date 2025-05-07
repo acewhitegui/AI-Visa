@@ -10,6 +10,7 @@ export type ArticleProps = {
 
 export type PromsPros = Promise<{
   locale: string;
+  id?: string;
 }>
 
 export type ArticlePromsPros = Promise<{

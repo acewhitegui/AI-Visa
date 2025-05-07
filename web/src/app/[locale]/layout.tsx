@@ -62,7 +62,7 @@ export default async function RootLayout({
       <SessionProvider session={session}>
         <SidebarProvider defaultOpen={defaultOpen}>
           <AppSidebar/>
-          <main className="min-h-screen">
+          <main className="min-h-screen w-full">
             <SidebarTrigger/>
             {children}
           </main>

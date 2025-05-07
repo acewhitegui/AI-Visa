@@ -43,9 +43,22 @@ interface StepperProps {
   steps: Array<{ title: string; description?: string }>
   currentStep: number
   onStepChange: (step: number) => void
+  children?: React.ReactNode
+  buttonPosition?: 'top' | 'bottom' | 'both'
 }
 
-export function Stepper({steps, currentStep, onStepChange}: StepperProps) {
+export function Stepper({steps, currentStep, onStepChange, children, buttonPosition = 'bottom'}: StepperProps) {
+  const renderNavigationButtons = () => (
+    <div className="flex justify-between">
+      <Button variant="outline" onClick={() => onStepChange(currentStep - 1)} disabled={currentStep === 0}>
+        Previous
+      </Button>
+      <Button onClick={() => onStepChange(currentStep + 1)} disabled={currentStep === steps.length - 1}>
+        {currentStep === steps.length - 1 ? "Finish" : "Next"}
+      </Button>
+    </div>
+  )
+
   return (
     <div className="w-full max-w-3xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -61,15 +74,12 @@ export function Stepper({steps, currentStep, onStepChange}: StepperProps) {
           </React.Fragment>
         ))}
       </div>
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={() => onStepChange(currentStep - 1)} disabled={currentStep === 0}>
-          Previous
-        </Button>
-        <Button onClick={() => onStepChange(currentStep + 1)} disabled={currentStep === steps.length - 1}>
-          {currentStep === steps.length - 1 ? "Finish" : "Next"}
-        </Button>
-      </div>
+
+      {(buttonPosition === 'top' || buttonPosition === 'both') && renderNavigationButtons()}
+
+      {children}
+
+      {(buttonPosition === 'bottom' || buttonPosition === 'both') && renderNavigationButtons()}
     </div>
   )
 }
-
