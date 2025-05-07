@@ -110,4 +110,4 @@ async def logout():
 
 @router.get("/users/me")
 async def read_users_me(current_user: Annotated[User, Depends(get_current_user)]):
-    return current_user
+    return utils.resp_success(data=current_user.to_dict())

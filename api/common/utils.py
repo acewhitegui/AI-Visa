@@ -41,11 +41,9 @@ def resp_success(data=None):
     if data is None:
         data = {}
 
-    resp_data = {}
-    if not isinstance(data, dict):
-        resp_data[CONST.DATA] = data
-    else:
-        resp_data = data
+    resp_data = {
+        CONST.DATA: data
+    }
 
     if CONST.RESULT not in resp_data:
         resp_data[CONST.RESULT] = CONST.SUCCESS
