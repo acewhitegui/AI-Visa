@@ -7,21 +7,16 @@
 @Desc :
 """
 
-from sqlalchemy import String, Text, Integer
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import mapped_column
 
 from models.db.base import Base, BaseModel
 
 
 class Message(Base, BaseModel):
     """
-        对话列表
+        AI回答的消息记录表
     """
     __tablename__ = 'message'
-    chat_id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    conversation_id: Mapped[str] = mapped_column(String(36), nullable=False)
-    user_send: Mapped[str] = mapped_column(Text, nullable=False)
-    create_time: Mapped[int] = mapped_column(Integer, nullable=False)
-    complete_data: Mapped[str] = mapped_column(Text, nullable=False)
-    complete_type: Mapped[str] = mapped_column(Text, nullable=False)
-    complete_time: Mapped[int] = mapped_column(Integer, nullable=False)
+    message_id = mapped_column(max_length=50, primary_key=True, default="")
+    answer = mapped_column(blank=False, default="")
+    metadata = mapped_column(blank=False, default=dict)
