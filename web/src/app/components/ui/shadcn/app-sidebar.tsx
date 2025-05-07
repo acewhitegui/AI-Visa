@@ -20,13 +20,13 @@ import {
   DropdownMenuTrigger
 } from "@/app/components/ui/shadcn/dropdown-menu";
 import {useState} from "react";
-import {Link, useRouter} from "@/i18n/routing";
+import {Link} from "@/i18n/routing";
+import {Product} from "@/app/library/objects/types";
 
 
-export function AppSidebar() {
-  const router = useRouter();
+export function AppSidebar({defaultProductName, productList}: { defaultProductName: string; productList: Product[] }) {
   const {setConversationId, productId, setProductId} = useSidebar()
-  const [productName, setProductName] = useState("UK Student Visa")
+  const [productName, setProductName] = useState(defaultProductName)
   // Menu items.
   const items = [
     {
@@ -54,12 +54,17 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
-                <DropdownMenuItem onSelect={() => changeProduct("uk-student-visa", "UK Student Visa")}>
-                  <span>UK Student Visa</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => changeProduct("uk-tourist-visa", "UK Tourist Visa")}>
-                  <span>UK Tourist Visa</span>
-                </DropdownMenuItem>
+                {
+                  productList.map(product => {
+                    const productId = product.id;
+                    const productName = product.title;
+                    return (
+                      <DropdownMenuItem id={productId} onSelect={() => changeProduct(productId, productName)}>
+                        <span id={productId}>{productName}</span>
+                      </DropdownMenuItem>
+                    )
+                  })
+                }
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>

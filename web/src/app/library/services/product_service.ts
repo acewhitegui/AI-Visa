@@ -1,6 +1,21 @@
 "use server"
 import {fetchAPI} from "@/app/library/common/fetch-api";
-import {Product, SitemapItem} from "@/app/library/objects/props";
+
+import {Product, SitemapItem} from "@/app/library/objects/types";
+
+export async function getProductList(locale: string): Promise<Product[]> {
+  const token = process.env.STRAPI_API_TOKEN;
+
+  if (!token) throw new Error("The Strapi API Token environment variable is not set.");
+
+  const path = `/products`;
+  const options = {headers: {Authorization: `Bearer ${token}`}};
+  const urlParamsObject = {
+    locale: locale,
+  };
+  const resp = await fetchAPI(path, urlParamsObject, options);
+  return resp?.data
+}
 
 export async function getProductBySlug(locale: string, slug: string): Promise<Product> {
   const token = process.env.STRAPI_API_TOKEN;
