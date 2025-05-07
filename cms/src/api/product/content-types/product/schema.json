@@ -28,15 +28,6 @@
         }
       }
     },
-    "description": {
-      "type": "blocks",
-      "required": true,
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
     "blocks": {
       "type": "dynamiczone",
       "components": [
@@ -70,23 +61,27 @@
       "targetField": "title",
       "required": true
     },
-    "icon": {
-      "type": "media",
-      "multiple": false,
-      "required": true,
-      "allowedTypes": [
-        "images"
-      ]
-    },
-    "sellPoint": {
-      "type": "string",
-      "required": true,
-      "maxLength": 120,
+    "extraCheckTips": {
+      "type": "text",
+      "maxLength": 20480,
+      "minLength": 1,
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       }
+    },
+    "questions": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::question.question",
+      "mappedBy": "products"
+    },
+    "materials": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::material.material",
+      "mappedBy": "products"
     }
   }
 }
