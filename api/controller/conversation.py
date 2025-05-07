@@ -8,6 +8,8 @@
 """
 from fastapi import APIRouter
 
+from common import utils
+
 router = APIRouter()
 
 
@@ -18,7 +20,7 @@ async def create_conversation(conversation):
     :param conversation:
     :return:
     """
-    pass
+    return utils.resp_success()
 
 
 @router.put("/conversation")

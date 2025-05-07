@@ -17,6 +17,7 @@ class UploadFile(Base, BaseModel):
         上传的文件记录
     """
     __tablename__ = 'upload_file'
-    name = mapped_column(String(120))  # 文件名
-    type = mapped_column(String(32), default="other")  # 文件类型
-    file_path = mapped_column(String(1024), nullable=False, default="")
+    sha256 = mapped_column(String(36), primary_key=True)
+    name = mapped_column(String(120), nullable=False)  # 文件名
+    type = mapped_column(String(32), nullable=False, default="other")  # 文件类型
+    file_path = mapped_column(String(1024), nullable=False)

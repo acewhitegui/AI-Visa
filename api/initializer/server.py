@@ -17,7 +17,7 @@ from starlette.responses import Response
 from common.const import CONST
 from common.globals import GLOBALS
 from common.logger import log
-from controller import alive, auth
+from controller import alive, auth, conversation
 
 
 @asynccontextmanager
@@ -33,6 +33,7 @@ app = FastAPI(root_path=CONST.URL_PREFIX, lifespan=lifespan)
 path = [
     alive.router,
     auth.router,
+    conversation.router
 ]
 
 app.add_middleware(
