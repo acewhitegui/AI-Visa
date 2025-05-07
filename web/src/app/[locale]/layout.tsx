@@ -2,8 +2,6 @@ import type {Metadata} from "next";
 import {NextIntlClientProvider} from "next-intl";
 import "@/app/assets/css/globals.css";
 import {getMessages, setRequestLocale} from "next-intl/server";
-import Footer from "@/app/components/ui/Footer";
-import Navbar from "@/app/components/ui/Navbar";
 import {getLanguageList} from "@/app/library/services/language_service";
 import {getFooterMenu, getGlobal, getNavbarMenu} from "@/app/library/services/global_service";
 import {PublicEnvScript} from "next-runtime-env";
@@ -16,6 +14,9 @@ import {FALLBACK_SEO, HOST, LOGO_URL} from "@/app/library/common/constants";
 import {getAlternate} from "@/app/library/common/i18n-helpers";
 import {logger} from "@/app/library/common/logger";
 import {Props} from "@/app/library/objects/props";
+import {SidebarProvider, SidebarTrigger} from "@/app/components/ui/shadcn/sidebar";
+import {AppSidebar} from "../components/ui/shadcn/app-sidebar";
+import {cookies} from "next/headers";
 
 export default async function RootLayout({
                                            children,
@@ -48,6 +49,9 @@ export default async function RootLayout({
 
   const session = await auth()
 
+  const cookieStore = await cookies()
+  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
+
   return (
     <html lang={locale}>
     <head>
@@ -56,23 +60,13 @@ export default async function RootLayout({
     <body>
     <NextIntlClientProvider locale={locale} messages={messages}>
       <SessionProvider session={session}>
-        <Navbar
-          links={navbarMenu}
-          locale={locale}
-          languages={languages}
-          logoUrl={navbar.navbarLogo.logoImg.url}
-          logoText={navbar.navbarLogo.logoText}
-        />
-        <main className="min-h-screen bg-gradient-to-r from-gray-900 to-black">
-          {children}
-        </main>
-        <Footer
-          logoText={footer.footerLogo.logoText}
-          logoUrl={footer.footerLogo.logoImg.url}
-          links={footerMenu}
-          legalLinks={footer.legalLinks}
-          socialLinks={footer.socialLinks}
-        />
+        <SidebarProvider defaultOpen={defaultOpen}>
+          <AppSidebar/>
+          <main className="min-h-screen">
+            <SidebarTrigger/>
+            {children}
+          </main>
+        </SidebarProvider>
       </SessionProvider>
     </NextIntlClientProvider>
     </body>

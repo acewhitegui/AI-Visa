@@ -20,7 +20,7 @@ export function DesktopAccountSection({
         <div className="relative">
           <button
             onClick={() => setUserMenuOpen((open: boolean) => !open)}
-            className="bg-violet-700 hover:bg-violet-800 text-white font-bold py-2 px-4 rounded mr-4"
+            className="font-bold py-2 px-4 rounded mr-4"
           >
             {t("my-account")}
           </button>
@@ -36,7 +36,7 @@ export function DesktopAccountSection({
       ) : (
         <Link
           href="/login"
-          className="bg-violet-700 hover:bg-violet-800 text-white font-bold py-2 px-4 rounded mr-4"
+          className="font-bold py-2 px-4 rounded mr-4"
         >
           {t("login")}
         </Link>
