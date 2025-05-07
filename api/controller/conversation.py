@@ -6,24 +6,29 @@
 @Date  : 2025/5/7
 @Desc :
 """
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Depends
 
 from common import utils
+from models import User
 from models.db import Conversation
 from models.view.conversation import ConversationVO
 from services import conversation_service
+from services.auth_service import get_current_user
 
 router = APIRouter()
 
 
 @router.post("/conversation")
-async def create_conversation(conversation: ConversationVO):
+async def create_conversation(conversation: ConversationVO, current_user: Annotated[User, Depends(get_current_user)]):
     """
         创建会话
     :param conversation:
     :return:
     """
-    db_data: Conversation = await conversation_service.create_conversation(conversation)
+    user_id = current_user.id
+    db_data: Conversation = await conversation_service.create_conversation(user_id, conversation)
     return utils.resp_success(data=db_data.to_dict())
 
 

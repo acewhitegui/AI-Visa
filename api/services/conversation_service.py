@@ -11,11 +11,13 @@ from models.db import Conversation
 from models.view.conversation import ConversationVO
 
 
-async def create_conversation(conversation: ConversationVO) -> Conversation:
+async def create_conversation(user_id: int, conversation: ConversationVO) -> Conversation:
     with GLOBALS.get_postgres_wrapper().session_scope() as session:
         conversation = Conversation(**conversation.model_dump())
+        conversation.user_id = user_id
         session.add(conversation)
         session.commit()
         session.refresh(conversation)
+        session.expunge(conversation)
 
     return conversation
