@@ -19,9 +19,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/app/components/ui/shadcn/dropdown-menu";
-import {useState} from "react";
+import {useCallback, useState} from "react";
 import {Link} from "@/i18n/routing";
 import {Conversation, Product} from "@/app/library/objects/types";
+import {createNewConversation} from "@/app/library/services/conversation_service";
 
 
 export function AppSidebar({defaultProductName, productList, conversationList}: {
@@ -44,6 +45,10 @@ export function AppSidebar({defaultProductName, productList, conversationList}: 
     setProductId(id);
     setProductName(name)
   }
+
+  const createConversation = useCallback(async (name: string) => {
+    await createNewConversation(productId, name)
+  }, []);
 
   return (
     <Sidebar>
@@ -93,6 +98,13 @@ export function AppSidebar({defaultProductName, productList, conversationList}: 
           <SidebarGroupLabel>History</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={async () =>
+                  createConversation("New Conversation")
+                }>
+                  <span>New Conversation</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               {
                 conversationList.map(conversation => {
                   const conversationId = conversation.id
@@ -102,7 +114,7 @@ export function AppSidebar({defaultProductName, productList, conversationList}: 
                       <SidebarMenuButton asChild onClick={async () => {
                         setConversationId(conversationId)
                       }}>
-                        <Link href={`/steps/${productId}/${conversationId}`}>
+                        <Link id={conversationId} href={`/steps/${productId}/${conversationId}`}>
                           <span id={conversationId}>{conversationName}</span>
                         </Link>
                       </SidebarMenuButton>

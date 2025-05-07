@@ -1,32 +1,18 @@
-"use client"
-import React, {useState} from "react";
-import {Stepper} from "@/app/components/ui/shadcn/stepper";
+import React from "react";
+import {Steps} from "@/app/components/ui/steps/Steps";
 
-export default function StepsPage({params}: {
-  params: {
+export default async function StepsPage({params}: {
+  params: Promise<{
     locale: string;
     productId: string;
     conversationId: string;
-  }
+  }>
 }) {
-  const {locale, productId, conversationId} = params;
-
-  const [currentStep, setCurrentStep] = useState(0)
-
-  const steps = [
-    {title: "Step 1", description: "Create your account"},
-    {title: "Step 2", description: "Verify your email"},
-    {title: "Step 3", description: "Confirm and finish"},
-  ]
+  const {locale, productId, conversationId} = await params;
 
   return (
     <div className="container mx-auto">
-      <Stepper steps={steps} currentStep={currentStep} onStepChange={setCurrentStep}>
-        <div className="my-8 p-4 border rounded-md">
-          <h2 className="text-lg font-semibold mb-2 text-center">Current Step Content</h2>
-          <p className="text-center">{steps[currentStep].description}</p>
-        </div>
-      </Stepper>
+      <Steps locale={locale} productId={productId} conversationId={conversationId}/>
     </div>
   )
 }
