@@ -7,7 +7,7 @@
 @Desc :
 """
 
-from sqlalchemy import String, Integer, Column, JSON
+from sqlalchemy import String, Integer, JSON
 from sqlalchemy.orm import Mapped, mapped_column
 
 from common import utils
@@ -20,7 +20,7 @@ class Conversation(Base, BaseModel):
     """
     __tablename__ = 'conversation'
     conversation_id: Mapped[str] = mapped_column(String(36), primary_key=True, default=utils.generate_uuid)
-    product_id: Mapped[int] = Column(Integer, nullable=False, index=True)
+    product_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
     user_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
     name = mapped_column(String(32), nullable=False)  # 对话名称
     step = mapped_column(Integer, default=0)
