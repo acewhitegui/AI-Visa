@@ -4,9 +4,9 @@ import {useRouter} from "@/i18n/routing";
 import {useSearchParams} from 'next/navigation';
 import {ExclamationCircleIcon,} from '@heroicons/react/24/outline';
 import {ArrowRightIcon} from '@heroicons/react/20/solid';
-import {Button} from "@headlessui/react";
 import {authenticate} from "@/app/library/services/auth_service";
 import {useSession} from "next-auth/react";
+import {Button} from "@/app/components/ui/shadcn/button";
 
 export function LoginForm() {
   const searchParams = useSearchParams();
@@ -23,7 +23,7 @@ export function LoginForm() {
       try {
         // 这里需要根据你的认证机制来判断用户是否已登录
         // 例如检查localStorage中的token或者通过API请求验证会话状态
-        const isLoggedIn = session?.user
+        const isLoggedIn = session?.user?.name
         if (isLoggedIn) {
           // 如果已登录，重定向到callbackUrl或首页
           router.push(callbackUrl);
@@ -42,12 +42,12 @@ export function LoginForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-gray-800 p-10 rounded-lg shadow-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-white">Sign In</h2>
+      <div className="max-w-md w-full space-y-8 p-10 rounded-lg shadow-md">
+        <h2 className="mt-6 text-center text-3xl font-extrabold">Sign In</h2>
         <form className="mt-8 space-y-6" action={formAction}>
-          <div className="rounded-md shadow-sm -space-y-px">
+          <div className="rounded-md ">
             <div className="mb-4">
-              <label htmlFor="username" className="block text-gray-300 text-sm font-bold mb-2">Username</label>
+              <label htmlFor="username" className="block text-sm font-bold mb-2">Username</label>
               <input
                 type="text"
                 id="username"
@@ -55,11 +55,11 @@ export function LoginForm() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Enter your username"
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-600 placeholder-gray-400 bg-gray-700 text-white focus:outline-none focus:ring-violet-500 focus:border-violet-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border focus:outline-none focus:z-10 sm:text-sm"
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="password" className="block text-gray-300 text-sm font-bold mb-2">Password</label>
+              <label htmlFor="password" className="block text-sm font-bold mb-2">Password</label>
               <input
                 type="password"
                 id="password"
@@ -67,16 +67,15 @@ export function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-600 placeholder-gray-400 bg-gray-700 text-white focus:outline-none focus:ring-violet-500 focus:border-violet-500 focus:z-10 sm:text-sm"
+                className="rounded-md relative block w-full px-3 py-2 border sm:text-sm"
               />
             </div>
           </div>
           <input type="hidden" name="callbackUrl" value={callbackUrl}/>
           <Button
-            className="mt-4 w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold py-2 px-4 transition-all duration-300 rounded-md shadow-lg transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-opacity-50"
             type="submit">
               <span className="flex items-center justify-center">
-                Log in <ArrowRightIcon className="ml-auto h-5 w-5 text-white animate-pulse"/>
+                Log in <ArrowRightIcon className="ml-auto h-5 w-5 animate-pulse"/>
               </span>
           </Button>
           <div
@@ -92,15 +91,14 @@ export function LoginForm() {
             )}
           </div>
           <div className="text-center mt-4">
-            <p className="text-gray-300">
+            <p>
               Don&#39;t have an account?{" "}
-              <button
-                type="button"
+              <Button
+                variant="link"
                 onClick={navigateToRegister}
-                className="text-violet-400 hover:text-violet-300 font-medium focus:outline-none"
               >
                 Register here
-              </button>
+              </Button>
             </p>
           </div>
         </form>
