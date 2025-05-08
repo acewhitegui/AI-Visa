@@ -9,10 +9,9 @@
 from typing import Union
 
 from fastapi import Form
+from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from typing_extensions import Annotated, Doc
-
-from fastapi.security import OAuth2PasswordRequestForm
 
 
 class UserRegistrationForm(OAuth2PasswordRequestForm):
@@ -115,6 +114,7 @@ class Token(BaseModel):
     email: str
     access_token: str
     token_type: str
+    expired_at: int
 
 
 class TokenData(BaseModel):

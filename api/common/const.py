@@ -80,7 +80,7 @@ class _Const(object):
     JWT_PRIVATE_KEY = os.getenv("JWT_PRIVATE_KEY", "")
     JWT_PUBLIC_KEY = os.getenv("JWT_PUBLIC_KEY", "")
 
-    ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60)
+    ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60))
 
     SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
     SMTP_PORT = os.getenv("SMTP_PORT", 587)
