@@ -134,6 +134,10 @@ class _Const(object):
     FILES = "files"
     # product
     EXTRA_CHECK_TIPS = "extra_check_tips"
+    # message
+    PRODUCT_ID = "product_id"
+    CONVERSATION_ID = 'conversation_id'
+    ANSWER = "answer"
 
 
 CONST = _Const()

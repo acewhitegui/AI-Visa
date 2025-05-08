@@ -17,7 +17,7 @@ from starlette.responses import Response
 from common.const import CONST
 from common.globals import GLOBALS
 from common.logger import log
-from controller import alive, auth, conversation, file
+from controller import alive, auth, conversation, file, ai
 
 
 @asynccontextmanager
@@ -34,7 +34,8 @@ path = [
     alive.router,
     auth.router,
     conversation.router,
-    file.router
+    file.router,
+    ai.router
 ]
 
 app.add_middleware(

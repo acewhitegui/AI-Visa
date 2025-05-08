@@ -17,7 +17,7 @@ def get_latest_message(product_id: str, conversation_id: str):
     with GLOBALS.get_postgres_wrapper().session_scope() as session:
         message = session.query(Message).filter(Message.product_id == product_id,
                                                 Message.conversation_id == conversation_id).order_by(
-            "-created_at").first()
+            Message.created_at.desc()).first()
         if not message:
             return {}
 
