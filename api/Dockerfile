@@ -7,8 +7,8 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-RUN pip install pip -U
 RUN pip config set global.index-url https://mirrors.cloud.tencent.com/pypi/simple
+RUN pip install pip -U
 RUN pip install -r requirements.txt
 
 COPY . .
