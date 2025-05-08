@@ -38,7 +38,7 @@ async def login_for_access_token(
         )
     access_token_expires = timedelta(minutes=CONST.ACCESS_TOKEN_EXPIRE_MINUTES)
     email = user.email
-    access_token = create_access_token(
+    access_token, expired_at = create_access_token(
         data={
             CONST.EMAIL: email,
             CONST.USERNAME: form_data.username,
@@ -51,10 +51,12 @@ async def login_for_access_token(
         username=user.username,
         email=email,
         access_token=access_token,
-        token_type="bearer")
+        expired_at=expired_at,
+        token_type="bearer"
+    )
 
 
-@router.post("/register", response_model=Token)
+@router.post("/register")
 async def register_user_endpoint(
         form_data: Annotated[UserRegistrationForm, Depends()],
 ) -> Token:
@@ -64,7 +66,7 @@ async def register_user_endpoint(
         2. send confirmation email
     """
     email = form_data.email
-    access_token = create_access_token(
+    access_token, _ = create_access_token(
         data={
             CONST.EMAIL: email,
             CONST.USERNAME: form_data.username,

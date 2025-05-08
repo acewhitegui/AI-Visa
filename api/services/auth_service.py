@@ -102,9 +102,10 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
         expire = datetime.now(timezone.utc) + expires_delta
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=15)
-    to_encode.update({CONST.EXPIRE: expire.timestamp()})
+    expired_at = round(expire.timestamp())
+    to_encode.update({CONST.EXPIRE: expired_at})
     encoded_jwt = jwt_service.encode_jwt(to_encode)
-    return encoded_jwt
+    return encoded_jwt, expired_at
 
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
