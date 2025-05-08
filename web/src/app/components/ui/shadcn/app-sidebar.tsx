@@ -32,6 +32,17 @@ import {signOut, useSession} from "next-auth/react";
 import {redirect} from "next/navigation";
 import {toast} from "sonner";
 import {Button} from "@/app/components/ui/shadcn/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from "@/app/components/ui/shadcn/alert-dialog";
 
 
 export function AppSidebar({defaultProductName, productList}: {
@@ -234,12 +245,25 @@ export function AppSidebar({defaultProductName, productList}: {
                             >
                               Cancel
                             </Button>
-                            <Button
-                              variant="destructive"
-                              onClick={() => handleDeleteConversation(conversationId)}
-                            >
-                              Delete
-                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="destructive">Delete</Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete your
+                                    conversation and remove your data from our servers.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDeleteConversation(conversationId)}>Continue</AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                           </div>
                         </div>
                       ) : (
