@@ -1,7 +1,7 @@
 version: '3'
 services:
   api:
-    image: registry.ap-southeast-1.aliyuncs.com/whitedit/ai-visa
+    image: registry.ap-southeast-1.aliyuncs.com/whitedit/ai-visa-api
     deploy:
       mode: replicated
       replicas: 1
