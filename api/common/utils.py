@@ -8,12 +8,17 @@
 """
 import asyncio
 import time
+import uuid
 from functools import wraps
 
 from starlette.responses import JSONResponse
 
 from common.const import CONST
 from common.logger import log
+
+
+def generate_uuid():
+    return str(uuid.uuid4())
 
 
 def get_timestamp(millisecond=False):
@@ -41,11 +46,9 @@ def resp_success(data=None):
     if data is None:
         data = {}
 
-    resp_data = {}
-    if not isinstance(data, dict):
-        resp_data[CONST.DATA] = data
-    else:
-        resp_data = data
+    resp_data = {
+        CONST.DATA: data
+    }
 
     if CONST.RESULT not in resp_data:
         resp_data[CONST.RESULT] = CONST.SUCCESS

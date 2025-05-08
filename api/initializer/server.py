@@ -17,7 +17,7 @@ from starlette.responses import Response
 from common.const import CONST
 from common.globals import GLOBALS
 from common.logger import log
-from controller import alive, auth
+from controller import alive, auth, conversation, file, ai
 
 
 @asynccontextmanager
@@ -33,6 +33,9 @@ app = FastAPI(root_path=CONST.URL_PREFIX, lifespan=lifespan)
 path = [
     alive.router,
     auth.router,
+    conversation.router,
+    file.router,
+    ai.router
 ]
 
 app.add_middleware(
@@ -61,5 +64,5 @@ async def catch_exceptions_middleware(request: Request, call_next):
         return await call_next(request)
     except Exception as e:
         # you probably want some kind of logging here
-        log.exception(f"Uncaught exception,error info: {str(e)}")
+        log.exception(f"Uncaught exception, error info: {str(e)}")
         return Response("Internal server error", status_code=400)

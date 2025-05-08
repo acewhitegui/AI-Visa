@@ -64,6 +64,10 @@ class User(Base, BaseModel):
         ),
     )
 
+    def to_dict(self):
+        self.password_hash = ""
+        return super().to_dict()
+
 
 class Role(Base, BaseModel):
     """

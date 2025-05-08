@@ -6,3 +6,6 @@
 @Date  : 2025/4/13
 @Desc :
 """
+from models.db.conversation import Conversation
+from models.db.message import Message
+from models.db.upload_file import UploadFile

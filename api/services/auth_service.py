@@ -20,7 +20,6 @@ from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 
 from common.const import CONST
-from common.globals import GLOBALS
 from common.logger import log
 from dao.email.smtp import send_email
 from models.view.auth import TokenData, User
@@ -32,7 +31,7 @@ async def send_verify_email(email: str, access_token: str):
     """
         发送确认邮件
     """
-    verify_url = f"{CONST.ANY_CONVERTERS_WEB_URL}/api/verify-email?token={access_token}"
+    verify_url = f"{CONST.WEB_SERVER_URL}/api/verify-email?token={access_token}"
     path = "./models/templates/email_confirm.html"
     from_addr = "no-reply@anyconverter.com"
     to_addrs = [email]
@@ -43,7 +42,7 @@ async def send_verify_email(email: str, access_token: str):
     body = body_temp.replace("{{verifyUrl}}", verify_url)
     send_email(from_addr, to_addrs, subject, body)
     log.info(f"SUCCESS to send verification email,confirm url: {verify_url}")
-    return
+    return verify_url
 
 
 async def get_query_params(

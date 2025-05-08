@@ -17,9 +17,10 @@ from typing_extensions import Annotated
 
 from common import utils
 from common.const import CONST
+from models import User
 from models.view.auth import UserRegistrationForm, Token
 from services import jwt_service, auth_service, user_service
-from services.auth_service import create_access_token, authenticate_user, send_verify_email
+from services.auth_service import create_access_token, authenticate_user, send_verify_email, get_current_user
 
 router = APIRouter()
 
@@ -73,8 +74,10 @@ async def register_user_endpoint(
         },
         expires_delta=timedelta(minutes=CONST.ACCESS_TOKEN_EXPIRE_MINUTES)
     )
-    await send_verify_email(email, access_token)
-    return utils.resp_success()
+    verify_url = await send_verify_email(email, access_token)
+    return utils.resp_success(data={
+        CONST.VERIFY_URL: verify_url
+    })
 
 
 @router.get("/verify-email")
@@ -94,8 +97,8 @@ async def confirm_verify_email(token: str):
     if expires_at < datetime.datetime.now().timestamp():
         return utils.resp_failure(reason="expired")
 
-    user_service.register_email_confirmed_user(decoded_data)
-    return utils.resp_success()
+    user = user_service.register_email_confirmed_user(decoded_data)
+    return utils.resp_success(data=user.to_dict())
 
 
 @router.post("/logout")
@@ -103,3 +106,8 @@ async def logout():
     # Since JWT is stateless, the client is responsible for discarding the token
     # Server-side, we just return a successful response
     return {"message": "Successfully logged out"}
+
+
+@router.get("/users/me")
+async def read_users_me(current_user: Annotated[User, Depends(get_current_user)]):
+    return utils.resp_success(data=current_user.to_dict())

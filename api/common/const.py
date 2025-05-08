@@ -7,7 +7,6 @@
 @Desc :
 """
 import os
-from typing import Dict, Optional
 
 from dotenv import load_dotenv
 
@@ -33,6 +32,7 @@ class _Const(object):
     PARSER_LXML = 'lxml'
     FILE_HTML = 'html'
 
+    ID = "id"
     DATA = "data"
     RESULT = "result"
     MESSAGE = "message"
@@ -41,9 +41,11 @@ class _Const(object):
     FAILURE = "failure"
     TYPE = "type"
 
+    AUTHORIZATION = "Authorization"
+
     HOST = os.getenv("HOST", "localhost")
     PORT = int(os.getenv("PORT", 8000))
-    ANY_CONVERTERS_WEB_URL = os.getenv("ANY_CONVERTERS_WEB_URL", "https://anyconverters.com")
+    WEB_SERVER_URL = os.getenv("WEB_SERVER_URL", "http://localhost:8001")
 
     POSTGRES_URL = os.getenv("POSTGRES_URL")
     POSTGRES_ECHO = bool(int(os.getenv("POSTGRES_ECHO", 0)))
@@ -62,6 +64,9 @@ class _Const(object):
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
     OPENAI_MODEL_NAME = os.getenv("OPENAI_MODEL_NAME", "gpt-4o")
     ASSEMBLY_API_KEY = os.getenv("ASSEMBLY_API_KEY", "")
+
+    STRAPI_BASE_URL = os.getenv("STRAPI_BASE_URL", "https://api.strapi.io")
+    STRAPI_API_TOKEN = os.getenv("STRAPI_API_TOKEN", "")
 
     ALIYUN_ACCESS_KEY_ID = os.getenv("ALIYUN_ACCESS_KEY_ID", "")
     ALIYUN_ACCESS_KEY_SECRET = os.getenv("ALIYUN_ACCESS_KEY_SECRET", "")
@@ -83,6 +88,8 @@ class _Const(object):
     SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
 
     TITLE = "title"
+
+    VERIFY_URL = "verify_url"
 
     # assembly ai
     LANGUAGE_CODE = "language_code"
@@ -110,40 +117,27 @@ class _Const(object):
     PASSWORD_HASH = "password_hash"
     EXPIRE = "exp"
 
-    # Define font styles mapping once at module level
-
-    UNICODE_FONT_STYLES: Dict[str, Dict[str, Optional[int]]] = {
-        'bold': {
-            'upper_start': 0x1D400,
-            'lower_start': 0x1D41A,
-            'number_start': 0x1D7CE
-        },
-        'italic': {
-            'upper_start': 0x1D434,
-            'lower_start': 0x1D44E,
-            'number_start': None  # No italic numbers in Unicode
-        },
-        'bold_italic': {
-            'upper_start': 0x1D468,
-            'lower_start': 0x1D482,
-            'number_start': None
-        },
-        'monospace': {
-            'upper_start': 0x1D670,
-            'lower_start': 0x1D68A,
-            'number_start': 0x1D7F6
-        },
-        'script': {
-            'upper_start': 0x1D49C,
-            'lower_start': None,  # Script typically only has uppercase
-            'number_start': None
-        },
-        'sans_serif': {
-            'upper_start': 0x1D5A0,
-            'lower_start': 0x1D5BA,
-            'number_start': 0x1D7E2
-        }
-    }
+    # strapi
+    FIELDS = "fields"
+    DOCUMENT_ID = "documentId"
+    POPULATE = "populate"
+    # material
+    LIMITS = "limits"
+    MATERIAL = "material"
+    MATERIALS = "materials"
+    PASSPORT = "passport"
+    STANDARD = "standard"
+    # question
+    CHOICES = "choices"
+    CHOICE_ID = "choice_id"
+    # file
+    FILES = "files"
+    # product
+    EXTRA_CHECK_TIPS = "extra_check_tips"
+    # message
+    PRODUCT_ID = "product_id"
+    CONVERSATION_ID = 'conversation_id'
+    ANSWER = "answer"
 
 
 CONST = _Const()
