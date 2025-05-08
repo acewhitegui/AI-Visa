@@ -19,22 +19,22 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/app/components/ui/shadcn/dropdown-menu";
-import {useCallback, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {Link} from "@/i18n/routing";
 import {Conversation, Product} from "@/app/library/objects/types";
-import {createNewConversation} from "@/app/library/services/conversation_service";
+import {createNewConversation, getConversationList} from "@/app/library/services/conversation_service";
 import {signOut, useSession} from "next-auth/react";
 import {redirect} from "next/navigation";
 import {toast} from "sonner";
 
 
-export function AppSidebar({defaultProductName, productList, conversationList}: {
+export function AppSidebar({defaultProductName, productList}: {
   defaultProductName: string;
   productList: Product[];
-  conversationList: Conversation[]
 }) {
   const {setConversationId, productId, setProductId} = useSidebar()
   const [productName, setProductName] = useState(defaultProductName)
+  const [conversationList, setConversationList] = useState([] as Conversation[])
   const {data: session} = useSession();
   // Menu items.
   const items = [
@@ -44,6 +44,18 @@ export function AppSidebar({defaultProductName, productList, conversationList}: 
       icon: Home,
     },
   ]
+
+  useEffect(() => {
+    const handleConversationList = async () => {
+      const userToken = session?.user?.access_token;
+      if (userToken) {
+        const conversations = await getConversationList(userToken, productId)
+        setConversationList(conversations)
+      }
+    };
+    handleConversationList();
+  }, []);
+
 
   function changeProduct(id: string, name: string) {
     setProductId(id);
@@ -106,13 +118,6 @@ export function AppSidebar({defaultProductName, productList, conversationList}: 
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>History</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton onClick={async () =>
                   createConversation("New Conversation")
@@ -120,10 +125,17 @@ export function AppSidebar({defaultProductName, productList, conversationList}: 
                   <span>New Conversation</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>History</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
               {
                 conversationList.map(conversation => {
                   const conversationId = conversation.conversation_id
-                  const conversationName = conversation.title
+                  const conversationName = conversation.name
                   return (
                     <SidebarMenuItem id={conversationId}>
                       <SidebarMenuButton asChild onClick={async () => {

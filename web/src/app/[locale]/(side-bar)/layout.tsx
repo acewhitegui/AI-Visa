@@ -5,7 +5,6 @@ import {SidebarProvider, SidebarTrigger} from "@/app/components/ui/shadcn/sideba
 import {AppSidebar} from "@/app/components/ui/shadcn/app-sidebar";
 import {cookies} from "next/headers";
 import {getProductList} from "@/app/library/services/product_service";
-import {getConversationList} from "@/app/library/services/conversation_service";
 
 export default async function RootLayout({
                                            children,
@@ -36,13 +35,9 @@ export default async function RootLayout({
   const defaultProductId = products?.[0]?.documentId
   const defaultProductName = products?.[0]?.title
 
-  const conversations = await getConversationList(defaultProductId)
-  const defaultConversationId = conversations?.[0]?.conversation_id
-
   return (
-    <SidebarProvider defaultOpen={defaultOpen} defaultProductId={defaultProductId}
-                     defaultConversationId={defaultConversationId}>
-      <AppSidebar defaultProductName={defaultProductName} productList={products} conversationList={conversations}/>
+    <SidebarProvider defaultOpen={defaultOpen} defaultProductId={defaultProductId}>
+      <AppSidebar defaultProductName={defaultProductName} productList={products}/>
       <SidebarTrigger/>
       <div>
         {children}
