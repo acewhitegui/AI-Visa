@@ -1,1 +1,1 @@
-docker stack deploy -c docker-compose.yaml any-converters
+docker stack deploy -c docker-compose.yaml ai-visa

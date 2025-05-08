@@ -1,8 +1,7 @@
 version: '3'
 services:
   api:
-    image: registry.ap-southeast-1.aliyuncs.com/whitedit/any-converters-api
-    command: 'alembic upgrade head'
+    image: registry.ap-southeast-1.aliyuncs.com/whitedit/ai-visa
     deploy:
       mode: replicated
       replicas: 1
@@ -14,12 +13,12 @@ services:
       update_config:
         order: start-first
     ports:
-      - "8000:8000"
+      - "8001:8001"
     environment:
       HOST: 0.0.0.0
-      PORT: 8000
+      PORT: 8001
       DEBUG: 1
-      ANY_CONVERTERS_WEB_URL: http://192.168.50.24:3000
+      WEB_SERVER_URL: http://192.168.50.24:3000
       POSTGRES_URL: postgresql+psycopg2://postgres:PG202410122130@192.168.50.24/any-converters
       POSTGRES_ECHO: 1
       LOG_LEVEL: debug

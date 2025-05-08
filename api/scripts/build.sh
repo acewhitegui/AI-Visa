@@ -3,7 +3,7 @@ cd ..
 ls
 
 REGISTRY="registry.ap-southeast-1.aliyuncs.com/whitedit"
-IMAGE_NAME="any-converters-api"
+IMAGE_NAME="ai-visa-api"
 DOCKER_VERSION="${DOKCER_VERSION:-latest}"
 
 
