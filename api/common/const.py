@@ -7,7 +7,6 @@
 @Desc :
 """
 import os
-from typing import Dict, Optional
 
 from dotenv import load_dotenv
 
@@ -85,6 +84,7 @@ class _Const(object):
     TITLE = "title"
 
     VERIFY_URL = "verify_url"
+    MATERIALS = "materials"
 
     # assembly ai
     LANGUAGE_CODE = "language_code"
@@ -111,41 +111,5 @@ class _Const(object):
     PASSWORD = "password"
     PASSWORD_HASH = "password_hash"
     EXPIRE = "exp"
-
-    # Define font styles mapping once at module level
-
-    UNICODE_FONT_STYLES: Dict[str, Dict[str, Optional[int]]] = {
-        'bold': {
-            'upper_start': 0x1D400,
-            'lower_start': 0x1D41A,
-            'number_start': 0x1D7CE
-        },
-        'italic': {
-            'upper_start': 0x1D434,
-            'lower_start': 0x1D44E,
-            'number_start': None  # No italic numbers in Unicode
-        },
-        'bold_italic': {
-            'upper_start': 0x1D468,
-            'lower_start': 0x1D482,
-            'number_start': None
-        },
-        'monospace': {
-            'upper_start': 0x1D670,
-            'lower_start': 0x1D68A,
-            'number_start': 0x1D7F6
-        },
-        'script': {
-            'upper_start': 0x1D49C,
-            'lower_start': None,  # Script typically only has uppercase
-            'number_start': None
-        },
-        'sans_serif': {
-            'upper_start': 0x1D5A0,
-            'lower_start': 0x1D5BA,
-            'number_start': 0x1D7E2
-        }
-    }
-
 
 CONST = _Const()
