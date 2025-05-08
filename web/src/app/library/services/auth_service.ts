@@ -3,6 +3,7 @@ import {signIn} from '@/auth';
 import {AuthError} from 'next-auth';
 import {FormState, SignupFormSchema} from "@/app/library/definitions/form";
 import {redirect} from "next/navigation";
+import {getApiBaseUrl} from "@/app/library/common/api-helpers";
 
 export async function signup(state: FormState, formData: FormData) {
   // Validate form fields
@@ -86,8 +87,8 @@ export async function verifyToken(token: string) {
 }
 
 export async function login(username: string, password: string) {
-  const ANY_CONVERTERS_API_BASE = getApiBaseUrl();
-  const url = `${ANY_CONVERTERS_API_BASE}/login`;
+  const apiBaseUrl = getApiBaseUrl();
+  const url = `${apiBaseUrl}/login`;
 
   const response = await fetch(url, {
     method: 'POST',
@@ -132,14 +133,4 @@ export async function authenticate(
     }
     throw error;
   }
-}
-
-function getApiBaseUrl(): string {
-  const AI_VISA_API_BASE_URL = process.env.AI_VISA_API_BASE_URL;
-
-  if (!AI_VISA_API_BASE_URL) {
-    throw new Error('API base URL is not configured. Set AI_VISA_API_BASE_URL environment variable.');
-  }
-
-  return AI_VISA_API_BASE_URL;
 }

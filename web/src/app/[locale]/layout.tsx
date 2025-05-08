@@ -13,6 +13,7 @@ import {FALLBACK_SEO, HOST, LOGO_URL} from "@/app/library/common/constants";
 import {getAlternate} from "@/app/library/common/i18n-helpers";
 import {logger} from "@/app/library/common/logger";
 import {Props} from "@/app/library/objects/props";
+import {Toaster} from "@/app/components/ui/shadcn/sonner";
 
 export default async function RootLayout({
                                            children,
@@ -53,6 +54,7 @@ export default async function RootLayout({
         <main className="min-h-screen w-full">
           {children}
         </main>
+        <Toaster/>
       </SessionProvider>
     </NextIntlClientProvider>
     </body>

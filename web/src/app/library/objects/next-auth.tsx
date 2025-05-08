@@ -9,6 +9,7 @@ declare module 'next-auth' {
       username: string;
       first_name: string;
       last_name: string;
+      access_token: string;
     } & DefaultSession['user'];
   }
 

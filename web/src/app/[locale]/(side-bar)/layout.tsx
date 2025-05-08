@@ -33,11 +33,11 @@ export default async function RootLayout({
   const cookieStore = await cookies()
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
 
-  const defaultProductId = products?.[0]?.id
+  const defaultProductId = products?.[0]?.documentId
   const defaultProductName = products?.[0]?.title
 
   const conversations = await getConversationList(defaultProductId)
-  const defaultConversationId = conversations?.[0]?.id
+  const defaultConversationId = conversations?.[0]?.conversation_id
 
   return (
     <SidebarProvider defaultOpen={defaultOpen} defaultProductId={defaultProductId}

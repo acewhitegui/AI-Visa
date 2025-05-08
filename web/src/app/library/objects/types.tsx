@@ -54,7 +54,7 @@ export type StrapiLink = {
 }
 
 export type StrapiMedia = {
-  id: string;
+  id: number;
   name: string;
   url: string;
   mime: string;
@@ -64,7 +64,8 @@ export type StrapiMedia = {
   caption: string;
 }
 export type Product = {
-  id: string;
+  id: number;
+  documentId: string;
   title: string;
   description: any;
   icon: StrapiMedia;
@@ -75,7 +76,7 @@ export type Product = {
 }
 
 export type Conversation = {
-  id: string;
+  conversation_id: string;
   title: string;
 }
 

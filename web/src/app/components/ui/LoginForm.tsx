@@ -7,6 +7,7 @@ import {ArrowRightIcon} from '@heroicons/react/20/solid';
 import {authenticate} from "@/app/library/services/auth_service";
 import {useSession} from "next-auth/react";
 import {Button} from "@/app/components/ui/shadcn/button";
+import {toast} from "sonner";
 
 export function LoginForm() {
   const searchParams = useSearchParams();
@@ -26,6 +27,7 @@ export function LoginForm() {
         // 例如检查localStorage中的token或者通过API请求验证会话状态
         const isLoggedIn = session?.user
         if (isLoggedIn) {
+          toast.success("You are logged in");
           // 如果已登录，重定向到callbackUrl或首页
           router.push(callbackUrl);
         }

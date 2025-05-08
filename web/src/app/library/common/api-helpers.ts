@@ -42,3 +42,14 @@ export function formatDateOnlyMonth(dateString: string, locale?: string) {
 
 // ADDS DELAY TO SIMULATE SLOW API REMOVE FOR PRODUCTION
 export const delay = (time: number) => new Promise((resolve) => setTimeout(() => resolve(1), time));
+
+
+export function getApiBaseUrl(): string {
+  const AI_VISA_API_BASE_URL = process.env.AI_VISA_API_BASE_URL;
+
+  if (!AI_VISA_API_BASE_URL) {
+    throw new Error('API base URL is not configured. Set AI_VISA_API_BASE_URL environment variable.');
+  }
+
+  return AI_VISA_API_BASE_URL;
+}
