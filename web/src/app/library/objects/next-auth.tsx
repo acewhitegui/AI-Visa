@@ -10,6 +10,7 @@ declare module 'next-auth' {
       first_name: string;
       last_name: string;
       access_token: string;
+      expired_at: number;
     } & DefaultSession['user'];
   }
 

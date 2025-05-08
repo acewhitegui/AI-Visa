@@ -95,8 +95,8 @@ export function AppSidebar({defaultProductName, productList}: {
                     const productId = product.documentId;
                     const productName = product.title;
                     return (
-                      <DropdownMenuItem id={productId} onSelect={() => changeProduct(productId, productName)}>
-                        <span id={productId}>{productName}</span>
+                      <DropdownMenuItem key={productId} onSelect={() => changeProduct(productId, productName)}>
+                        <span>{productName}</span>
                       </DropdownMenuItem>
                     )
                   })
@@ -137,12 +137,12 @@ export function AppSidebar({defaultProductName, productList}: {
                   const conversationId = conversation.conversation_id
                   const conversationName = conversation.name
                   return (
-                    <SidebarMenuItem id={conversationId}>
+                    <SidebarMenuItem key={conversationId}>
                       <SidebarMenuButton asChild onClick={async () => {
                         setConversationId(conversationId)
                       }}>
-                        <Link id={conversationId} href={`/steps/${productId}/${conversationId}`}>
-                          <span id={conversationId}>{conversationName}</span>
+                        <Link href={`/steps/${productId}/${conversationId}`}>
+                          <span>{conversationName}</span>
                           <EditIcon className="ml-2 h-4 w-4" onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
