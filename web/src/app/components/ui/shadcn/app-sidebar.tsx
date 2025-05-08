@@ -24,6 +24,7 @@ import {Link} from "@/i18n/routing";
 import {Conversation, Product} from "@/app/library/objects/types";
 import {
   createNewConversation,
+  deleteConversation,
   getConversationList,
   updateConversation
 } from "@/app/library/services/conversation_service";
@@ -113,6 +114,26 @@ export function AppSidebar({defaultProductName, productList}: {
     }
   }
 
+  const handleDeleteConversation = async (conversationId: string) => {
+    const userToken = session?.user?.access_token
+    if (!userToken) {
+      toast.warning("Please login first")
+      return
+    }
+    try {
+      const result = await deleteConversation(userToken, conversationId)
+      if (!result) {
+        toast.error("Conversation deleted failed, please try again")
+        return
+      }
+      toast.success("Conversation deleted successfully")
+    } catch (error) {
+      toast.error("Failed to deleted conversation")
+    } finally {
+      await handleConversationList()
+    }
+  }
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -193,25 +214,33 @@ export function AppSidebar({defaultProductName, productList}: {
                   return (
                     <SidebarMenuItem key={conversationId}>
                       {editingConversation === conversationId ? (
-                        <div className="flex items-center justify-between w-auto p-2">
+                        <div className="flex flex-col items-center justify-between w-full p-2">
                           <input
                             type="text"
                             value={newName}
                             onChange={(e) => setNewName(e.target.value)}
-                            className="flex-1 mr-2 p-1 text-black"
+                            className="mr-2 mb-2 p-1 w-auto"
                             autoFocus
                           />
-                          <Button
-                            onClick={() => handleUpdateConversation(conversationId)}
-                          >
-                            Save
-                          </Button>
-                          <Button
-                            variant="secondary"
-                            onClick={() => setEditingConversation(null)}
-                          >
-                            Cancel
-                          </Button>
+                          <div className="grid grid-cols-3 gap-2">
+                            <Button
+                              onClick={() => handleUpdateConversation(conversationId)}
+                            >
+                              Save
+                            </Button>
+                            <Button
+                              variant="secondary"
+                              onClick={() => setEditingConversation(null)}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              onClick={() => handleDeleteConversation(conversationId)}
+                            >
+                              Delete
+                            </Button>
+                          </div>
                         </div>
                       ) : (
                         <SidebarMenuButton asChild onClick={async () => {
