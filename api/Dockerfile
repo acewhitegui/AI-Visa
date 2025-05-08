@@ -12,7 +12,6 @@ COPY requirements.txt .
 
 # Set pip mirror and upgrade pip in a single RUN
 RUN pip config set global.index-url https://mirrors.cloud.tencent.com/pypi/simple && \
-    pip install --upgrade pip && \
     pip install -r requirements.txt
 
 FROM base AS build
