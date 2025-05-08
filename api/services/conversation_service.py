@@ -36,6 +36,16 @@ async def get_conversation_list(user_id: int, params: ConversationListVO) -> Lis
         return [x.to_dict() for x in obj_list]
 
 
+async def get_conversation(user_id, conversation_id) -> Conversation:
+    with GLOBALS.get_postgres_wrapper().session_scope() as session:
+        conversation = session.query(Conversation).filter(Conversation.user_id == user_id,
+                                                          Conversation.conversation_id == conversation_id).one_or_none()
+        if conversation:
+            session.expunge(conversation)
+
+    return conversation
+
+
 async def update_conversation(user_id: int, conversation: ModifyConversationVO):
     with GLOBALS.get_postgres_wrapper().session_scope() as session:
         conversation_id = conversation.conversation_id

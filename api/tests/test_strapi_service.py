@@ -10,6 +10,7 @@ import pprint
 import unittest
 
 from services.product_service import get_product_details
+from services.question_service import get_question_details
 
 
 class TestTemplate(unittest.IsolatedAsyncioTestCase):
@@ -26,6 +27,12 @@ class TestTemplate(unittest.IsolatedAsyncioTestCase):
         self.assertIsInstance(result, dict)
         document_id = result.get("documentId")
         self.assertEqual(document_id, product_id)
+        pprint.pprint(result)
+
+    async def test_get_question_details(self):
+        question_id = "yclryfbuayh7tdc4git7927i"
+        locale = "en"
+        result = await get_question_details(question_id, locale)
         pprint.pprint(result)
 
 

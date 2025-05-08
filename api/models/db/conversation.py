@@ -24,4 +24,4 @@ class Conversation(Base, BaseModel):
     user_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
     name = mapped_column(String(32), nullable=False)  # 对话名称
     step = mapped_column(Integer, default=0)
-    answers = mapped_column(JSON)
+    answers: Mapped[dict] = mapped_column(JSON)

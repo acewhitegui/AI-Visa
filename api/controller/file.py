@@ -8,7 +8,7 @@
 """
 from typing import List, Optional, Annotated
 
-from fastapi import APIRouter, HTTPException, UploadFile, Depends
+from fastapi import APIRouter, HTTPException, UploadFile, Depends, Query
 from pydantic import BaseModel
 
 from common import utils
@@ -16,6 +16,7 @@ from common.const import CONST
 from common.logger import log
 from dao.aliyun import oss_service
 from models import User
+from models.view.material import MaterialVO
 from services import material_service, file_service
 from services.auth_service import get_current_user
 
@@ -29,14 +30,14 @@ class FileUploadForm(BaseModel):
 
 
 @router.get("/materials")
-async def get_file_view(product_id: Optional[str] = None, conversation_id: Optional[str] = None):
+async def get_file_view(params: Annotated[MaterialVO, Query()],
+                        current_user: Annotated[User, Depends(get_current_user)]):
     """
         获取需要的参数
-    :param product_id:
-    :param conversation_id:
     :return:
     """
-    materials = await material_service.get_material_list(product_id, conversation_id)
+    user_id = current_user.id
+    materials = await material_service.get_material_list(user_id, params)
     data = {
         CONST.MATERIALS: materials,
     }

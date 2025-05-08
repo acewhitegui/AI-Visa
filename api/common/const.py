@@ -120,10 +120,14 @@ class _Const(object):
     # strapi
     FIELDS = "fields"
     DOCUMENT_ID = "documentId"
+    POPULATE = "populate"
     # material
     LIMITS = "limits"
     MATERIAL = "material"
     MATERIALS = "materials"
+    # question
+    CHOICES = "choices"
+    CHOICE_ID = "choice_id"
 
 
 CONST = _Const()

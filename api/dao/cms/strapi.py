@@ -8,6 +8,7 @@
 """
 
 import aiohttp
+from fastapi import HTTPException
 
 from common.const import CONST
 from common.logger import log
@@ -28,9 +29,11 @@ async def get_resource_list(resource_path: str, locale: str, filters: dict = Non
     log.info(f"Try to get resource list from server: {url}, params: {params}")
     async with aiohttp.ClientSession() as session:
         async with session.get(url, params=params, headers=headers) as response:
-            if response.status != 200:
+            status_code = response.status
+            if status_code != 200:
                 error_text = await response.text()
-                raise Exception(f"Failed to fetch resources: {response.status} - {error_text}")
+                raise HTTPException(status_code=status_code,
+                                    detail=f"Failed to fetch resources: {resource_path} | {status_code} - {error_text}")
 
             data = await response.json()
             log.info(f"SUCCESS to get resource list from server: {url}, params: {params}")
