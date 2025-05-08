@@ -23,6 +23,9 @@ import {useCallback, useState} from "react";
 import {Link} from "@/i18n/routing";
 import {Conversation, Product} from "@/app/library/objects/types";
 import {createNewConversation} from "@/app/library/services/conversation_service";
+import {signOut, useSession} from "next-auth/react";
+import {redirect} from "next/navigation";
+import {toast} from "sonner";
 
 
 export function AppSidebar({defaultProductName, productList, conversationList}: {
@@ -32,6 +35,7 @@ export function AppSidebar({defaultProductName, productList, conversationList}: 
 }) {
   const {setConversationId, productId, setProductId} = useSidebar()
   const [productName, setProductName] = useState(defaultProductName)
+  const {data: session} = useSession();
   // Menu items.
   const items = [
     {
@@ -47,7 +51,18 @@ export function AppSidebar({defaultProductName, productList, conversationList}: 
   }
 
   const createConversation = useCallback(async (name: string) => {
-    await createNewConversation(productId, name)
+    const userToken = session?.user?.access_token
+    if (!userToken) {
+      toast.warning("Please login first")
+      redirect("/auth/login")
+    }
+
+    const newConversation = await createNewConversation(userToken, productId, name)
+    if (!newConversation) {
+      toast.error("Conversation created failed, please try again")
+      return
+    }
+    conversationList.push(newConversation)
   }, []);
 
   return (
@@ -65,7 +80,7 @@ export function AppSidebar({defaultProductName, productList, conversationList}: 
               <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
                 {
                   productList.map(product => {
-                    const productId = product.id;
+                    const productId = product.documentId;
                     const productName = product.title;
                     return (
                       <DropdownMenuItem id={productId} onSelect={() => changeProduct(productId, productName)}>
@@ -107,7 +122,7 @@ export function AppSidebar({defaultProductName, productList, conversationList}: 
               </SidebarMenuItem>
               {
                 conversationList.map(conversation => {
-                  const conversationId = conversation.id
+                  const conversationId = conversation.conversation_id
                   const conversationName = conversation.title
                   return (
                     <SidebarMenuItem id={conversationId}>
@@ -146,28 +161,40 @@ export function AppSidebar({defaultProductName, productList, conversationList}: 
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  <User2/> Username
-                  <ChevronUp className="ml-auto"/>
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                side="top"
-                className="w-[--radix-popper-anchor-width]"
-              >
-                <DropdownMenuItem>
-                  <span>Account</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>Billing</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>Sign out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {
+              session?.user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <SidebarMenuButton>
+                      <User2/> {session.user.username}
+                      <ChevronUp className="ml-auto"/>
+                    </SidebarMenuButton>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    side="top"
+                    className="w-[--radix-popper-anchor-width]"
+                  >
+                    <DropdownMenuItem>
+                      <span>Account</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <span>Billing</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Link href="#" onClick={async () => await signOut({redirectTo: "/auth/login", redirect: true})}>Sign
+                        out</Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link
+                  href="/auth/login"
+                  className="font-bold py-2 px-4 rounded mr-4"
+                >
+                  Login
+                </Link>
+              )
+            }
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
