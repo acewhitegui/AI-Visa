@@ -5,6 +5,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export function getTimestamp() {
+  return Math.round(Date.now() / 1000)
+}
+
 export function formatDate(dateString: string, locale?: string) {
   if (!locale) {
     locale = 'en-US';

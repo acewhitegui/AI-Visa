@@ -82,6 +82,12 @@ export type Conversation = {
   step: number;
 }
 
+
+export type Answer = {
+  question_id: string;
+  choice_id: number
+}
+
 export type CaseStudy = {
   id: number;
   locale: string;

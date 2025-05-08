@@ -5,9 +5,10 @@ import {useSearchParams} from 'next/navigation';
 import {ExclamationCircleIcon,} from '@heroicons/react/24/outline';
 import {ArrowRightIcon} from '@heroicons/react/20/solid';
 import {authenticate} from "@/app/library/services/auth_service";
-import {useSession} from "next-auth/react";
+import {signOut, useSession} from "next-auth/react";
 import {Button} from "@/app/components/ui/shadcn/button";
 import {toast} from "sonner";
+import {getTimestamp} from "@/app/library/common/utils";
 
 export function LoginForm() {
   const searchParams = useSearchParams();
@@ -25,8 +26,13 @@ export function LoginForm() {
         // update session before checking
         await update()
         // 例如检查localStorage中的token或者通过API请求验证会话状态
-        const isLoggedIn = session?.user
-        if (isLoggedIn) {
+        const expiredAt = session?.user?.expired_at
+        if (expiredAt) {
+          if (expiredAt < getTimestamp()) {
+            toast.warning("Your session has expired");
+            await signOut()
+            return
+          }
           toast.success("You are logged in");
           // 如果已登录，重定向到callbackUrl或首页
           router.push(callbackUrl);

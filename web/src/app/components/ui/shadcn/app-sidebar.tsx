@@ -22,10 +22,27 @@ import {
 import React, {useCallback, useEffect, useState} from "react";
 import {Link} from "@/i18n/routing";
 import {Conversation, Product} from "@/app/library/objects/types";
-import {createNewConversation, getConversationList} from "@/app/library/services/conversation_service";
+import {
+  createNewConversation,
+  deleteConversation,
+  getConversationList,
+  updateConversation
+} from "@/app/library/services/conversation_service";
 import {signOut, useSession} from "next-auth/react";
 import {redirect} from "next/navigation";
 import {toast} from "sonner";
+import {Button} from "@/app/components/ui/shadcn/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from "@/app/components/ui/shadcn/alert-dialog";
 
 
 export function AppSidebar({defaultProductName, productList}: {
@@ -35,6 +52,8 @@ export function AppSidebar({defaultProductName, productList}: {
   const {setConversationId, productId, setProductId} = useSidebar()
   const [productName, setProductName] = useState(defaultProductName)
   const [conversationList, setConversationList] = useState([] as Conversation[])
+  const [editingConversation, setEditingConversation] = useState<string | null>(null)
+  const [newName, setNewName] = useState("")
   const {data: session} = useSession();
   // Menu items.
   const items = [
@@ -45,14 +64,15 @@ export function AppSidebar({defaultProductName, productList}: {
     },
   ]
 
+  const handleConversationList = async () => {
+    const userToken = session?.user?.access_token;
+    if (userToken) {
+      const conversations = await getConversationList(userToken, productId)
+      setConversationList(conversations)
+    }
+  };
+
   useEffect(() => {
-    const handleConversationList = async () => {
-      const userToken = session?.user?.access_token;
-      if (userToken) {
-        const conversations = await getConversationList(userToken, productId)
-        setConversationList(conversations)
-      }
-    };
     handleConversationList();
   }, []);
 
@@ -74,8 +94,56 @@ export function AppSidebar({defaultProductName, productList}: {
       toast.error("Conversation created failed, please try again")
       return
     }
-    conversationList.push(newConversation)
+    await handleConversationList()
   }, []);
+
+  const handleEditConversation = (conversationId: string, currentName: string) => {
+    setEditingConversation(conversationId)
+    setNewName(currentName)
+  }
+
+  const handleUpdateConversation = async (conversationId: string) => {
+    const userToken = session?.user?.access_token
+    if (!userToken) {
+      toast.warning("Please login first")
+      return
+    }
+
+    try {
+      const result = await updateConversation(userToken, productId, conversationId, newName)
+      if (!result) {
+        toast.error("Conversation updated failed, please try again")
+        return
+      }
+      await handleConversationList()
+      toast.success("Conversation name updated")
+    } catch (error) {
+      toast.error("Failed to update conversation name")
+    } finally {
+      setEditingConversation(null)
+      setNewName("")
+    }
+  }
+
+  const handleDeleteConversation = async (conversationId: string) => {
+    const userToken = session?.user?.access_token
+    if (!userToken) {
+      toast.warning("Please login first")
+      return
+    }
+    try {
+      const result = await deleteConversation(userToken, conversationId)
+      if (!result) {
+        toast.error("Conversation deleted failed, please try again")
+        return
+      }
+      toast.success("Conversation deleted successfully")
+    } catch (error) {
+      toast.error("Failed to deleted conversation")
+    } finally {
+      await handleConversationList()
+    }
+  }
 
   return (
     <Sidebar>
@@ -95,8 +163,8 @@ export function AppSidebar({defaultProductName, productList}: {
                     const productId = product.documentId;
                     const productName = product.title;
                     return (
-                      <DropdownMenuItem id={productId} onSelect={() => changeProduct(productId, productName)}>
-                        <span id={productId}>{productName}</span>
+                      <DropdownMenuItem key={productId} onSelect={() => changeProduct(productId, productName)}>
+                        <span>{productName}</span>
                       </DropdownMenuItem>
                     )
                   })
@@ -108,6 +176,24 @@ export function AppSidebar({defaultProductName, productList}: {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <Link href={item.url}>
+                      <item.icon/>
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Actions</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
@@ -137,40 +223,67 @@ export function AppSidebar({defaultProductName, productList}: {
                   const conversationId = conversation.conversation_id
                   const conversationName = conversation.name
                   return (
-                    <SidebarMenuItem id={conversationId}>
-                      <SidebarMenuButton asChild onClick={async () => {
-                        setConversationId(conversationId)
-                      }}>
-                        <Link id={conversationId} href={`/steps/${productId}/${conversationId}`}>
-                          <span id={conversationId}>{conversationName}</span>
-                          <EditIcon className="ml-2 h-4 w-4" onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            // Add your edit functionality here
-                          }}/>
-                        </Link>
-                      </SidebarMenuButton>
+                    <SidebarMenuItem key={conversationId}>
+                      {editingConversation === conversationId ? (
+                        <div className="flex flex-col items-center justify-between w-full p-2">
+                          <input
+                            type="text"
+                            value={newName}
+                            onChange={(e) => setNewName(e.target.value)}
+                            className="mr-2 mb-2 p-1 w-auto"
+                            autoFocus
+                          />
+                          <div className="grid grid-cols-3 gap-2">
+                            <Button
+                              onClick={() => handleUpdateConversation(conversationId)}
+                            >
+                              Save
+                            </Button>
+                            <Button
+                              variant="secondary"
+                              onClick={() => setEditingConversation(null)}
+                            >
+                              Cancel
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="destructive">Delete</Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete your
+                                    conversation and remove your data from our servers.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDeleteConversation(conversationId)}>Continue</AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </div>
+                      ) : (
+                        <SidebarMenuButton asChild onClick={async () => {
+                          setConversationId(conversationId)
+                        }}>
+                          <Link href={`/steps/${productId}/${conversationId}`}>
+                            <span>{conversationName}</span>
+                            <EditIcon className="ml-2 h-4 w-4" onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleEditConversation(conversationId, conversationName);
+                            }}/>
+                          </Link>
+                        </SidebarMenuButton>
+                      )}
                     </SidebarMenuItem>
                   )
                 })
               }
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url}>
-                      <item.icon/>
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

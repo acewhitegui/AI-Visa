@@ -1,6 +1,6 @@
 "use server"
 
-import {Conversation} from "@/app/library/objects/types"
+import {Answer, Conversation} from "@/app/library/objects/types"
 import {getApiBaseUrl} from "@/app/library/common/api-helpers";
 import {logger} from "@/app/library/common/logger";
 import {redirect} from "next/navigation";
@@ -60,4 +60,74 @@ export async function createNewConversation(userToken: string, productId: string
 
   const data = await response.json();
   return data.data;
+}
+
+export async function updateConversation(userToken: string, productId: string, conversationId: string, name: string, answers?: Record<string, Answer>): Promise<Conversation | null> {
+  const apiBaseUrl = getApiBaseUrl();
+  const url = `${apiBaseUrl}/conversation`;
+
+  if (!answers) {
+    answers = {}
+  }
+
+  const putData = JSON.stringify({
+    product_id: productId,
+    conversation_id: conversationId,
+    name: name,
+    answers: answers
+  });
+
+  logger.info(`Try to update conversation to url: ${url}, with data: ${putData}`)
+  const response = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'bearer ' + userToken
+    },
+    body: putData
+  });
+
+
+  if (!response.ok) {
+    const statusCode = response.status;
+    console.error("ERROR to update conversation, get status code: ", statusCode, "resp info: ", await response.text() || 'update failed');
+    if (401 == response.status) {
+      redirect("/auth/login")
+    }
+    return null;
+  }
+
+  const data = await response.json();
+  return data.data;
+}
+
+export async function deleteConversation(userToken: string, conversationId: string): Promise<boolean> {
+  const apiBaseUrl = getApiBaseUrl();
+  const url = `${apiBaseUrl}/conversation`;
+
+  const deleteData = JSON.stringify({
+    conversation_id: conversationId,
+  });
+
+  logger.info(`Try to delete conversation to url: ${url}, with data: ${deleteData}`)
+  const response = await fetch(url, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'bearer ' + userToken
+    },
+    body: deleteData
+  });
+
+
+  if (!response.ok) {
+    const statusCode = response.status;
+    console.error("ERROR to update conversation, get status code: ", statusCode, "resp info: ", await response.text() || 'update failed');
+    if (401 == response.status) {
+      redirect("/auth/login")
+    }
+    return false;
+  }
+
+  return true;
 }
