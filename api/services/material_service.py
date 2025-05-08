@@ -10,6 +10,7 @@
 from fastapi import HTTPException
 
 from common.const import CONST
+from dao.cms import strapi
 from models.view.material import MaterialVO
 from services import product_service, conversation_service, question_service
 
@@ -45,3 +46,13 @@ async def get_material_list(user_id: int, params: MaterialVO):
                 default_materials.extend(choice.get(CONST.MATERIALS))
 
     return default_materials
+
+
+async def get_material(document_id, locale):
+    populate = {
+        CONST.MATERIALS: {
+            CONST.FIELDS: [CONST.STANDARD]
+        }
+    }
+    result = await strapi.get_resource_list(f"materials/{document_id}", locale, populate=populate)
+    return result

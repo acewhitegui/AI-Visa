@@ -18,5 +18,7 @@ class Message(Base, BaseModel):
     """
     __tablename__ = 'message'
     message_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    product_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    conversation_id: Mapped[str] = mapped_column(String(36), nullable=False)
     answer: Mapped[str] = mapped_column(JSON(), nullable=False)
     metafield: Mapped[str] = mapped_column(JSON(), nullable=False, default="")

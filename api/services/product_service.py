@@ -10,7 +10,7 @@ from common.const import CONST
 from dao.cms import strapi
 
 
-async def get_product_details(product_id: str, locale: str):
+async def get_product_details(product_id: str, locale: str) -> dict:
     populate = {
         CONST.MATERIALS: {
             CONST.FIELDS: [CONST.TITLE, CONST.TYPE, CONST.LIMITS]

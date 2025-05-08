@@ -20,6 +20,7 @@ class UploadFile(Base, BaseModel):
     __tablename__ = 'upload_file'
     file_id = mapped_column(String(36), primary_key=True, default=utils.generate_uuid)
     conversation_id = mapped_column(String(36), nullable=False)
+    material_id = mapped_column(String(36), nullable=False)
     name = mapped_column(String(120), nullable=False)  # 文件名
     type = mapped_column(String(32), nullable=False, default="other")  # 文件类型
     file_path = mapped_column(String(1024), nullable=False)

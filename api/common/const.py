@@ -125,11 +125,15 @@ class _Const(object):
     LIMITS = "limits"
     MATERIAL = "material"
     MATERIALS = "materials"
+    PASSPORT = "passport"
+    STANDARD = "standard"
     # question
     CHOICES = "choices"
     CHOICE_ID = "choice_id"
     # file
     FILES = "files"
+    # product
+    EXTRA_CHECK_TIPS = "extra_check_tips"
 
 
 CONST = _Const()
