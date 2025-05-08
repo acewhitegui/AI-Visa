@@ -72,6 +72,6 @@ async def upload_files(
         bucket_key = f"users/{user_id}/{file_name}"
         oss_service.upload_file(bucket, bucket_key, data=content)
         # Store file info in database
-        await file_service.store_file(int(product_id), conversation_id, file_name, file_type, bucket_key)
+        await file_service.store_file(conversation_id, file_name, file_type, bucket_key)
 
     return utils.resp_success()
