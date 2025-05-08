@@ -22,10 +22,15 @@ import {
 import React, {useCallback, useEffect, useState} from "react";
 import {Link} from "@/i18n/routing";
 import {Conversation, Product} from "@/app/library/objects/types";
-import {createNewConversation, getConversationList} from "@/app/library/services/conversation_service";
+import {
+  createNewConversation,
+  getConversationList,
+  updateConversation
+} from "@/app/library/services/conversation_service";
 import {signOut, useSession} from "next-auth/react";
 import {redirect} from "next/navigation";
 import {toast} from "sonner";
+import {Button} from "@/app/components/ui/shadcn/button";
 
 
 export function AppSidebar({defaultProductName, productList}: {
@@ -35,6 +40,8 @@ export function AppSidebar({defaultProductName, productList}: {
   const {setConversationId, productId, setProductId} = useSidebar()
   const [productName, setProductName] = useState(defaultProductName)
   const [conversationList, setConversationList] = useState([] as Conversation[])
+  const [editingConversation, setEditingConversation] = useState<string | null>(null)
+  const [newName, setNewName] = useState("")
   const {data: session} = useSession();
   // Menu items.
   const items = [
@@ -77,6 +84,34 @@ export function AppSidebar({defaultProductName, productList}: {
     }
     await handleConversationList()
   }, []);
+
+  const handleEditConversation = (conversationId: string, currentName: string) => {
+    setEditingConversation(conversationId)
+    setNewName(currentName)
+  }
+
+  const handleUpdateConversation = async (conversationId: string) => {
+    const userToken = session?.user?.access_token
+    if (!userToken) {
+      toast.warning("Please login first")
+      return
+    }
+
+    try {
+      const result = await updateConversation(userToken, productId, conversationId, newName)
+      if (!result) {
+        toast.error("Conversation updated failed, please try again")
+        return
+      }
+      await handleConversationList()
+      toast.success("Conversation name updated")
+    } catch (error) {
+      toast.error("Failed to update conversation name")
+    } finally {
+      setEditingConversation(null)
+      setNewName("")
+    }
+  }
 
   return (
     <Sidebar>
@@ -157,18 +192,41 @@ export function AppSidebar({defaultProductName, productList}: {
                   const conversationName = conversation.name
                   return (
                     <SidebarMenuItem key={conversationId}>
-                      <SidebarMenuButton asChild onClick={async () => {
-                        setConversationId(conversationId)
-                      }}>
-                        <Link href={`/steps/${productId}/${conversationId}`}>
-                          <span>{conversationName}</span>
-                          <EditIcon className="ml-2 h-4 w-4" onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            // Add your edit functionality here
-                          }}/>
-                        </Link>
-                      </SidebarMenuButton>
+                      {editingConversation === conversationId ? (
+                        <div className="flex items-center justify-between w-auto p-2">
+                          <input
+                            type="text"
+                            value={newName}
+                            onChange={(e) => setNewName(e.target.value)}
+                            className="flex-1 mr-2 p-1 text-black"
+                            autoFocus
+                          />
+                          <Button
+                            onClick={() => handleUpdateConversation(conversationId)}
+                          >
+                            Save
+                          </Button>
+                          <Button
+                            variant="secondary"
+                            onClick={() => setEditingConversation(null)}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      ) : (
+                        <SidebarMenuButton asChild onClick={async () => {
+                          setConversationId(conversationId)
+                        }}>
+                          <Link href={`/steps/${productId}/${conversationId}`}>
+                            <span>{conversationName}</span>
+                            <EditIcon className="ml-2 h-4 w-4" onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleEditConversation(conversationId, conversationName);
+                            }}/>
+                          </Link>
+                        </SidebarMenuButton>
+                      )}
                     </SidebarMenuItem>
                   )
                 })
