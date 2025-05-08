@@ -40,6 +40,8 @@ class _Const(object):
     FAILURE = "failure"
     TYPE = "type"
 
+    AUTHORIZATION = "Authorization"
+
     HOST = os.getenv("HOST", "localhost")
     PORT = int(os.getenv("PORT", 8000))
     WEB_SERVER_URL = os.getenv("WEB_SERVER_URL", "http://localhost:8001")
@@ -61,6 +63,9 @@ class _Const(object):
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
     OPENAI_MODEL_NAME = os.getenv("OPENAI_MODEL_NAME", "gpt-4o")
     ASSEMBLY_API_KEY = os.getenv("ASSEMBLY_API_KEY", "")
+
+    STRAPI_BASE_URL = os.getenv("STRAPI_BASE_URL", "https://api.strapi.io")
+    STRAPI_API_TOKEN = os.getenv("STRAPI_API_TOKEN", "")
 
     ALIYUN_ACCESS_KEY_ID = os.getenv("ALIYUN_ACCESS_KEY_ID", "")
     ALIYUN_ACCESS_KEY_SECRET = os.getenv("ALIYUN_ACCESS_KEY_SECRET", "")
@@ -84,7 +89,6 @@ class _Const(object):
     TITLE = "title"
 
     VERIFY_URL = "verify_url"
-    MATERIALS = "materials"
 
     # assembly ai
     LANGUAGE_CODE = "language_code"
@@ -111,5 +115,13 @@ class _Const(object):
     PASSWORD = "password"
     PASSWORD_HASH = "password_hash"
     EXPIRE = "exp"
+
+    # strapi
+    FIELDS = "fields"
+
+    # material
+    LIMITS = "limits"
+    MATERIAL = "material"
+    MATERIALS = "materials"
 
 CONST = _Const()
