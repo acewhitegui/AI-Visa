@@ -45,14 +45,15 @@ export function AppSidebar({defaultProductName, productList}: {
     },
   ]
 
+  const handleConversationList = async () => {
+    const userToken = session?.user?.access_token;
+    if (userToken) {
+      const conversations = await getConversationList(userToken, productId)
+      setConversationList(conversations)
+    }
+  };
+
   useEffect(() => {
-    const handleConversationList = async () => {
-      const userToken = session?.user?.access_token;
-      if (userToken) {
-        const conversations = await getConversationList(userToken, productId)
-        setConversationList(conversations)
-      }
-    };
     handleConversationList();
   }, []);
 
@@ -74,7 +75,7 @@ export function AppSidebar({defaultProductName, productList}: {
       toast.error("Conversation created failed, please try again")
       return
     }
-    conversationList.push(newConversation)
+    await handleConversationList()
   }, []);
 
   return (
