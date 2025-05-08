@@ -114,7 +114,12 @@ export async function authenticate(
   formData: FormData,
 ) {
   try {
-    await signIn('credentials', formData); // find logic to -> auth.js
+    await signIn('credentials', {
+      ...Object.fromEntries(formData),
+      redirect: false
+    }); // find logic to -> auth.js
+    const callbackUrl: string = formData.get('callbackUrl')?.toString() || '/';
+    return redirect(callbackUrl);
   } catch (error) {
     if (error instanceof AuthError) {
       console.error("Auth error: ", error);

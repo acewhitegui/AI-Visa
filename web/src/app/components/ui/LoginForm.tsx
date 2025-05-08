@@ -15,13 +15,14 @@ export function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-  const {data: session} = useSession();
+  const {data: session, update} = useSession();
 
   useEffect(() => {
     // 检查用户是否已经登录
     const checkLoginStatus = async () => {
       try {
-        // 这里需要根据你的认证机制来判断用户是否已登录
+        // update session before checking
+        await update()
         // 例如检查localStorage中的token或者通过API请求验证会话状态
         const isLoggedIn = session?.user
         if (isLoggedIn) {
@@ -34,7 +35,7 @@ export function LoginForm() {
     };
 
     checkLoginStatus();
-  }, [router, callbackUrl, session?.user]);
+  }, []);
 
   const navigateToRegister = () => {
     router.push("/register");
