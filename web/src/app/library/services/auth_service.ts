@@ -36,8 +36,8 @@ export async function signup(state: FormState, formData: FormData) {
 }
 
 async function registerUser(username: string, email: string, password: string) {
-  const ANY_CONVERTERS_API_BASE = getApiBaseUrl();
-  const url = `${ANY_CONVERTERS_API_BASE}/register`;
+  const apiBaseUrl = getApiBaseUrl();
+  const url = `${apiBaseUrl}/register`;
 
   try {
     const response = await fetch(url, {
@@ -70,8 +70,8 @@ async function registerUser(username: string, email: string, password: string) {
 }
 
 export async function verifyToken(token: string) {
-  const ANY_CONVERTERS_API_BASE = getApiBaseUrl();
-  const url = `${ANY_CONVERTERS_API_BASE}/verify-email?token=${token}`;
+  const apiBaseUrl = getApiBaseUrl();
+  const url = `${apiBaseUrl}/verify-email?token=${token}`;
 
   const response = await fetch(url, {
     method: 'GET'
