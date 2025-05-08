@@ -5,13 +5,13 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-COPY src/requirements.txt .
+COPY requirements.txt .
 
 RUN pip install pip -U
 RUN pip config set global.index-url https://mirrors.cloud.tencent.com/pypi/simple
 RUN pip install -r requirements.txt
 
-COPY src .
+COPY . .
 
 EXPOSE 8001
 

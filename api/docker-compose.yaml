@@ -19,7 +19,7 @@ services:
       PORT: 8001
       DEBUG: 1
       WEB_SERVER_URL: http://192.168.50.24:3000
-      POSTGRES_URL: postgresql+psycopg2://postgres:PG202410122130@192.168.50.24/any-converters
+      POSTGRES_URL: postgresql+psycopg2://postgres:PG202410122130@192.168.50.24/ai-visa
       POSTGRES_ECHO: 1
       LOG_LEVEL: debug
       TEMP_FILE_PATH: ./data/tmp
@@ -29,7 +29,7 @@ services:
       ALIYUN_ACCESS_KEY_ID: LTAI5tLEZ2rQhV4mMD69XnVj
       ALIYUN_ACCESS_KEY_SECRET: xxxx
       ALIYUN_BUCKET_ENDPOINT: https://oss-ap-southeast-1.aliyuncs.com
-      ALIYUN_BUCKET_NAME: any-converters
+      ALIYUN_BUCKET_NAME: ai-visa
       ALIYUN_BUCKET_REGION: ap-southeast-1
       OSS_DEFAULT_EXPIRES: 300
       PROXY_API_BASE_URL:
