@@ -1,4 +1,4 @@
-FROM python:3.12-slim AS BASE
+FROM python:3.12-slim AS base
 
 # Install curl and clean up in a single layer
 RUN apt-get update && \
@@ -15,7 +15,7 @@ RUN pip config set global.index-url https://mirrors.cloud.tencent.com/pypi/simpl
     pip install --upgrade pip && \
     pip install -r requirements.txt
 
-FROM BASE AS BUILD
+FROM base AS build
 
 # Copy the rest of the application code
 COPY . .
