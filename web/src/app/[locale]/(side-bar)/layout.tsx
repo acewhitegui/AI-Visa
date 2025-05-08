@@ -39,7 +39,7 @@ export default async function RootLayout({
     <SidebarProvider defaultOpen={defaultOpen} defaultProductId={defaultProductId}>
       <AppSidebar defaultProductName={defaultProductName} productList={products}/>
       <SidebarTrigger/>
-      <div>
+      <div className="w-full">
         {children}
       </div>
     </SidebarProvider>

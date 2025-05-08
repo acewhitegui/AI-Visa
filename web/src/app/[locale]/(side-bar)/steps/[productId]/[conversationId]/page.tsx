@@ -11,7 +11,7 @@ export default async function StepsPage({params}: {
   const {locale, productId, conversationId} = await params;
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto my-12">
       <Steps locale={locale} productId={productId} conversationId={conversationId}/>
     </div>
   )
