@@ -32,6 +32,7 @@ class _Const(object):
     PARSER_LXML = 'lxml'
     FILE_HTML = 'html'
 
+    ID = "id"
     DATA = "data"
     RESULT = "result"
     MESSAGE = "message"
@@ -118,10 +119,11 @@ class _Const(object):
 
     # strapi
     FIELDS = "fields"
-
+    DOCUMENT_ID = "documentId"
     # material
     LIMITS = "limits"
     MATERIAL = "material"
     MATERIALS = "materials"
+
 
 CONST = _Const()
