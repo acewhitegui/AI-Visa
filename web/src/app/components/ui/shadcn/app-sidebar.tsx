@@ -23,7 +23,7 @@ import {useCallback, useState} from "react";
 import {Link} from "@/i18n/routing";
 import {Conversation, Product} from "@/app/library/objects/types";
 import {createNewConversation} from "@/app/library/services/conversation_service";
-import {useSession} from "next-auth/react";
+import {signOut, useSession} from "next-auth/react";
 
 
 export function AppSidebar({defaultProductName, productList, conversationList}: {
@@ -149,11 +149,11 @@ export function AppSidebar({defaultProductName, productList, conversationList}: 
         <SidebarMenu>
           <SidebarMenuItem>
             {
-              session?.user?.name ? (
+              session?.user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <SidebarMenuButton>
-                      <User2/> {session.user.name}
+                      <User2/> {session.user.username}
                       <ChevronUp className="ml-auto"/>
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
@@ -168,7 +168,8 @@ export function AppSidebar({defaultProductName, productList, conversationList}: 
                       <span>Billing</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                      <span>Sign out</span>
+                      <Link href="#" onClick={async () => await signOut({redirectTo: "/auth/login", redirect: true})}>Sign
+                        out</Link>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

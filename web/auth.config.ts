@@ -8,8 +8,8 @@ export const authConfig = {
   secret: process.env.AUTH_SECRET,
   trustHost: true,
   pages: {
-    signIn: '/login',
-    newUser: '/register',
+    signIn: '/auth/login',
+    newUser: '/auth/register',
   },
   callbacks: {
     async jwt({token, user}) {

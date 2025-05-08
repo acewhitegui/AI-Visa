@@ -23,7 +23,7 @@ export function LoginForm() {
       try {
         // 这里需要根据你的认证机制来判断用户是否已登录
         // 例如检查localStorage中的token或者通过API请求验证会话状态
-        const isLoggedIn = session?.user?.name
+        const isLoggedIn = session?.user
         if (isLoggedIn) {
           // 如果已登录，重定向到callbackUrl或首页
           router.push(callbackUrl);

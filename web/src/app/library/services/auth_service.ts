@@ -130,11 +130,11 @@ export async function authenticate(
 }
 
 function getApiBaseUrl(): string {
-  const ANY_CONVERTERS_API_BASE = process.env.ANY_CONVERTERS_API_BASE;
+  const AI_VISA_API_BASE_URL = process.env.AI_VISA_API_BASE_URL;
 
-  if (!ANY_CONVERTERS_API_BASE) {
-    throw new Error('API base URL is not configured. Set ANY_CONVERTERS_API_BASE environment variable.');
+  if (!AI_VISA_API_BASE_URL) {
+    throw new Error('API base URL is not configured. Set AI_VISA_API_BASE_URL environment variable.');
   }
 
-  return ANY_CONVERTERS_API_BASE;
+  return AI_VISA_API_BASE_URL;
 }

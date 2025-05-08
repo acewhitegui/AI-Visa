@@ -29,7 +29,7 @@ export const {auth, signIn, signOut, handlers} = NextAuth({
           const {username, password} = parsedCredentials.data;
           user = await login(username, password);
           if (!user) return null;
-
+          console.log("SUCCESS to get logined user info: ", JSON.stringify(user, null, 2));
           return user;
         },
       }),]
