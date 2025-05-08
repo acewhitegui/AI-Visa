@@ -12,7 +12,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/app/components/ui/shadcn/sidebar"
-import {ChevronDown, ChevronUp, Home, Search, User2} from "lucide-react"
+import {ChevronDown, ChevronUp, EditIcon, Home, Search, User2} from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -129,7 +129,7 @@ export function AppSidebar({defaultProductName, productList}: {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>History</SidebarGroupLabel>
+          {conversationList.length > 0 && <SidebarGroupLabel>History</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
               {
@@ -143,6 +143,11 @@ export function AppSidebar({defaultProductName, productList}: {
                       }}>
                         <Link id={conversationId} href={`/steps/${productId}/${conversationId}`}>
                           <span id={conversationId}>{conversationName}</span>
+                          <EditIcon className="ml-2 h-4 w-4" onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            // Add your edit functionality here
+                          }}/>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
