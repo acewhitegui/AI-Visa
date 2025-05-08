@@ -128,6 +128,8 @@ class _Const(object):
     # question
     CHOICES = "choices"
     CHOICE_ID = "choice_id"
+    # file
+    FILES = "files"
 
 
 CONST = _Const()

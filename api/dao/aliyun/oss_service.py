@@ -27,6 +27,10 @@ def upload_file(bucket: Bucket, oss_path, data):
         raise e
 
 
+def generate_file_url(oss_path):
+    return f"https://{CONST.ALIYUN_BUCKET_NAME}.{CONST.ALIYUN_BUCKET_ENDPOINT.replace("https://", "")}/{oss_path}"
+
+
 def presign_file_url(bucket: Bucket, oss_path, expires=CONST.OSS_DEFAULT_EXPIRES):
     try:
         result = bucket.sign_url('GET', oss_path, expires)

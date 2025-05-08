@@ -8,13 +8,27 @@
 """
 from datetime import datetime
 
+from common.const import CONST
 from common.globals import GLOBALS
 from common.logger import log
+from dao.aliyun import oss_service
 from models.db import UploadFile
 
 
 async def get_uploaded_files(conversation_id):
-    return None
+    file_dict = {}
+    with GLOBALS.get_postgres_wrapper().session_scope() as session:
+        obj_list: list[UploadFile] = session.query(UploadFile).filter(
+            UploadFile.conversation_id == conversation_id).all()
+        for obj in obj_list:
+            item = obj.to_dict()
+            file_type = obj.type
+            file_path = obj.file_path
+            file_url = oss_service.generate_file_url(file_path)
+            item[CONST.URL] = file_url
+            file_dict[file_type] = item
+
+    return file_dict
 
 
 async def store_file(conversation_id, file_name, file_type, file_path):

@@ -38,7 +38,8 @@ async def get_file_view(params: Annotated[MaterialVO, Query()],
 
 
 @router.get("/files")
-async def get_uploaded_files_endpoint(conversation_id: Optional[str] = None):
+async def get_uploaded_files_endpoint(conversation_id: Optional[str],
+                                      current_user: Annotated[User, Depends(get_current_user)]):
     """
         查询已经上传好的文件列表
     :param conversation_id:
@@ -54,7 +55,6 @@ async def get_uploaded_files_endpoint(conversation_id: Optional[str] = None):
 @router.post("/files")
 async def upload_files(
         files: list[UploadFile] = Form(...),
-        product_id: str = Form(...),
         conversation_id: str = Form(...),
         file_type: str = Form(...),
         current_user: Annotated[User, Depends(get_current_user)] = None
