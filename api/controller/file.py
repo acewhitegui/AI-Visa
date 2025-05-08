@@ -6,10 +6,9 @@
 @Date  : 2025/5/7
 @Desc :
 """
-from typing import List, Optional, Annotated
+from typing import Optional, Annotated
 
-from fastapi import APIRouter, HTTPException, UploadFile, Depends, Query
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException, UploadFile, Depends, Query, Form
 
 from common import utils
 from common.const import CONST
@@ -21,12 +20,6 @@ from services import material_service, file_service
 from services.auth_service import get_current_user
 
 router = APIRouter()
-
-
-class FileUploadForm(BaseModel):
-    product_id: str
-    conversation_id: str
-    file_type: str
 
 
 @router.get("/materials")
@@ -44,7 +37,7 @@ async def get_file_view(params: Annotated[MaterialVO, Query()],
     return utils.resp_success(data=data)
 
 
-@router.get("/upload-files")
+@router.get("/files")
 async def get_uploaded_files_endpoint(conversation_id: Optional[str] = None):
     """
         查询已经上传好的文件列表
@@ -58,40 +51,27 @@ async def get_uploaded_files_endpoint(conversation_id: Optional[str] = None):
     })
 
 
-@router.post("/upload-files")
-async def upload_file(
-        product_id: str,
-        conversation_id: str,
-        file_type: str,
-        files: List[UploadFile],
-        current_user: Annotated[User, Depends(get_current_user)]
+@router.post("/files")
+async def upload_files(
+        files: list[UploadFile] = Form(...),
+        product_id: str = Form(...),
+        conversation_id: str = Form(...),
+        file_type: str = Form(...),
+        current_user: Annotated[User, Depends(get_current_user)] = None
 ):
-    try:
-        if not files:
-            raise HTTPException(status_code=400, detail="No files uploaded")
+    if not files:
+        raise HTTPException(status_code=400, detail="No files uploaded")
 
-        user_id = current_user.id
-        for uploaded_file in files:
-            file_name = uploaded_file.filename
+    log.info(f"Try to handle files, files size: {len(files)}")
+    user_id = current_user.id
+    for uploaded_file in files:
+        file_name = uploaded_file.filename
+        # Save the file
+        bucket = oss_service.get_bucket()
+        content = await uploaded_file.read()
+        bucket_key = f"users/{user_id}/{file_name}"
+        oss_service.upload_file(bucket, bucket_key, data=content)
+        # Store file info in database
+        await file_service.store_file(int(product_id), conversation_id, file_name, file_type, bucket_key)
 
-            # Save the file
-            bucket = oss_service.get_bucket()
-            content = await uploaded_file.read()
-            bucket_key = f"users/{user_id}/{file_name}"
-            oss_service.upload_file(bucket, bucket_key, data=content)
-
-            # Store file info in database
-            await file_service.store_file(int(product_id), conversation_id, file_name, file_type, bucket_key)
-
-        log.info('File uploaded successfully!')
-        return utils.resp_success()
-    except Exception as e:
-        reason = f'Error uploading file: {str(e)}'
-        log.exception(reason)
-        raise HTTPException(
-            status_code=400,
-            detail={
-                "status": "failure",
-                "reason": reason
-            }
-        )
+    return utils.resp_success()
