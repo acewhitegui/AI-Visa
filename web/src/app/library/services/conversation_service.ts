@@ -3,6 +3,7 @@
 import {Conversation} from "@/app/library/objects/types"
 import {getApiBaseUrl} from "@/app/library/common/api-helpers";
 import {logger} from "@/app/library/common/logger";
+import {redirect} from "next/navigation";
 
 export async function getConversationList(userToken: string, productId: string): Promise<Conversation[]> {
   const apiBaseUrl = getApiBaseUrl();
@@ -51,6 +52,9 @@ export async function createNewConversation(userToken: string, productId: string
   if (!response.ok) {
     const statusCode = response.status;
     console.error("ERROR to create conversation, get status code: ", statusCode, "resp info: ", await response.text() || 'created failed');
+    if (401 == response.status) {
+      redirect("/auth/login")
+    }
     return null;
   }
 
