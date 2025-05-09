@@ -1,7 +1,7 @@
 "use client";
 
 import {Card, CardContent} from "@/app/components/ui/shadcn/card";
-import {Form, FormControl, FormField, FormItem, FormMessage} from "@/app/components/ui/shadcn/form";
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/app/components/ui/shadcn/form";
 import {Input} from "@/app/components/ui/shadcn/input";
 import {Button} from "@/app/components/ui/shadcn/button";
 import {useForm} from "react-hook-form";
@@ -61,18 +61,19 @@ export function Attachments({
       <CardContent>
         <div className="upload-form">
           <Form {...form}>
-            <form>
+            <form className="flex flex-col justify-center">
               {
                 materialList.length > 0 && materialList.map((material: Material) => {
 
                   const limits = material.limits
 
                   return (
-                    <div key={material.documentId} className="upload-section">
+                    <div key={material.documentId} className="upload-section my-8">
                       <FormField
                         name={material.title}
                         render={({field}) => (
                           <FormItem>
+                            <FormLabel>{material.title}</FormLabel>
                             <FormControl>
                               <Input
                                 type="file"
