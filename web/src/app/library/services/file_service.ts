@@ -15,24 +15,15 @@ export async function uploadFile(userToken: string, formData: FormData): Promise
       body: formData
     });
 
-    if (response.ok) {
-      try {
-        const result = await response.json();
-        console.log('Upload successful:', result);
-        return true;
-      } catch (parseError) {
-        console.log('Upload successful, but response was not JSON');
-        return true;
-      }
-    } else {
-      try {
-        const errorData = await response.json();
-        console.error('Upload failed:', errorData);
-      } catch (parseError) {
-        console.error('Upload failed with status:', response.status, response.statusText);
-      }
-      return false;
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('Upload failed: ', errorData);
+      return false
     }
+
+    const result = await response.json();
+    console.log('Upload successful:', result);
+    return true;
   } catch (error) {
     console.error('Network or other error during upload:', error);
     return false;
