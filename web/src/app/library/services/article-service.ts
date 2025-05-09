@@ -2,7 +2,7 @@
 
 
 import {fetchAPI} from "@/app/library/common/fetch-api";
-import {Article, ArticlePageData, SEO, SitemapItem} from "@/app/library/objects/props";
+import {Article, ArticlePageData, SEO, SitemapItem} from "@/app/library/objects/types";
 
 export async function getArticleList(locale: string, category: string, page: number, pageSize: number): Promise<ArticlePageData> {
   const token = process.env.STRAPI_API_TOKEN;

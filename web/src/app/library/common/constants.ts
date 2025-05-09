@@ -20,7 +20,7 @@ export const LOCALE_DISPLAY_MAP = new Map<string, string>([
   ["en", "English"],
   ["es", "Español"],
   ["ja", "日本語"],
-  ["zh-CN", "简体中文"],
+  ["zh", "简体中文"],
   ["zh-Hant", "繁體中文"],
   ["pt-BR", "português"]
 ]);

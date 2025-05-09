@@ -1,6 +1,6 @@
 "use strict"
 import {fetchAPI} from "@/app/library/common/fetch-api";
-import {Language} from "@/app/library/objects/props";
+import {Language} from "@/app/library/objects/types";
 import {routing} from "@/i18n/routing";
 import {LOCALE_DISPLAY_MAP} from "@/app/library/common/constants";
 

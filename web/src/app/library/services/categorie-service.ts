@@ -2,7 +2,7 @@
 
 import {fetchAPI} from "@/app/library/common/fetch-api";
 import {logger} from "@/app/library/common/logger";
-import {Category} from "@/app/library/objects/props";
+import {Category} from "@/app/library/objects/types";
 
 export async function fetchArticleSideMenuData(locale: string, filter: string) {
   try {
