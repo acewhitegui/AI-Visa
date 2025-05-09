@@ -4,6 +4,7 @@ import * as React from "react"
 import {Check, ChevronRight} from "lucide-react"
 import {cn} from "@/app/library/common/utils"
 import {Button} from "@/app/components/ui/shadcn/button"
+import {useRouter} from "next/navigation";
 
 interface StepProps {
   title: string
@@ -48,12 +49,20 @@ interface StepperProps {
 }
 
 export function Stepper({steps, currentStep, onStepChange, children, buttonPosition = 'bottom'}: StepperProps) {
+  const router = useRouter();
+
   const renderNavigationButtons = () => (
     <div className="flex justify-between">
-      <Button variant="outline" onClick={() => onStepChange(currentStep - 1)} disabled={currentStep === 0}>
+      <Button variant="outline" onClick={() => {
+        router.refresh()
+        onStepChange(currentStep - 1);
+      }} disabled={currentStep === 0}>
         Previous
       </Button>
-      <Button onClick={() => onStepChange(currentStep + 1)} disabled={currentStep === steps.length - 1}>
+      <Button onClick={() => {
+        router.refresh()
+        onStepChange(currentStep + 1)
+      }} disabled={currentStep === steps.length - 1}>
         {currentStep === steps.length - 1 ? "Finish" : "Next"}
       </Button>
     </div>
