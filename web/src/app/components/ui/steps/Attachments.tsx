@@ -1,9 +1,9 @@
 "use client";
 
-export function Attachments() {
+export function Attachments({conversationId}: { conversationId: string }) {
   return (
     <>
-      <div> 这是第3步的内容</div>
+      <div> 这是第2步的内容: {conversationId}</div>
     </>
   )
 }

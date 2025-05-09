@@ -78,10 +78,23 @@ export type Product = {
 export type Conversation = {
   conversation_id: string;
   name: string;
-  answers: string
+  answers: any;
   step: number;
 }
 
+export type Question = {
+  documentId: string;
+  title: string;
+  showDefault: boolean;
+  choices: Choice[];
+}
+
+export type Choice = {
+  id: number;
+  title: string;
+  question: Question;
+  action: string;
+}
 
 export type Answer = {
   question_id: string;

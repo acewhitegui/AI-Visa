@@ -6,6 +6,8 @@
 @Date  : 2025/5/7
 @Desc :
 """
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -26,8 +28,8 @@ class ConversationListVO(BaseModel):
 class ModifyConversationVO(BaseModel):
     conversation_id: str
     name: str
-    answers: dict
-
+    answers: Optional[dict] = None
+    step: Optional[int] = None
 
 class DeleteConversationVO(BaseModel):
     conversation_id: str

@@ -1,6 +1,6 @@
 "use server"
 
-import {Answer, Conversation} from "@/app/library/objects/types"
+import {Conversation} from "@/app/library/objects/types"
 import {getApiBaseUrl} from "@/app/library/common/api-helpers";
 import {logger} from "@/app/library/common/logger";
 import {redirect} from "next/navigation";
@@ -28,8 +28,27 @@ export async function getConversationList(userToken: string, productId: string):
   return data.data;
 }
 
-export async function getConversation(userToken: string, conversationId: string): Promise<Conversation> {
-  return null
+export async function getConversation(userToken: string, conversationId: string): Promise<Conversation | null> {
+  const apiBaseUrl = getApiBaseUrl();
+  const url = `${apiBaseUrl}/conversation?conversation_id=${conversationId}`;
+
+  logger.info(`Try to get conversation details from url: ${url}, conversation id: ${conversationId}`)
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: 'bearer ' + userToken
+    },
+  });
+
+
+  if (!response.ok) {
+    const statusCode = response.status;
+    logger.error(`ERROR to get conversation details from url: ${url}, get status code: ${statusCode} resp info: " ${await response.text() || 'get failed'}`);
+    return null;
+  }
+
+  const data = await response.json();
+  return data.data;
 }
 
 export async function createNewConversation(userToken: string, productId: string, name: string): Promise<Conversation | null> {
@@ -66,7 +85,41 @@ export async function createNewConversation(userToken: string, productId: string
   return data.data;
 }
 
-export async function updateConversation(userToken: string, productId: string, conversationId: string, name: string, answers?: Record<string, Answer>): Promise<Conversation | null> {
+export async function updateConversationName(userToken: string, productId: string, conversationId: string, name: string): Promise<Conversation | null> {
+  const apiBaseUrl = getApiBaseUrl();
+  const url = `${apiBaseUrl}/conversation`;
+
+  const putData = JSON.stringify({
+    product_id: productId,
+    conversation_id: conversationId,
+    name: name,
+  });
+
+  logger.info(`Try to update conversation to url: ${url}, with data: ${putData}`)
+  const response = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'bearer ' + userToken
+    },
+    body: putData
+  });
+
+
+  if (!response.ok) {
+    const statusCode = response.status;
+    console.error("ERROR to update conversation, get status code: ", statusCode, "resp info: ", await response.text() || 'update failed');
+    if (401 == response.status) {
+      redirect("/auth/login")
+    }
+    return null;
+  }
+
+  const data = await response.json();
+  return data.data;
+}
+
+export async function updateConversation(userToken: string, productId: string, conversationId: string, name: string, nextStep: number, answers: any): Promise<Conversation | null> {
   const apiBaseUrl = getApiBaseUrl();
   const url = `${apiBaseUrl}/conversation`;
 
@@ -78,6 +131,7 @@ export async function updateConversation(userToken: string, productId: string, c
     product_id: productId,
     conversation_id: conversationId,
     name: name,
+    step: nextStep,
     answers: answers
   });
 

@@ -3,11 +3,12 @@ import {Stepper} from "@/app/components/ui/shadcn/stepper";
 import React, {useEffect, useState} from "react";
 import {useSession} from "next-auth/react";
 import {redirect} from "next/navigation";
-import {Conversation} from "@/app/library/objects/types";
 import {getConversation} from "@/app/library/services/conversation_service";
 import {Questions} from "@/app/components/ui/steps/Questions";
 import {Attachments} from "@/app/components/ui/steps/Attachments";
 import {Messages} from "@/app/components/ui/steps/Messages";
+import {toast} from "sonner";
+import {Conversation} from "@/app/library/objects/types";
 
 export function Steps({locale, productId, conversationId}: {
   locale: string;
@@ -15,28 +16,45 @@ export function Steps({locale, productId, conversationId}: {
   conversationId: string
 }) {
   const [currentStep, setCurrentStep] = useState(0)
-
-  const stepList = [
-    {title: "Step 1", description: "Answer some questions", component: <Questions/>},
-    {title: "Step 2", description: "Upload documents", component: <Attachments/>},
-    {title: "Step 3", description: "Confirm check results with AI", component: <Messages/>},
-  ]
+  const [conversation, setConversation] = useState<Conversation>();
   // session
   const {data: session} = useSession();
   const userToken = session?.user?.access_token
   if (!userToken) {
     redirect("/auth/login")
   }
+
+  const stepList = [
+    {
+      title: "Step 1",
+      description: "Answer some questions",
+      component: <Questions userToken={userToken} productId={productId} conversationId={conversationId}
+                            conversation={conversation}
+                            locale={locale} onStepChange={setCurrentStep}/>
+    },
+    {title: "Step 2", description: "Upload documents", component: <Attachments conversationId={conversationId}/>},
+    {
+      title: "Step 3",
+      description: "Confirm check results with AI",
+      component: <Messages conversationId={conversationId}/>
+    },
+  ]
   // 获取当前会话的详情
   useEffect(() => {
     const fetchConversation = async () => {
-      const conversation: Conversation = await getConversation(userToken, conversationId);
-      const step = conversation.step
+      const conversationObj = await getConversation(userToken, conversationId);
+      if (!conversationObj) {
+        toast.error("No conversation found, please try again")
+        return
+      }
+
+      const step = conversationObj.step
       setCurrentStep(step)
+      setConversation(conversationObj)
     };
 
     fetchConversation();
-  }, [conversationId, userToken]);
+  }, [conversationId, userToken, currentStep]);
 
   return (
     <Stepper steps={stepList} currentStep={currentStep} onStepChange={setCurrentStep}>

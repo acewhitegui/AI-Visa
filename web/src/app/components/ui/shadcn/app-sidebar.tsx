@@ -26,7 +26,7 @@ import {
   createNewConversation,
   deleteConversation,
   getConversationList,
-  updateConversation
+  updateConversationName
 } from "@/app/library/services/conversation_service";
 import {signOut, useSession} from "next-auth/react";
 import {redirect} from "next/navigation";
@@ -102,7 +102,7 @@ export function AppSidebar({defaultProductName, productList}: {
     setNewName(currentName)
   }
 
-  const handleUpdateConversation = async (conversationId: string) => {
+  const handleUpdateConversationName = async (conversationId: string) => {
     const userToken = session?.user?.access_token
     if (!userToken) {
       toast.warning("Please login first")
@@ -110,7 +110,7 @@ export function AppSidebar({defaultProductName, productList}: {
     }
 
     try {
-      const result = await updateConversation(userToken, productId, conversationId, newName)
+      const result = await updateConversationName(userToken, productId, conversationId, newName)
       if (!result) {
         toast.error("Conversation updated failed, please try again")
         return
@@ -237,7 +237,7 @@ export function AppSidebar({defaultProductName, productList}: {
                           />
                           <div className="grid grid-cols-3 gap-2">
                             <Button
-                              onClick={() => handleUpdateConversation(conversationId)}
+                              onClick={() => handleUpdateConversationName(conversationId)}
                             >
                               Save
                             </Button>
