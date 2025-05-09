@@ -21,7 +21,7 @@ export async function getQuestionList(productId: string, locale: string): Promis
         fields: ["title", "action"],
         populate: {
           question: {
-            fields: ["title"]
+            fields: ["id", "documentId", "title", "showDefault"]
           }
         }
       }

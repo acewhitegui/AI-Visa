@@ -32,7 +32,7 @@ export function Questions({productId, locale}: {
     const fetchQuestionList = async () => {
       const questions: Question[] = await getQuestionList(productId, locale);
       if (!questions) {
-        toast.error("No conversation found, please try again")
+        toast.error("No question found, please try again")
         return
       }
       setQuestionList(questions);
@@ -41,6 +41,19 @@ export function Questions({productId, locale}: {
     fetchQuestionList();
   }, [locale, productId]);
 
+  const handleChoiceChange = (choice: Choice) => {
+    const questions = choice.question
+    if (questions && questions.length > 0) {
+      questions.forEach((question: Question) => {
+        if (!questionList.some(q => q.id === question.id)) {
+          question.showDefault = true
+          questionList.push(question);
+        }
+      })
+      setQuestionList(questions)
+    }
+  }
+
   return (
     <Card className="mb-4">
       <CardContent>
@@ -48,6 +61,10 @@ export function Questions({productId, locale}: {
           <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
             {
               questionList.map((question: Question) => {
+                const isShow = question.showDefault
+                if (!isShow) {
+                  return
+                }
                 return (
                   <FormField
                     key={question.documentId}
@@ -58,7 +75,14 @@ export function Questions({productId, locale}: {
                         <FormLabel>{question.title}</FormLabel>
                         <FormControl>
                           <RadioGroup
-                            onValueChange={field.onChange}
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              // find which selected
+                              const selectedChoice = question.choices?.find(choice => choice.id.toString() === value);
+                              if (selectedChoice) {
+                                handleChoiceChange(selectedChoice);
+                              }
+                            }}
                             defaultValue={field.value}
                             className="flex flex-col space-y-1"
                           >
