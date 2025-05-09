@@ -109,6 +109,15 @@ export type Material = {
   limits: number;
 }
 
+export type UploadFile = {
+  file_id: string;
+  name: string;
+  conversation_id: string;
+  material_id: string;
+  type: string;
+  url: string;
+}
+
 export type CaseStudy = {
   id: number;
   locale: string;

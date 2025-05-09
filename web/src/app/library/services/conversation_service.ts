@@ -20,7 +20,7 @@ export async function getConversationList(userToken: string, productId: string):
 
   if (!response.ok) {
     const statusCode = response.status;
-    logger.error(`ERROR to get conversation list from url: ${url}, get status code: ${statusCode} resp info: " ${await response.text() || 'created failed'}`);
+    logger.error(`ERROR to get conversation list from url: ${url}, get status code: ${statusCode} resp info: " ${await response.text()}`);
     return [];
   }
 
@@ -74,7 +74,7 @@ export async function createNewConversation(userToken: string, productId: string
 
   if (!response.ok) {
     const statusCode = response.status;
-    console.error("ERROR to create conversation, get status code: ", statusCode, "resp info: ", await response.text() || 'created failed');
+    console.error("ERROR to create conversation, get status code: ", statusCode, "resp info: ", await response.text());
     if (401 == response.status) {
       redirect("/auth/login")
     }

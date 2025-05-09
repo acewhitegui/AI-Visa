@@ -1,25 +1,21 @@
 "use client";
 
 import {Card, CardContent} from "@/app/components/ui/shadcn/card";
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/app/components/ui/shadcn/form";
+import {Form, FormControl, FormItem, FormLabel, FormMessage} from "@/app/components/ui/shadcn/form";
 import {Input} from "@/app/components/ui/shadcn/input";
 import {Button} from "@/app/components/ui/shadcn/button";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import {getMaterialList} from "@/app/library/services/material_service";
-import {Material} from "@/app/library/objects/types";
+import {Material, UploadFile} from "@/app/library/objects/types";
 import {toast} from "sonner";
-import {uploadFile} from "@/app/library/services/file_service";
+import {getUploadedFiles, uploadFile} from "@/app/library/services/file_service";
+import Link from "next/link";
+import {useRouter} from "@/i18n/routing";
 
-// Dynamic schema creation based on material list would be better
-const formSchema = z.object({
-  images: z.any().optional(),
-  pdf: z.any().optional(),
-  excel: z.any().optional(),
-});
-
+const formSchema = z.object({});
 type FormSchema = z.infer<typeof formSchema>;
 
 interface AttachmentProps {
@@ -38,12 +34,19 @@ export function Attachments({
                               onStepChange,
                             }: AttachmentProps) {
   const [materialList, setMaterialList] = useState<Material[]>([]);
+  const [uploadedFilesMap, setUploadedFilesMap] = useState<Record<string, UploadFile | undefined>>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  const router = useRouter();
+
+  // Store selected files outside of react-hook-form
+  const fileInputsRef = useRef<Record<string, FileList | null>>({});
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema)
   });
 
+  // Fetch material list on component mount
   useEffect(() => {
     const fetchMaterialList = async () => {
       try {
@@ -58,29 +61,37 @@ export function Attachments({
     fetchMaterialList();
   }, [userToken, productId, conversationId, locale]);
 
+  // Fetch already uploaded files
+  useEffect(() => {
+    const fetchUploadedFiles = async () => {
+      if (!conversationId) return;
+
+      try {
+        const fileMap = await getUploadedFiles(userToken, conversationId);
+        setUploadedFilesMap(fileMap);
+      } catch (error) {
+        console.error("Failed to fetch uploaded files:", error);
+      }
+    };
+
+    fetchUploadedFiles();
+  }, [conversationId, userToken]);
+
   const handleUploadFile = async (material: Material, files: FileList): Promise<boolean> => {
     const formData = new FormData();
 
-    // Append files to FormData
     Array.from(files).forEach(file => {
       formData.append('files', file);
     });
 
-    // Add required metadata
     formData.append('product_id', productId);
     formData.append('conversation_id', conversationId);
+    formData.append('material_id', material.documentId);
     formData.append('file_type', material.type);
 
     try {
-      const result = await uploadFile(userToken, formData)
-
-      if (result) {
-        console.log('Upload successful');
-        return true;
-      } else {
-        toast.error(`Failed to upload ${material.title}`);
-        return false;
-      }
+      const result = await uploadFile(userToken, formData);
+      return result;
     } catch (error) {
       console.error('Error during upload:', error);
       toast.error(`Error uploading ${material.title}`);
@@ -93,14 +104,12 @@ export function Attachments({
     let allUploadsSuccessful = true;
 
     for (const material of materialList) {
-      const files = form.getValues(material.title as any) as FileList;
-
-      if (!files || files.length === 0) {
-        continue;
-      }
+      const files = fileInputsRef.current[material.title];
+      if (!files || files.length === 0) continue;
 
       const uploadSuccess = await handleUploadFile(material, files);
       if (!uploadSuccess) {
+        toast.error(`Failed to upload ${material.title}`);
         allUploadsSuccessful = false;
       }
     }
@@ -108,9 +117,65 @@ export function Attachments({
     setIsLoading(false);
 
     if (allUploadsSuccessful) {
+      toast.success("Successfully uploaded!");
       onStepChange(2);
     }
-  }, [materialList, form, onStepChange]);
+
+    router.refresh()
+  }, [materialList, onStepChange, productId, conversationId, userToken]);
+
+  const handleFileChange = (material: Material, files: FileList | null) => {
+    if (files && files.length > material.limits) {
+      toast.warning(`Maximum ${material.limits} files allowed`);
+    }
+    fileInputsRef.current[material.title] = files;
+  };
+
+  const removeUploadedFile = (material: Material) => {
+    const updatedFilesMap = {...uploadedFilesMap};
+    delete updatedFilesMap[material.type];
+    setUploadedFilesMap(updatedFilesMap);
+
+    // Reset file input
+    const fileInput = document.querySelector(`input[type="file"][data-material="${material.documentId}"]`) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+    fileInputsRef.current[material.title] = null;
+
+    toast.success(`Removed ${material.title}`);
+  };
+
+  const renderUploadedFile = (material: Material) => {
+    const uploadedFile = uploadedFilesMap[material.type];
+    if (!uploadedFile) return null;
+
+    return (
+      <div className="uploaded-file-container mt-2 flex items-center">
+        <Link
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            const fileUrl = uploadedFile.url;
+            if (fileUrl) {
+              window.open(fileUrl, '_blank', 'noopener,noreferrer');
+            }
+          }}
+          className="uploaded-file-name underline text-blue-500 hover:text-blue-700 mr-2"
+        >
+          {uploadedFile.name}
+        </Link>
+        <Button
+          type="button"
+          variant="destructive"
+          size="sm"
+          onClick={() => removeUploadedFile(material)}
+        >
+          Remove
+        </Button>
+      </div>
+    );
+  };
 
   return (
     <Card className="mb-4">
@@ -118,32 +183,26 @@ export function Attachments({
         <Form {...form}>
           <form
             className="flex flex-col justify-center"
-            onSubmit={form.handleSubmit(handleSubmit)}
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
           >
             {materialList.map((material) => (
               <div key={material.documentId} className="upload-section my-8">
-                <FormField
-                  name={material.title}
-                  render={({field}) => (
-                    <FormItem>
-                      <FormLabel>{material.title}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="file"
-                          multiple
-                          onChange={(e) => {
-                            const files = e.target.files;
-                            if (files && files.length > material.limits) {
-                              toast.warning(`Maximum ${material.limits} files allowed`);
-                            }
-                            field.onChange(e);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage/>
-                    </FormItem>
-                  )}
-                />
+                <FormItem>
+                  <FormLabel>{material.title}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="file"
+                      multiple
+                      data-material={material.documentId}
+                      onChange={(e) => handleFileChange(material, e.target.files)}
+                    />
+                  </FormControl>
+                  {renderUploadedFile(material)}
+                  <FormMessage/>
+                </FormItem>
               </div>
             ))}
             <Button type="submit" disabled={isLoading}>
