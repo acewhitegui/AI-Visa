@@ -35,6 +35,6 @@ def save_message(product_id: str, conversation_id: str, ai_message: dict):
         message.metafield = metadata
         session.add(message)
         session.commit()
-        session.flush(message)
+        session.refresh(message)
         session.expunge(message)
         return message.to_dict()

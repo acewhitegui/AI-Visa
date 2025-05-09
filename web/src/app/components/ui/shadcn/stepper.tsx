@@ -50,7 +50,7 @@ interface StepperProps {
 
 export function Stepper({steps, currentStep, onStepChange, children, buttonPosition = 'bottom'}: StepperProps) {
   const router = useRouter();
-
+  currentStep = parseInt(String(currentStep))
   const renderNavigationButtons = () => (
     <div className="flex justify-between">
       <Button variant="outline" onClick={() => {

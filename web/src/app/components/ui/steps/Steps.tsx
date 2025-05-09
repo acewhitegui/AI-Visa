@@ -41,7 +41,8 @@ export function Steps({locale, productId, conversationId}: {
     {
       title: "Step 3",
       description: "Confirm check results with AI",
-      component: <Messages conversationId={conversationId}/>
+      component: <Messages userToken={userToken} productId={productId} conversationId={conversationId}
+                           locale={locale}/>
     },
   ]
   // 获取当前会话的详情
@@ -64,7 +65,9 @@ export function Steps({locale, productId, conversationId}: {
   return (
     <Stepper steps={stepList} currentStep={currentStep} onStepChange={setCurrentStep}>
       {/* 这部分是实际要展示的内容，根据step需要修改逻辑 */}
-      {stepList[currentStep].component}
+      {
+        stepList[currentStep].component
+      }
     </Stepper>
   )
 }
