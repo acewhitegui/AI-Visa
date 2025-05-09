@@ -138,6 +138,27 @@ class _Const(object):
     PRODUCT_ID = "product_id"
     CONVERSATION_ID = 'conversation_id'
     ANSWER = "answer"
+    # ai
+    LOCALE = "locale"
+    USAGE = "usage"
+
+    ALLOW_MIMETYPES = [
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+        'image/svg+xml',
+        'image/tiff',
+        'image/bmp',
+        'image/x-icon',
+        'image/vnd.microsoft.icon',
+        'image/avif',
+        'image/apng',
+        'image/heic',
+        'image/heif',
+        'image/jxl',
+        'image/jp2'
+    ]
 
 
 CONST = _Const()
