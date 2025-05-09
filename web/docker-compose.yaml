@@ -1,0 +1,24 @@
+version: "3"
+services:
+  web:
+    image: registry.ap-southeast-1.aliyuncs.com/whitedit/ai-visa-web
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
+      update_config:
+        order: start-first
+    ports:
+      - "3002:3002"
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3002
+      NEXT_PUBLIC_BASE_URL: http://localhost:3002
+      AI_VISA_API_BASE_URL: http://192.168.50.24:8001/ai-visa/api/v1
+      STRIPE_BASE_URL: https://api.stripe.com
+      STRIPE_SECRET_KEY: sk_texxxxxx
+      NEXT_PUBLIC_STRIPE_PUBLIC_KEY: pk_test_xxxxx
