@@ -120,9 +120,8 @@ export function Attachments({
       toast.success("Successfully uploaded!");
       onStepChange(2);
     }
-
-    router.refresh()
-  }, [materialList, onStepChange, productId, conversationId, userToken]);
+    window.location.reload()
+  }, [materialList, handleUploadFile, onStepChange]);
 
   const handleFileChange = (material: Material, files: FileList | null) => {
     if (files && files.length > material.limits) {

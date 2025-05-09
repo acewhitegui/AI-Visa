@@ -4,7 +4,6 @@ import {getAIResult, submitAI, updateAIResult} from "@/app/library/services/ai_s
 import {Button} from "@/app/components/ui/shadcn/button";
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/app/components/ui/shadcn/card";
 import {toast} from "sonner";
-import {useRouter} from "next/navigation";
 import {Message} from "@/app/library/objects/types";
 import {formatDate} from "@/app/library/common/utils";
 
@@ -19,7 +18,6 @@ export function Messages({userToken, productId, conversationId}: MessageProps) {
   const [message, setMessage] = useState<Message | null>(null);
   const [htmlBuffer, setHtmlBuffer] = useState<Buffer | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const router = useRouter();
 
   const handleAIOperation = useCallback(async (operation: (token: string, prodId: string, convId: string) => Promise<any>) => {
     setIsGenerating(true);
@@ -29,14 +27,15 @@ export function Messages({userToken, productId, conversationId}: MessageProps) {
         toast.error("Error creating AI result, please try again later");
         return;
       }
-      router.refresh();
+      toast.success("Successfully created AI result");
+      window.location.reload()
     } catch (error) {
       console.error("ERROR with AI operation:", error);
       toast.error("Error creating AI result, please try again later");
     } finally {
       setIsGenerating(false);
     }
-  }, [userToken, productId, conversationId, router]);
+  }, [userToken, productId, conversationId]);
 
   const generateAIResult = useCallback(() =>
     handleAIOperation(submitAI), [handleAIOperation]);
