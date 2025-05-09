@@ -15,6 +15,7 @@ export function Steps({locale, productId, conversationId}: {
   conversationId: string
 }) {
   const [currentStep, setCurrentStep] = useState(0)
+  const [conversationName, setConversationName] = useState("");
 
   // session
   const {data: session} = useSession();
@@ -28,7 +29,8 @@ export function Steps({locale, productId, conversationId}: {
       title: "Step 1",
       description: "Answer some questions",
       component: <Questions userToken={userToken} productId={productId} conversationId={conversationId}
-                            locale={locale}/>
+                            conversationName={conversationName}
+                            locale={locale} onStepChange={setCurrentStep}/>
     },
     {title: "Step 2", description: "Upload documents", component: <Attachments conversationId={conversationId}/>},
     {
@@ -48,6 +50,7 @@ export function Steps({locale, productId, conversationId}: {
 
       const step = conversation.step
       setCurrentStep(step)
+      setConversationName(conversation.name)
     };
 
     fetchConversation();

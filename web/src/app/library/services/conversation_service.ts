@@ -1,6 +1,6 @@
 "use server"
 
-import {Answer, Conversation} from "@/app/library/objects/types"
+import {Conversation} from "@/app/library/objects/types"
 import {getApiBaseUrl} from "@/app/library/common/api-helpers";
 import {logger} from "@/app/library/common/logger";
 import {redirect} from "next/navigation";
@@ -85,7 +85,7 @@ export async function createNewConversation(userToken: string, productId: string
   return data.data;
 }
 
-export async function updateConversation(userToken: string, productId: string, conversationId: string, name: string, answers?: Record<string, Answer>): Promise<Conversation | null> {
+export async function updateConversation(userToken: string, productId: string, conversationId: string, name: string, answers?: any): Promise<Conversation | null> {
   const apiBaseUrl = getApiBaseUrl();
   const url = `${apiBaseUrl}/conversation`;
 

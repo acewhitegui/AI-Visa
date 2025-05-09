@@ -10,19 +10,25 @@ import {Card, CardContent} from "@/app/components/ui/shadcn/card";
 import {useEffect, useState} from "react";
 import {Choice, Question} from "@/app/library/objects/types";
 import {getQuestionList} from "@/app/library/services/question_service";
+import {updateConversation} from "@/app/library/services/conversation_service";
 
-export function Questions({productId, locale}: {
+export function Questions({userToken, productId, conversationId, conversationName, locale, onStepChange}: {
   userToken: string;
   productId: string;
   conversationId: string
+  conversationName: string;
   locale: string;
+  onStepChange: (step: number) => void;
 }) {
   const [questionList, setQuestionList] = useState<Question[]>([]);
   const [visibleQuestions, setVisibleQuestions] = useState<Set<string>>(new Set());
   const [selectedChoices, setSelectedChoices] = useState<Record<string, string>>({});
 
   const formSchema = z.object({
-    answers: z.record(z.string())
+    answers: z.record(z.string(), z.object({
+      choice_id: z.string(),
+      question_id: z.string()
+    }).nullable())
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -32,22 +38,32 @@ export function Questions({productId, locale}: {
     }
   });
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    toast.info("You submitted the following values: " + JSON.stringify(data, null, 2))
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    const result = await updateConversation(userToken, productId, conversationId, conversationName, data)
+    if (!result) {
+      toast.error("Submit failed, Please try again later")
+      return
+    }
+    toast.success("Submit successfully.")
+    onStepChange(1)
   }
 
   // 获取问题列表
   useEffect(() => {
     const fetchQuestionList = async () => {
-      const questions: Question[] = await getQuestionList(productId, locale);
-      if (!questions || questions.length === 0) {
-        toast.error("No questions found, please try again")
-        return
+      try {
+        const questions: Question[] = await getQuestionList(productId, locale);
+        if (!questions || questions.length === 0) {
+          toast.error("No questions found, please try again")
+          return
+        }
+        // 找到第一个根问题（链式结构只允许一个入口）
+        const rootQuestion = questions.find(q => q.showDefault);
+        setQuestionList(questions);
+        setVisibleQuestions(rootQuestion ? new Set([rootQuestion.documentId]) : new Set());
+      } catch (error) {
+        toast.error("Failed to fetch questions: " + (error instanceof Error ? error.message : String(error)));
       }
-      // 找到第一个根问题（链式结构只允许一个入口）
-      const rootQuestion = questions.find(q => q.showDefault);
-      setQuestionList(questions);
-      setVisibleQuestions(rootQuestion ? new Set([rootQuestion.documentId]) : new Set());
     };
     fetchQuestionList();
   }, [locale, productId]);
@@ -61,7 +77,7 @@ export function Questions({productId, locale}: {
     if (selectedChoice && selectedChoice.question) {
       const nextQuestionId = selectedChoice.question.documentId;
       // 清除下游答案
-      form.setValue(`answers.${nextQuestionId}`, "");
+      form.setValue(`answers.${nextQuestionId}`, null);
       delete updatedSelectedChoices[nextQuestionId];
       clearDownstreamAnswers(nextQuestionId, updatedSelectedChoices);
     }
@@ -94,7 +110,10 @@ export function Questions({productId, locale}: {
     clearDownstreamAnswers(questionId, newSelectedChoices);
 
     // 更新表单值
-    form.setValue(`answers.${questionId}`, choiceId);
+    form.setValue(`answers.${questionId}`, {
+      choice_id: choiceId,
+      question_id: questionId
+    });
 
     // 找到根问题
     const rootQuestion = questionList.find(q => q.showDefault);
@@ -104,15 +123,15 @@ export function Questions({productId, locale}: {
     const newVisibleQuestions = getVisibleChain(rootQuestion.documentId, newSelectedChoices);
 
     // 清除不可见问题的答案
-    const currentAnswers = form.getValues().answers;
+    const currentAnswers = form.getValues().answers || {};
     Object.keys(currentAnswers).forEach(answerId => {
       if (!newVisibleQuestions.has(answerId)) {
-        form.setValue(`answers.${answerId}`, "");
+        form.setValue(`answers.${answerId}`, null);
         delete newSelectedChoices[answerId];
       }
     });
 
-    setSelectedChoices({...newSelectedChoices});
+    setSelectedChoices(newSelectedChoices);
     setVisibleQuestions(newVisibleQuestions);
   };
 
@@ -136,10 +155,9 @@ export function Questions({productId, locale}: {
                       <FormControl>
                         <RadioGroup
                           onValueChange={(value) => {
-                            field.onChange(value);
                             handleChoiceChange(question.documentId, value);
                           }}
-                          value={field.value}
+                          value={field.value?.choice_id || ""}
                           className="flex flex-col space-y-1"
                         >
                           {question?.choices?.map((choice: Choice) => (
