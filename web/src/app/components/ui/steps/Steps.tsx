@@ -54,7 +54,7 @@ export function Steps({locale, productId, conversationId}: {
     };
 
     fetchConversation();
-  }, [conversationId, userToken]);
+  }, [conversationId, userToken, currentStep]);
 
   return (
     <Stepper steps={stepList} currentStep={currentStep} onStepChange={setCurrentStep}>
