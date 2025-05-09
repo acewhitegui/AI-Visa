@@ -1,6 +1,6 @@
 "use client"
 import React, {useState} from "react";
-import {Language} from "@/app/library/objects/props";
+import {Language} from "@/app/library/objects/types";
 import {LOCALE_DISPLAY_MAP} from "@/app/library/common/constants";
 import {Button} from "@/app/components/ui/shadcn/button";
 

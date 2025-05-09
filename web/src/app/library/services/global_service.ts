@@ -1,6 +1,6 @@
 "use server"
 import {fetchAPI} from "@/app/library/common/fetch-api";
-import {Navigation} from "@/app/library/objects/props";
+import {Navigation} from "@/app/library/objects/types";
 
 export async function getGlobal(locale: string) {
   const token = process.env.STRAPI_API_TOKEN;

@@ -5,7 +5,7 @@ import CustomLink from "@/app/components/elements/CustomLink";
 import {useState} from "react";
 import {useTranslations} from "next-intl";
 import {StopIcon} from "@heroicons/react/24/solid";
-import {StrapiLink, StrapiMedia} from "@/app/library/objects/props";
+import {StrapiLink, StrapiMedia} from "@/app/library/objects/types";
 import {BlocksContent, BlocksRenderer} from "@strapi/blocks-react-renderer";
 import {formatDateOnlyMonth, getStrapiMedia} from "@/app/library/common/api-helpers";
 

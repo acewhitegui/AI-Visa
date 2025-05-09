@@ -1,5 +1,5 @@
 import React from "react";
-import {Page, PromsPros} from "@/app/library/objects/props";
+import {PromsPros} from "@/app/library/objects/props";
 import type {Metadata} from "next";
 import {BLOG_SLUG, FALLBACK_SEO, HOST, LOGO_URL, SITE_NAME} from "@/app/library/common/constants";
 import {getAlternate} from "@/app/library/common/i18n-helpers";
@@ -12,6 +12,7 @@ import {
   BreadcrumbSeparator,
 } from "@/app/components/ui/shadcn/breadcrumb"
 import {getPageBySlug} from "@/app/library/services/page_service";
+import {Page} from "@/app/library/objects/types";
 
 export async function PageLayout({
                                    params,

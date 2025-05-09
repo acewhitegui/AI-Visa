@@ -1,6 +1,6 @@
 "use server"
 import {fetchAPI} from "@/app/library/common/fetch-api";
-import {Page, SitemapItem} from "@/app/library/objects/props";
+import {Page, SitemapItem} from "@/app/library/objects/types";
 
 export async function getPageBySlug(locale: string, slug: string): Promise<Page> {
   const token = process.env.STRAPI_API_TOKEN;

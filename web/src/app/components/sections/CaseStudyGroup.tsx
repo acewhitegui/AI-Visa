@@ -6,8 +6,8 @@ import {useTranslations} from "next-intl";
 import {Link} from "@/i18n/routing";
 import {StopIcon} from "@heroicons/react/24/solid";
 import CustomLink from "@/app/components/elements/CustomLink";
-import {CaseStudy} from "@/app/library/objects/props";
 import {formatDateOnlyMonth, getStrapiMedia} from "@/app/library/common/api-helpers";
+import {CaseStudy} from "@/app/library/objects/types";
 
 
 interface CaseStudiesProps {

@@ -1,5 +1,5 @@
 import React from "react";
-import {Article, ArticlePromsPros, ArticleProps, Page} from "@/app/library/objects/props";
+import {ArticlePromsPros, ArticleProps} from "@/app/library/objects/props";
 import {Metadata} from "next";
 import {getArticleBySlug} from "@/app/library/services/article-service";
 import {BLOG_SLUG, FALLBACK_SEO, HOST, LOGO_URL, SITE_NAME} from "@/app/library/common/constants";
@@ -13,6 +13,7 @@ import {
   BreadcrumbSeparator
 } from "@/app/components/ui/shadcn/breadcrumb";
 import {getPageBySlug} from "@/app/library/services/page_service";
+import {Article, Page} from "@/app/library/objects/types";
 
 export default async function layout({params, children}: { params: ArticlePromsPros; children: React.ReactNode }) {
   const {locale, slug} = await params;

@@ -1,6 +1,6 @@
 import {Link, usePathname} from "@/i18n/routing";
 import React from "react";
-import {Navigation} from "@/app/library/objects/props";
+import {Navigation} from "@/app/library/objects/types";
 
 
 interface MobileNavLinkProps extends Navigation {

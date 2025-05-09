@@ -1,5 +1,5 @@
 "use server"
-import {Article, ArticleProps} from "@/app/library/objects/props";
+import {ArticleProps} from "@/app/library/objects/props";
 import {notFound} from 'next/navigation';
 import Image from 'next/image';
 import {getArticleBySlug} from "@/app/library/services/article-service";
@@ -7,6 +7,7 @@ import {BlocksRenderer} from "@strapi/blocks-react-renderer";
 import {Link} from "@/i18n/routing";
 import "@/app/assets/css/article.css"
 import {formatDate} from "@/app/library/common/utils";
+import {Article} from "@/app/library/objects/types";
 
 
 export default async function ArticlePage({params}: ArticleProps) {

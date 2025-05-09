@@ -1,6 +1,5 @@
 import PropTypes from "prop-types"
-import {StrapiLink} from "@/app/library/objects/props";
-import {linkPropTypes} from "@/app/library/objects/types";
+import {linkPropTypes, StrapiLink} from "@/app/library/objects/types";
 import Button from "@/app/components/elements/Button";
 import {Link} from "@/i18n/routing";
 

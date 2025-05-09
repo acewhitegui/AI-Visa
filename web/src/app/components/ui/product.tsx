@@ -1,6 +1,6 @@
 import {BlocksRenderer} from "@strapi/blocks-react-renderer";
 import React from "react";
-import {Product} from "@/app/library/objects/props";
+import {Product} from "@/app/library/objects/types";
 import componentResolver from "@/app/library/common/component-resolver";
 
 export function ProductHero({product}: { product: Product }) {

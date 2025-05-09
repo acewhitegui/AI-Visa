@@ -1,7 +1,8 @@
 "use server"
 import {getPageBySlug} from "@/app/library/services/page_service";
-import {Page, Props} from "@/app/library/objects/props";
 import {BlocksRenderer} from "@strapi/blocks-react-renderer";
+import {Page} from "@/app/library/objects/types";
+import {Props} from "@/app/library/objects/props";
 
 export default async function Terms({params}: Props) {
   const {locale} = await params;

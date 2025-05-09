@@ -7,7 +7,7 @@ import {usePathname, useRouter} from "@/i18n/routing";
 import Logo from "@/app/components/ui/Logo";
 import {signOut, useSession} from "next-auth/react";
 import {DesktopNavLink, MobileNavLink, renderNavigationLinks} from "@/app/components/ui/navbar/NavLink";
-import {Language, Navigation} from "@/app/library/objects/props";
+import {Language, Navigation} from "@/app/library/objects/types";
 import {DesktopAccountSection, MobileAccountSection} from "@/app/components/ui/navbar/AccountSections";
 
 type NavbarProps = {
