@@ -42,15 +42,14 @@ export function Questions({productId, locale}: {
   }, [locale, productId]);
 
   const handleChoiceChange = (choice: Choice) => {
-    const questions = choice.question
-    if (questions && questions.length > 0) {
-      questions.forEach((question: Question) => {
-        if (!questionList.some(q => q.id === question.id)) {
+    const nextQuestion = choice.question
+    if (nextQuestion) {
+      questionList.forEach((question: Question) => {
+        if (question.id === nextQuestion.id) {
           question.showDefault = true
-          questionList.push(question);
         }
       })
-      setQuestionList(questions)
+      setQuestionList(questionList)
     }
   }
 

@@ -93,7 +93,7 @@ export type Question = {
 export type Choice = {
   id: number;
   title: string;
-  question: Question[];
+  question: Question;
   action: string;
 }
 
