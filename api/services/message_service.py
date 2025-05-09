@@ -10,7 +10,7 @@ import json
 
 from common.const import CONST
 from common.globals import GLOBALS
-from models.db import Message
+from models.db import Message, Conversation
 
 
 def get_latest_message(product_id: str, conversation_id: str):
@@ -26,6 +26,8 @@ def get_latest_message(product_id: str, conversation_id: str):
 
 def save_message(product_id: str, conversation_id: str, ai_message: dict):
     with GLOBALS.get_postgres_wrapper().session_scope() as session:
+        session.query(Conversation).filter(Conversation.conversation_id == conversation_id).update({CONST.STEP: 2})
+
         metadata = json.dumps(ai_message.pop(CONST.USAGE, {}))
         message = Message()
         message.message_id = ai_message.get(CONST.ID)
@@ -37,4 +39,5 @@ def save_message(product_id: str, conversation_id: str, ai_message: dict):
         session.commit()
         session.refresh(message)
         session.expunge(message)
+
         return message.to_dict()

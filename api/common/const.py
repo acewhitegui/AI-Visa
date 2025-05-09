@@ -142,6 +142,7 @@ class _Const(object):
     LOCALE = "locale"
     USAGE = "usage"
     CONTENT = "content"
+    STEP = "step"
 
     ALLOW_MIMETYPES = [
         'image/jpeg',
