@@ -44,8 +44,7 @@ def presign_file_url(bucket: Bucket, oss_path, expires=CONST.OSS_DEFAULT_EXPIRES
 def download_file(bucket: Bucket, oss_path):
     try:
         file_obj = bucket.get_object(oss_path)
-        content = file_obj.read().decode('utf-8')
-        log.info(f"File content: {content}")
+        content = file_obj.read()
         return content
     except oss2.exceptions.OssError as e:
         log.exception(f"Failed to download file: {e}")

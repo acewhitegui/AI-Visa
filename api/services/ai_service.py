@@ -6,6 +6,7 @@
 @Date  : 2025/4/9
 @Desc :
 """
+import os.path
 from tempfile import TemporaryDirectory
 
 import markdown
@@ -40,6 +41,8 @@ async def submit_ai_check(product_id: str, conversation_id: str, locale: str):
     with GLOBALS.get_postgres_wrapper().session_scope() as session:
         upload_obj_list: list[UploadFile] = session.query(UploadFile).filter(
             UploadFile.conversation_id == conversation_id).all()
+        for upload_obj in upload_obj_list:
+            session.expunge(upload_obj)
     # 2. 查找材料的检查条件
     file_id_list = []
     file_description_list = []
@@ -47,18 +50,19 @@ async def submit_ai_check(product_id: str, conversation_id: str, locale: str):
     for upload_obj in upload_obj_list:
         material_id = upload_obj.material_id
         file_type = upload_obj.type
-        material_obj: dict = await material_service.get_material(material_id, file_type)
+        material_obj: dict = await material_service.get_material(material_id, locale)
         if not material_obj:
             log.warning(f"WARNING to get not included file: {upload_obj.name}, file type: {file_type}")
             continue
 
         check_standard = material_obj.get(CONST.STANDARD)
         # 3. 上传ai文件
-        file_path = upload_obj.file_path
+        oss_file_key = upload_obj.file_path
+        filename = oss_file_key.split("/")[-1]
         with TemporaryDirectory() as tmp_dir:
-            full_path = f"{tmp_dir}/{full_path}"
+            full_path = os.path.join(tmp_dir, filename)
             with open(full_path, "wb") as file:
-                content = oss_service.download_file(bucket, file_path)
+                content = oss_service.download_file(bucket, oss_file_key)
                 file.write(content)
 
             file_id = openai.file_upload(full_path)

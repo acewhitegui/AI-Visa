@@ -49,10 +49,5 @@ async def get_material_list(user_id: int, params: MaterialVO):
 
 
 async def get_material(document_id, locale):
-    populate = {
-        CONST.MATERIALS: {
-            CONST.FIELDS: [CONST.STANDARD]
-        }
-    }
-    result = await strapi.get_resource_list(f"materials/{document_id}", locale, populate=populate)
+    result = await strapi.get_resource_list(f"materials/{document_id}", locale)
     return result

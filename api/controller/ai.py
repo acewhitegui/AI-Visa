@@ -6,25 +6,29 @@
 @Date  : 2025/5/7
 @Desc :
 """
+from typing import Annotated
 from typing import Dict, Any, Optional
 
 import markdown
-from fastapi import Query, Body, HTTPException, APIRouter
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import Body
 
 from common import utils
 from common.const import CONST
 from common.logger import log
+from models import User
 from services.ai_service import submit_ai_check
+from services.auth_service import get_current_user
 from services.message_service import get_latest_message
 
 router = APIRouter()
 
 
-@router.get("/ai", response_class=HTMLResponse)
+@router.get("/ai")
 async def get_ai_result(
+        current_user: Annotated[User, Depends(get_current_user)],
         product_id: Optional[str] = Query(None, alias=CONST.PRODUCT_ID),
-        conversation_id: Optional[str] = Query(None, alias=CONST.CONVERSATION_ID)
+        conversation_id: Optional[str] = Query(None, alias=CONST.CONVERSATION_ID),
 ):
     params = {"product_id": product_id, "conversation_id": conversation_id}
     message_dict = get_latest_message(product_id, conversation_id)
@@ -41,8 +45,9 @@ async def get_ai_result(
     return utils.resp_success(data=data)
 
 
-@router.post("/ai", response_class=HTMLResponse)
+@router.post("/ai")
 async def submit_ai_result(
+        current_user: Annotated[User, Depends(get_current_user)],
         data: Dict[str, Any] = Body(...)
 ):
     """
@@ -61,7 +66,7 @@ async def submit_ai_result(
         }
         log.info(f"SUCCESS to reuse the post data: {data}, result data: {response_data}")
     else:
-        result = submit_ai_check(product_id, conversation_id, locale)
+        result = await submit_ai_check(product_id, conversation_id, locale)
         response_data = {
             CONST.MESSAGE: result
         }
@@ -81,7 +86,7 @@ async def regenerate_ai_result(
     product_id = data.get(CONST.PRODUCT_ID)
     conversation_id = data.get(CONST.CONVERSATION_ID)
     locale = data.get(CONST.LOCALE)
-    result = submit_ai_check(product_id, conversation_id, locale)
+    result = await submit_ai_check(product_id, conversation_id, locale)
     response_data = {
         CONST.MESSAGE: result
     }

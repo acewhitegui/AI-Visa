@@ -17,7 +17,7 @@ class Message(Base, BaseModel):
         AI回答的消息记录表
     """
     __tablename__ = 'message'
-    message_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    message_id: Mapped[str] = mapped_column(String(50), primary_key=True)
     product_id: Mapped[str] = mapped_column(String(36), primary_key=True)
     conversation_id: Mapped[str] = mapped_column(String(36), nullable=False)
     answer: Mapped[str] = mapped_column(Text, nullable=False)
