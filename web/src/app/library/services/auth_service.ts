@@ -50,15 +50,15 @@ async function registerUser(username: string, email: string, password: string) {
       }).toString(),
     });
 
-    const data = await response.json();
-
     if (!response.ok) {
+      const respText = await response.text();
+      console.error("ERROR to register user, resp info: ", respText)
       return {
-        errors: data.error || 'Failed to register user',
+        errors: respText || 'Failed to register user',
       };
     }
-
-    console.log("Successfully registered user:", username, "at endpoint:", url);
+    const data = await response.json();
+    console.log("Successfully registered user:", username, "at endpoint:", url, "resp data: ", data.data);
     return {success: true};
   } catch (err) {
     // @ts-expect-error error any
