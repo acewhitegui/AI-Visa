@@ -21,7 +21,6 @@ export function Questions({productId, locale}: {
   const [visibleQuestions, setVisibleQuestions] = useState<Set<string>>(new Set());
   const [selectedChoices, setSelectedChoices] = useState<Record<string, string>>({});
 
-  // Create a dynamic form schema based on visible questions
   const formSchema = z.object({
     answers: z.record(z.string())
   });
@@ -37,7 +36,7 @@ export function Questions({productId, locale}: {
     toast.info("You submitted the following values: " + JSON.stringify(data, null, 2))
   }
 
-  // Fetch question list
+  // 获取问题列表
   useEffect(() => {
     const fetchQuestionList = async () => {
       const questions: Question[] = await getQuestionList(productId, locale);
@@ -45,63 +44,75 @@ export function Questions({productId, locale}: {
         toast.error("No questions found, please try again")
         return
       }
-
-      // Find root questions (those that should be visible by default)
-      const rootQuestions = new Set<string>();
-      questions.forEach(question => {
-        if (question.showDefault) {
-          rootQuestions.add(question.documentId);
-        }
-      });
-
+      // 找到第一个根问题（链式结构只允许一个入口）
+      const rootQuestion = questions.find(q => q.showDefault);
       setQuestionList(questions);
-      console.log("questions load: ", JSON.stringify(questions))
-      setVisibleQuestions(rootQuestions);
+      setVisibleQuestions(rootQuestion ? new Set([rootQuestion.documentId]) : new Set());
     };
-
     fetchQuestionList();
   }, [locale, productId]);
 
-  const handleChoiceChange = (questionId: string, choiceId: string) => {
-    // Update selected choices
-    const newSelectedChoices = {...selectedChoices, [questionId]: choiceId};
-    setSelectedChoices(newSelectedChoices);
+  // 递归清除下游所有相关问题的答案
+  const clearDownstreamAnswers = (questionId: string, updatedSelectedChoices: Record<string, string>) => {
+    const q = questionList.find(q => q.documentId === questionId);
+    if (!q) return;
+    const selectedChoiceId = updatedSelectedChoices[questionId];
+    const selectedChoice = q.choices?.find(c => c.id.toString() === selectedChoiceId);
+    if (selectedChoice && selectedChoice.question) {
+      const nextQuestionId = selectedChoice.question.documentId;
+      // 清除下游答案
+      form.setValue(`answers.${nextQuestionId}`, "");
+      delete updatedSelectedChoices[nextQuestionId];
+      clearDownstreamAnswers(nextQuestionId, updatedSelectedChoices);
+    }
+  };
 
-    // Update form value
+  // 计算链路上所有可见问题
+  const getVisibleChain = (rootId: string, choices: Record<string, string>): Set<string> => {
+    const chain = new Set<string>();
+    let currentId = rootId;
+    while (currentId) {
+      chain.add(currentId);
+      const q = questionList.find(q => q.documentId === currentId);
+      if (!q) break;
+      const selectedChoiceId = choices[currentId];
+      const selectedChoice = q.choices?.find(c => c.id.toString() === selectedChoiceId);
+      if (selectedChoice && selectedChoice.question) {
+        currentId = selectedChoice.question.documentId;
+      } else {
+        break;
+      }
+    }
+    return chain;
+  };
+
+  const handleChoiceChange = (questionId: string, choiceId: string) => {
+    // 更新选择
+    const newSelectedChoices = {...selectedChoices, [questionId]: choiceId};
+
+    // 清除下游所有相关问题的答案
+    clearDownstreamAnswers(questionId, newSelectedChoices);
+
+    // 更新表单值
     form.setValue(`answers.${questionId}`, choiceId);
 
-    // Calculate which questions should be visible based on the current selections
-    const newVisibleQuestions = new Set<string>();
+    // 找到根问题
+    const rootQuestion = questionList.find(q => q.showDefault);
+    if (!rootQuestion) return;
 
-    // First add root questions
-    questionList.forEach(question => {
-      if (question.showDefault) {
-        newVisibleQuestions.add(question.documentId);
-      }
-    });
+    // 计算链路上所有可见问题
+    const newVisibleQuestions = getVisibleChain(rootQuestion.documentId, newSelectedChoices);
 
-    // Then add questions that should be visible based on selected choices
-    Object.entries(newSelectedChoices).forEach(([qId, cId]) => {
-      const q = questionList.find(q => q.documentId === qId);
-      const c = q?.choices?.find(choice => choice.id.toString() === cId);
-
-      if (c?.question) {
-        newVisibleQuestions.add(c.question.documentId);
-      }
-    });
-
-    // Clear form values for questions that are no longer visible
+    // 清除不可见问题的答案
     const currentAnswers = form.getValues().answers;
     Object.keys(currentAnswers).forEach(answerId => {
       if (!newVisibleQuestions.has(answerId)) {
         form.setValue(`answers.${answerId}`, "");
-        // Also remove from selectedChoices
-        const updatedSelectedChoices = {...newSelectedChoices};
-        delete updatedSelectedChoices[answerId];
-        setSelectedChoices(updatedSelectedChoices);
+        delete newSelectedChoices[answerId];
       }
     });
 
+    setSelectedChoices({...newSelectedChoices});
     setVisibleQuestions(newVisibleQuestions);
   };
 
@@ -111,11 +122,9 @@ export function Questions({productId, locale}: {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
             {questionList.map((question: Question) => {
-              // Only render questions that should be visible
               if (!visibleQuestions.has(question.documentId)) {
                 return null;
               }
-
               return (
                 <FormField
                   key={question.documentId}
