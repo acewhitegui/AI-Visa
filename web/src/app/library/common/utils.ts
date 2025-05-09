@@ -15,7 +15,14 @@ export function formatDate(dateString: string, locale?: string) {
   }
 
   const date = new Date(dateString);
-  const options: Intl.DateTimeFormatOptions = {year: 'numeric', month: 'long', day: 'numeric'};
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric'
+  };
   return date.toLocaleDateString(locale, options);
 }
 

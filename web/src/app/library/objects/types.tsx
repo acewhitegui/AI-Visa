@@ -118,6 +118,14 @@ export type UploadFile = {
   url: string;
 }
 
+export type Message = {
+  message_id: string;
+  conversation_id: string;
+  created_at: string;
+  updated_at: string;
+  answer: string;
+}
+
 export type CaseStudy = {
   id: number;
   locale: string;
