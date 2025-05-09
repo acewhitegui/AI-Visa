@@ -12,10 +12,9 @@ import {getMaterialList} from "@/app/library/services/material_service";
 import {Material, UploadFile} from "@/app/library/objects/types";
 import {toast} from "sonner";
 import {getUploadedFiles, uploadFile} from "@/app/library/services/file_service";
+import Link from "next/link";
 
-// Dynamic schema creation based on material list would be better
 const formSchema = z.object({});
-
 type FormSchema = z.infer<typeof formSchema>;
 
 interface AttachmentProps {
@@ -38,12 +37,13 @@ export function Attachments({
   const [isLoading, setIsLoading] = useState(false);
 
   // Store selected files outside of react-hook-form
-  const fileInputsRef = useRef<{ [key: string]: FileList | null }>({});
+  const fileInputsRef = useRef<Record<string, FileList | null>>({});
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema)
   });
 
+  // Fetch material list on component mount
   useEffect(() => {
     const fetchMaterialList = async () => {
       try {
@@ -58,20 +58,20 @@ export function Attachments({
     fetchMaterialList();
   }, [userToken, productId, conversationId, locale]);
 
-  // 新增：获取已上传文件并存储到 state
+  // Fetch already uploaded files
   useEffect(() => {
-    async function setUploadedFiles() {
+    const fetchUploadedFiles = async () => {
       if (!conversationId) return;
-      try {
 
-        const fileMap = await getUploadedFiles(userToken, conversationId)
+      try {
+        const fileMap = await getUploadedFiles(userToken, conversationId);
         setUploadedFilesMap(fileMap);
       } catch (error) {
         console.error("Failed to fetch uploaded files:", error);
       }
-    }
+    };
 
-    setUploadedFiles();
+    fetchUploadedFiles();
   }, [conversationId, userToken]);
 
   const handleUploadFile = async (material: Material, files: FileList): Promise<boolean> => {
@@ -83,19 +83,12 @@ export function Attachments({
 
     formData.append('product_id', productId);
     formData.append('conversation_id', conversationId);
-    formData.append('material_id', material.documentId)
+    formData.append('material_id', material.documentId);
     formData.append('file_type', material.type);
 
     try {
       const result = await uploadFile(userToken, formData);
-
-      if (result) {
-        console.log('Upload successful');
-        return true;
-      } else {
-        toast.error(`Failed to upload ${material.title}`);
-        return false;
-      }
+      return result;
     } catch (error) {
       console.error('Error during upload:', error);
       toast.error(`Error uploading ${material.title}`);
@@ -109,11 +102,11 @@ export function Attachments({
 
     for (const material of materialList) {
       const files = fileInputsRef.current[material.title];
-      if (!files || files.length === 0) {
-        continue;
-      }
+      if (!files || files.length === 0) continue;
+
       const uploadSuccess = await handleUploadFile(material, files);
       if (!uploadSuccess) {
+        toast.error(`Failed to upload ${material.title}`);
         allUploadsSuccessful = false;
       }
     }
@@ -123,7 +116,37 @@ export function Attachments({
     if (allUploadsSuccessful) {
       onStepChange(2);
     }
-  }, [materialList, onStepChange]);
+  }, [materialList, onStepChange, productId, conversationId, userToken]);
+
+  const handleFileChange = (material: Material, files: FileList | null) => {
+    if (files && files.length > material.limits) {
+      toast.warning(`Maximum ${material.limits} files allowed`);
+    }
+    fileInputsRef.current[material.title] = files;
+  };
+
+  const renderUploadedFile = (material: Material) => {
+    const uploadedFile = uploadedFilesMap[material.type];
+    if (!uploadedFile) return null;
+
+    return (
+      <div className="uploaded-file-container mt-2">
+        <Link
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            const fileUrl = uploadedFile.url;
+            if (fileUrl) {
+              window.open(fileUrl, '_blank', 'noopener,noreferrer');
+            }
+          }}
+          className="uploaded-file-name underline text-blue-500 hover:text-blue-700"
+        >
+          {uploadedFile.name}
+        </Link>
+      </div>
+    );
+  };
 
   return (
     <Card className="mb-4">
@@ -131,44 +154,27 @@ export function Attachments({
         <Form {...form}>
           <form
             className="flex flex-col justify-center"
-            onSubmit={form.handleSubmit(handleSubmit)}
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
           >
-            {materialList.map((material) => {
-              return (
-                <div key={material.documentId} className="upload-section my-8">
-                  <FormItem>
-                    <FormLabel>{material.title}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        multiple
-                        onChange={(e) => {
-                          const files = e.target.files;
-                          if (files && files.length > material.limits) {
-                            toast.warning(`Maximum ${material.limits} files allowed`);
-                          }
-                          fileInputsRef.current[material.title] = files;
-                        }}
-                      />
-                      {/* 展示已上传文件 */}
-                      {uploadedFilesMap[material.type] && (
-                        <div className="uploaded-file-container mt-2">
-                          <a
-                            href={uploadedFilesMap[material.type]?.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="uploaded-file-name underline text-blue-500 hover:text-blue-700"
-                          >
-                            {uploadedFilesMap[material.type]?.name}
-                          </a>
-                        </div>
-                      )}
-                    </FormControl>
-                    <FormMessage/>
-                  </FormItem>
-                </div>
-              )
-            })}
+            {materialList.map((material) => (
+              <div key={material.documentId} className="upload-section my-8">
+                <FormItem>
+                  <FormLabel>{material.title}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="file"
+                      multiple
+                      onChange={(e) => handleFileChange(material, e.target.files)}
+                    />
+                  </FormControl>
+                  {renderUploadedFile(material)}
+                  <FormMessage/>
+                </FormItem>
+              </div>
+            ))}
             <Button type="submit" disabled={isLoading}>
               {isLoading ? "Uploading..." : "Submit"}
             </Button>
