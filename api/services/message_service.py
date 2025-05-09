@@ -37,5 +37,4 @@ def save_message(product_id: str, conversation_id: str, ai_message: dict):
         session.commit()
         session.flush(message)
         session.expunge(message)
-
-    return message.to_dict()
+        return message.to_dict()

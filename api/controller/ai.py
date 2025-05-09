@@ -86,7 +86,7 @@ async def regenerate_ai_result(
     product_id = data.get(CONST.PRODUCT_ID)
     conversation_id = data.get(CONST.CONVERSATION_ID)
     locale = data.get(CONST.LOCALE)
-    result = submit_ai_check(product_id, conversation_id, locale)
+    result = await submit_ai_check(product_id, conversation_id, locale)
     response_data = {
         CONST.MESSAGE: result
     }
