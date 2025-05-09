@@ -4,6 +4,7 @@ import {AuthError} from 'next-auth';
 import {FormState, SignupFormSchema} from "@/app/library/definitions/form";
 import {redirect} from "next/navigation";
 import {getApiBaseUrl} from "@/app/library/common/api-helpers";
+import {RedirectType} from "next/dist/client/components/redirect-error";
 
 export async function signup(state: FormState, formData: FormData) {
   // Validate form fields
@@ -120,7 +121,7 @@ export async function authenticate(
       redirect: false
     }); // find logic to -> auth.js
     const callbackUrl: string = formData.get('callbackUrl')?.toString() || '/';
-    return redirect(callbackUrl);
+    return redirect(callbackUrl, RedirectType.replace);
   } catch (error) {
     if (error instanceof AuthError) {
       console.error("Auth error: ", error);

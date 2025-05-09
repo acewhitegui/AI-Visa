@@ -44,6 +44,7 @@ export function LoginForm() {
   }, [callbackUrl, router, session?.user?.expired_at]);
 
   const navigateToRegister = () => {
+    router.refresh();
     router.push("/auth/register");
   };
 
