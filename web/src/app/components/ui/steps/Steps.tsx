@@ -32,7 +32,12 @@ export function Steps({locale, productId, conversationId}: {
                             conversation={conversation}
                             locale={locale} onStepChange={setCurrentStep}/>
     },
-    {title: "Step 2", description: "Upload documents", component: <Attachments conversationId={conversationId}/>},
+    {
+      title: "Step 2",
+      description: "Upload documents",
+      component: <Attachments userToken={userToken} productId={productId} conversationId={conversationId}
+                              locale={locale} onStepChange={setCurrentStep}/>
+    },
     {
       title: "Step 3",
       description: "Confirm check results with AI",

@@ -101,6 +101,14 @@ export type Answer = {
   choice_id: number
 }
 
+export type Material = {
+  id: number;
+  documentId: string;
+  title: string;
+  type: string;
+  limits: number;
+}
+
 export type CaseStudy = {
   id: number;
   locale: string;

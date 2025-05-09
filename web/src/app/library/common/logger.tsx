@@ -9,11 +9,11 @@ const myFormat = printf(({level, message, label, timestamp}) => {
 export const logger = createLogger({
   level: 'info',
   format: combine(
-    label({label: 'any-converters-web'}),
+    label({label: 'ai-visa-web'}),
     timestamp(),
     myFormat
   ),
-  defaultMeta: {service: 'any-converters-web'},
+  defaultMeta: {service: 'ai-visa-web'},
   transports: [
     new transports.Console({
       handleExceptions: true,
