@@ -51,7 +51,7 @@ async def update_conversation(user_id: int, conversation: ModifyConversationVO):
         conversation_id = conversation.conversation_id
         update_result = session.query(Conversation).filter(Conversation.user_id == user_id,
                                                            Conversation.conversation_id == conversation_id).update(
-            conversation.model_dump())
+            conversation.model_dump(exclude_none=True))
         session.commit()
 
     return update_result
