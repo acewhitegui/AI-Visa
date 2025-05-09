@@ -10,10 +10,10 @@ from typing import List
 
 from common.globals import GLOBALS
 from models.db import Conversation
-from models.view.conversation import ConversationVO, ModifyConversationVO, ConversationListVO, DeleteConversationVO
+from models.view.conversation import PostConversationVO, ModifyConversationVO, ConversationListVO, DeleteConversationVO
 
 
-async def create_conversation(user_id: int, conversation: ConversationVO) -> Conversation:
+async def create_conversation(user_id: int, conversation: PostConversationVO) -> Conversation:
     with GLOBALS.get_postgres_wrapper().session_scope() as session:
         conversation = Conversation(**conversation.model_dump())
         conversation.user_id = user_id
@@ -36,7 +36,7 @@ async def get_conversation_list(user_id: int, params: ConversationListVO) -> Lis
         return [x.to_dict() for x in obj_list]
 
 
-async def get_conversation(user_id, conversation_id) -> Conversation:
+async def get_conversation(user_id: int, conversation_id: str) -> Conversation:
     with GLOBALS.get_postgres_wrapper().session_scope() as session:
         conversation = session.query(Conversation).filter(Conversation.user_id == user_id,
                                                           Conversation.conversation_id == conversation_id).one_or_none()

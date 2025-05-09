@@ -10,6 +10,10 @@ from pydantic import BaseModel
 
 
 class ConversationVO(BaseModel):
+    conversation_id: str
+
+
+class PostConversationVO(BaseModel):
     product_id: str
     name: str
     answers: dict
