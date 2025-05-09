@@ -1,5 +1,5 @@
 import React from "react";
-import {StrapiMedia} from "@/app/library/objects/props";
+import {StrapiMedia} from "@/app/library/objects/types";
 import Image from "next/image";
 
 interface HowToProps {

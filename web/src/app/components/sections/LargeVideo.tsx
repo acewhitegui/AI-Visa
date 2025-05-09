@@ -1,5 +1,5 @@
 import Video from "@/app/components/elements/Video";
-import {StrapiMedia} from "@/app/library/objects/props";
+import {StrapiMedia} from "@/app/library/objects/types";
 
 interface LargeVideo {
   title: string

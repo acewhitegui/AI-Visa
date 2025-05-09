@@ -1,4 +1,4 @@
-import {StrapiMedia} from "@/app/library/objects/props";
+import {StrapiMedia} from "@/app/library/objects/types";
 import {getStrapiMedia} from "@/app/library/common/api-helpers";
 
 export default function Video({

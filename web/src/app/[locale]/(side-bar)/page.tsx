@@ -87,7 +87,7 @@ export default function Home() {
                 },
               ].map((testimonial, index) => (
                 <div key={index} className="p-6 rounded-xl">
-                  <p className={"italic  mb-4"}>"{testimonial.quote}"</p>
+                  <p className={"italic  mb-4"}>{testimonial.quote}</p>
                   <p className="font-semibold">{testimonial.author}</p>
                   <p className="text-sm">Visa to {testimonial.country}</p>
                 </div>

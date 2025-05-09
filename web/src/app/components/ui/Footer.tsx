@@ -7,7 +7,7 @@ import {Link} from "@/i18n/routing";
 import Logo from "@/app/components/ui/Logo";
 import React from "react";
 import {useTranslations} from "next-intl";
-import {Navigation} from "@/app/library/objects/props";
+import {Navigation} from "@/app/library/objects/types";
 
 interface FooterLink {
   id: number;

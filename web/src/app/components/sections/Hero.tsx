@@ -1,7 +1,7 @@
 import Image from "next/image";
 import {BlocksContent, BlocksRenderer} from "@strapi/blocks-react-renderer";
 import {Link} from "@/i18n/routing";
-import {StrapiMedia} from "@/app/library/objects/props";
+import {StrapiMedia} from "@/app/library/objects/types";
 import {getStrapiMedia} from "@/app/library/common/api-helpers";
 import {renderButtonStyle} from "@/app/library/common/button-helpers";
 import React from "react";

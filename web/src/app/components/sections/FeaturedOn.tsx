@@ -1,7 +1,7 @@
 import {env} from "next-runtime-env";
 import Image from "next/image";
 import {Link} from "@/i18n/routing";
-import {StrapiMedia} from "@/app/library/objects/props";
+import {StrapiMedia} from "@/app/library/objects/types";
 
 interface FeatureOnProps {
   locale: string,

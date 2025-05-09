@@ -1,15 +1,13 @@
 "use server"
 import React from "react";
-import {Page, Props} from "@/app/library/objects/props";
-import ArticleList from "@/app/components/ui/blog/ArticleList";
-import {getCategoryList} from "@/app/library/services/categorie-service";
+import {Props} from "@/app/library/objects/props";
 import {getPageBySlug} from "@/app/library/services/page_service";
 import {BLOG_SLUG, FALLBACK_SEO} from "@/app/library/common/constants";
 import {BlocksRenderer} from "@strapi/blocks-react-renderer";
+import {Page} from "@/app/library/objects/types";
 
 export default async function BlogPage({params}: Props) {
   const {locale} = await params;
-  const categories = await getCategoryList()
   const page: Page = await getPageBySlug(locale, BLOG_SLUG);
   if (!page) return FALLBACK_SEO;
 
@@ -25,7 +23,6 @@ export default async function BlogPage({params}: Props) {
           <BlocksRenderer content={description}/>
         </div>
       </header>
-      <ArticleList locale={locale} categories={categories}/>
     </div>
   );
 }

@@ -118,6 +118,7 @@ export function AppSidebar({defaultProductName, productList}: {
       await handleConversationList()
       toast.success("Conversation name updated")
     } catch (error) {
+      console.error("ERROR to update conversation: ", error)
       toast.error("Failed to update conversation name")
     } finally {
       setEditingConversation(null)
@@ -139,6 +140,7 @@ export function AppSidebar({defaultProductName, productList}: {
       }
       toast.success("Conversation deleted successfully")
     } catch (error) {
+      console.log("ERROR to delete conversation conversation: ", error)
       toast.error("Failed to deleted conversation")
     } finally {
       await handleConversationList()
@@ -198,10 +200,10 @@ export function AppSidebar({defaultProductName, productList}: {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <a href="/search">
+                  <Link href="/search">
                     <Search/>
                     <span>Search</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>

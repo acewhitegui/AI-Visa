@@ -1,8 +1,8 @@
-import {Product} from "@/app/library/objects/props";
 import {Link} from "@/i18n/routing";
 import Image from "next/image"
 import {BlocksRenderer} from "@strapi/blocks-react-renderer";
 import {getTranslations} from "next-intl/server";
+import {Product} from "@/app/library/objects/types";
 
 interface ProductsProps {
   locale: string;
