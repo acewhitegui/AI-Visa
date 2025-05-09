@@ -6,7 +6,7 @@ import {redirect} from "next/navigation";
 import {getApiBaseUrl} from "@/app/library/common/api-helpers";
 import {RedirectType} from "next/dist/client/components/redirect-error";
 
-export async function signup(state: FormState, formData: FormData) {
+export async function signup(prevState: FormState | undefined, formData: FormData): Promise<FormState | undefined> {
   // Validate form fields
   const validatedFields = SignupFormSchema.safeParse({
     username: formData.get('username'),
@@ -17,7 +17,7 @@ export async function signup(state: FormState, formData: FormData) {
 
   if (formData.get('password') !== formData.get('confirm_password')) {
     console.error("Passwords don't match");
-    return {errors: 'Passwords do not match'};
+    return {errors: {confirm_password: ["Passwords do not match"]}};
   }
 
   // If any form fields are invalid, return early
@@ -31,9 +31,10 @@ export async function signup(state: FormState, formData: FormData) {
   const {username, email, password} = validatedFields.data;
   const resp = await registerUser(username, email, password);
   if (resp.success) {
-    return redirect("/submitted?email=" + email);
+    redirect("/submitted?email=" + email);
+    return undefined; // This line is unreachable, but for type safety
   }
-  return resp;
+  return prevState;
 }
 
 async function registerUser(username: string, email: string, password: string) {

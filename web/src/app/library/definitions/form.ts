@@ -24,6 +24,7 @@ export type FormState =
     username?: string[]
     email?: string[]
     password?: string[]
+    confirm_password?: string[]
   }
   message?: string
 }
