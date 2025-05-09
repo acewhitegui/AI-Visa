@@ -55,6 +55,7 @@ export function Questions({productId, locale}: {
       });
 
       setQuestionList(questions);
+      console.log("questions load: ", JSON.stringify(questions))
       setVisibleQuestions(rootQuestions);
     };
 
@@ -86,6 +87,18 @@ export function Questions({productId, locale}: {
 
       if (c?.question) {
         newVisibleQuestions.add(c.question.documentId);
+      }
+    });
+
+    // Clear form values for questions that are no longer visible
+    const currentAnswers = form.getValues().answers;
+    Object.keys(currentAnswers).forEach(answerId => {
+      if (!newVisibleQuestions.has(answerId)) {
+        form.setValue(`answers.${answerId}`, "");
+        // Also remove from selectedChoices
+        const updatedSelectedChoices = {...newSelectedChoices};
+        delete updatedSelectedChoices[answerId];
+        setSelectedChoices(updatedSelectedChoices);
       }
     });
 

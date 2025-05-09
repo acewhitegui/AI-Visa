@@ -8,26 +8,25 @@ export async function getQuestionList(productId: string, locale: string): Promis
 
   if (!token) throw new Error("The Strapi API Token environment variable is not set.");
 
-  const path = `/questions`;
+  const path = `/products/${productId}`;
   const options = {headers: {Authorization: `Bearer ${token}`}};
   const urlParamsObject = {
-    filters: {
-      "products": {
-        documentId: productId,
-      }
-    },
     populate: {
-      choices: {
-        fields: ["title", "action"],
+      questions: {
         populate: {
-          question: {
-            fields: ["id", "documentId", "title", "showDefault"]
+          choices: {
+            fields: ["title", "action"],
+            populate: {
+              question: {
+                fields: ["id", "documentId", "title", "showDefault"]
+              }
+            }
           }
         }
-      }
+      },
     },
     locale: locale,
   };
   const resp = await fetchAPI(path, urlParamsObject, options);
-  return resp?.data
+  return resp?.data.questions;
 }
