@@ -141,6 +141,7 @@ class _Const(object):
     # ai
     LOCALE = "locale"
     USAGE = "usage"
+    CONTENT = "content"
 
     ALLOW_MIMETYPES = [
         'image/jpeg',
