@@ -13,6 +13,7 @@ import {Material, UploadFile} from "@/app/library/objects/types";
 import {toast} from "sonner";
 import {getUploadedFiles, uploadFile} from "@/app/library/services/file_service";
 import Link from "next/link";
+import {useRouter} from "@/i18n/routing";
 
 const formSchema = z.object({});
 type FormSchema = z.infer<typeof formSchema>;
@@ -35,6 +36,8 @@ export function Attachments({
   const [materialList, setMaterialList] = useState<Material[]>([]);
   const [uploadedFilesMap, setUploadedFilesMap] = useState<Record<string, UploadFile | undefined>>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  const router = useRouter();
 
   // Store selected files outside of react-hook-form
   const fileInputsRef = useRef<Record<string, FileList | null>>({});
@@ -114,8 +117,11 @@ export function Attachments({
     setIsLoading(false);
 
     if (allUploadsSuccessful) {
+      toast.success("Successfully uploaded!");
       onStepChange(2);
     }
+
+    router.refresh()
   }, [materialList, onStepChange, productId, conversationId, userToken]);
 
   const handleFileChange = (material: Material, files: FileList | null) => {
@@ -125,12 +131,27 @@ export function Attachments({
     fileInputsRef.current[material.title] = files;
   };
 
+  const removeUploadedFile = (material: Material) => {
+    const updatedFilesMap = {...uploadedFilesMap};
+    delete updatedFilesMap[material.type];
+    setUploadedFilesMap(updatedFilesMap);
+
+    // Reset file input
+    const fileInput = document.querySelector(`input[type="file"][data-material="${material.documentId}"]`) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+    fileInputsRef.current[material.title] = null;
+
+    toast.success(`Removed ${material.title}`);
+  };
+
   const renderUploadedFile = (material: Material) => {
     const uploadedFile = uploadedFilesMap[material.type];
     if (!uploadedFile) return null;
 
     return (
-      <div className="uploaded-file-container mt-2">
+      <div className="uploaded-file-container mt-2 flex items-center">
         <Link
           href="#"
           onClick={(e) => {
@@ -140,10 +161,18 @@ export function Attachments({
               window.open(fileUrl, '_blank', 'noopener,noreferrer');
             }
           }}
-          className="uploaded-file-name underline text-blue-500 hover:text-blue-700"
+          className="uploaded-file-name underline text-blue-500 hover:text-blue-700 mr-2"
         >
           {uploadedFile.name}
         </Link>
+        <Button
+          type="button"
+          variant="destructive"
+          size="sm"
+          onClick={() => removeUploadedFile(material)}
+        >
+          Remove
+        </Button>
       </div>
     );
   };
@@ -167,6 +196,7 @@ export function Attachments({
                     <Input
                       type="file"
                       multiple
+                      data-material={material.documentId}
                       onChange={(e) => handleFileChange(material, e.target.files)}
                     />
                   </FormControl>
