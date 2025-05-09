@@ -12,99 +12,75 @@ interface MessageProps {
   userToken: string;
   productId: string;
   conversationId: string;
-  locale: string;
+  locale: string; // Unused prop
 }
 
-export function Messages({
-                           userToken,
-                           productId,
-                           conversationId,
-                         }: MessageProps) {
-  const [message, setMessage] = useState<Message>();
+export function Messages({userToken, productId, conversationId}: MessageProps) {
+  const [message, setMessage] = useState<Message | null>(null);
   const [htmlBuffer, setHtmlBuffer] = useState<Buffer | null>(null);
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const router = useRouter();
 
-  const generateAIResult = useCallback(async () => {
+  const handleAIOperation = useCallback(async (operation: (token: string, prodId: string, convId: string) => Promise<any>) => {
     setIsGenerating(true);
     try {
-      const result = await submitAI(userToken, productId, conversationId)
+      const result = await operation(userToken, productId, conversationId);
       if (!result) {
         toast.error("Error creating AI result, please try again later");
-        return
+        return;
       }
-      router.refresh()
-    } catch (e) {
-      console.error("ERROR to generate AI result: ", e);
+      router.refresh();
+    } catch (error) {
+      console.error("ERROR with AI operation:", error);
       toast.error("Error creating AI result, please try again later");
     } finally {
       setIsGenerating(false);
     }
-  }, [])
+  }, [userToken, productId, conversationId, router]);
 
-  const regenerateAIResult = useCallback(async () => {
-    setIsGenerating(true);
-    try {
-      const result = await updateAIResult(userToken, productId, conversationId)
-      if (!result) {
-        toast.error("Error creating AI result, please try again later");
-        return
-      }
-      router.refresh()
-    } catch (e) {
-      console.error("ERROR to generate AI result: ", e);
-      toast.error("Error creating AI result, please try again later");
-    } finally {
-      setIsGenerating(false);
-    }
-  }, [])
+  const generateAIResult = useCallback(() =>
+    handleAIOperation(submitAI), [handleAIOperation]);
+
+  const regenerateAIResult = useCallback(() =>
+    handleAIOperation(updateAIResult), [handleAIOperation]);
 
   useEffect(() => {
     const fetchAIResult = async () => {
       const messageObj = await getAIResult(userToken, productId, conversationId);
       if (messageObj) {
-        setMessage(messageObj)
+        setMessage(messageObj);
         setHtmlBuffer(Buffer.from(messageObj.answer));
       }
-
     };
-    fetchAIResult()
+    fetchAIResult();
   }, [conversationId, productId, userToken]);
 
-  const getHtmlString = () => {
-    return htmlBuffer ? htmlBuffer.toString() : '';
-  };
+  const hasContent = htmlBuffer && htmlBuffer.length > 0;
 
   return (
     <Card className="mb-4">
-      {
-        message && <CardHeader>
-              <CardTitle>AI Result</CardTitle>
-              <CardDescription>Generated at: {formatDate(message.created_at)}</CardDescription>
-          </CardHeader>
-      }
+      {message && (
+        <CardHeader>
+          <CardTitle>AI Result</CardTitle>
+          <CardDescription>Generated at: {formatDate(message.created_at)}</CardDescription>
+        </CardHeader>
+      )}
       <CardContent>
-        {htmlBuffer && htmlBuffer?.length > 0 ? (
-          <div dangerouslySetInnerHTML={{__html: getHtmlString()}}/>
+        {hasContent ? (
+          <div dangerouslySetInnerHTML={{__html: htmlBuffer.toString()}}/>
         ) : (
-          <Button
-            onClick={generateAIResult}
-            disabled={isGenerating}
-          >
+          <Button onClick={generateAIResult} disabled={isGenerating}>
             {isGenerating ? 'Generating' : 'Generate'}
           </Button>
         )}
       </CardContent>
-      {
-        htmlBuffer && htmlBuffer?.length > 0 ? (
-          <CardFooter>
-            <Button
-              onClick={regenerateAIResult} disabled={isGenerating}>
-              {isGenerating ? 'Generating' : 'Regenerate'}
-            </Button>
-          </CardFooter>
-        ) : ("")
-      }
+      {hasContent && (
+        <CardFooter>
+          <Button onClick={regenerateAIResult} disabled={isGenerating}>
+            {isGenerating ? 'Generating' : 'Regenerate'}
+          </Button>
+        </CardFooter>
+      )}
     </Card>
-  )
+  );
 }

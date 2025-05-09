@@ -2,7 +2,7 @@
 import {getApiBaseUrl} from "@/app/library/common/api-helpers";
 import {logger} from "@/app/library/common/logger";
 import {redirect} from "next/navigation";
-import {Message} from "postcss";
+import {Message} from "@/app/library/objects/types";
 
 export async function submitAI(userToken: string, productId: string, conversationId: string): Promise<boolean> {
   const apiBaseUrl = getApiBaseUrl();
