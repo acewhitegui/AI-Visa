@@ -28,8 +28,27 @@ export async function getConversationList(userToken: string, productId: string):
   return data.data;
 }
 
-export async function getConversation(userToken: string, conversationId: string): Promise<Conversation> {
-  return null
+export async function getConversation(userToken: string, conversationId: string): Promise<Conversation | null> {
+  const apiBaseUrl = getApiBaseUrl();
+  const url = `${apiBaseUrl}/conversation?conversation_id=${conversationId}`;
+
+  logger.info(`Try to get conversation details from url: ${url}, conversation id: ${conversationId}`)
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: 'bearer ' + userToken
+    },
+  });
+
+
+  if (!response.ok) {
+    const statusCode = response.status;
+    logger.error(`ERROR to get conversation details from url: ${url}, get status code: ${statusCode} resp info: " ${await response.text() || 'get failed'}`);
+    return null;
+  }
+
+  const data = await response.json();
+  return data.data;
 }
 
 export async function createNewConversation(userToken: string, productId: string, name: string): Promise<Conversation | null> {
