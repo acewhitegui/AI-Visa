@@ -9,9 +9,9 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
 import {useCallback, useEffect, useRef, useState} from "react";
 import {getMaterialList} from "@/app/library/services/material_service";
-import {Material} from "@/app/library/objects/types";
+import {Material, UploadFile} from "@/app/library/objects/types";
 import {toast} from "sonner";
-import {uploadFile} from "@/app/library/services/file_service";
+import {getUploadedFiles, uploadFile} from "@/app/library/services/file_service";
 
 // Dynamic schema creation based on material list would be better
 const formSchema = z.object({});
@@ -34,6 +34,7 @@ export function Attachments({
                               onStepChange,
                             }: AttachmentProps) {
   const [materialList, setMaterialList] = useState<Material[]>([]);
+  const [uploadedFilesMap, setUploadedFilesMap] = useState<Record<string, UploadFile | undefined>>({});
   const [isLoading, setIsLoading] = useState(false);
 
   // Store selected files outside of react-hook-form
@@ -56,6 +57,22 @@ export function Attachments({
 
     fetchMaterialList();
   }, [userToken, productId, conversationId, locale]);
+
+  // 新增：获取已上传文件并存储到 state
+  useEffect(() => {
+    async function setUploadedFiles() {
+      if (!conversationId) return;
+      try {
+
+        const fileMap = await getUploadedFiles(userToken, conversationId)
+        setUploadedFilesMap(fileMap);
+      } catch (error) {
+        console.error("Failed to fetch uploaded files:", error);
+      }
+    }
+
+    setUploadedFiles();
+  }, [conversationId, userToken]);
 
   const handleUploadFile = async (material: Material, files: FileList): Promise<boolean> => {
     const formData = new FormData();
@@ -116,27 +133,42 @@ export function Attachments({
             className="flex flex-col justify-center"
             onSubmit={form.handleSubmit(handleSubmit)}
           >
-            {materialList.map((material) => (
-              <div key={material.documentId} className="upload-section my-8">
-                <FormItem>
-                  <FormLabel>{material.title}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="file"
-                      multiple
-                      onChange={(e) => {
-                        const files = e.target.files;
-                        if (files && files.length > material.limits) {
-                          toast.warning(`Maximum ${material.limits} files allowed`);
-                        }
-                        fileInputsRef.current[material.title] = files;
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage/>
-                </FormItem>
-              </div>
-            ))}
+            {materialList.map((material) => {
+              return (
+                <div key={material.documentId} className="upload-section my-8">
+                  <FormItem>
+                    <FormLabel>{material.title}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        multiple
+                        onChange={(e) => {
+                          const files = e.target.files;
+                          if (files && files.length > material.limits) {
+                            toast.warning(`Maximum ${material.limits} files allowed`);
+                          }
+                          fileInputsRef.current[material.title] = files;
+                        }}
+                      />
+                      {/* 展示已上传文件 */}
+                      {uploadedFilesMap[material.type] && (
+                        <div className="uploaded-file-container mt-2">
+                          <a
+                            href={uploadedFilesMap[material.type]?.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="uploaded-file-name underline text-blue-500 hover:text-blue-700"
+                          >
+                            {uploadedFilesMap[material.type]?.name}
+                          </a>
+                        </div>
+                      )}
+                    </FormControl>
+                    <FormMessage/>
+                  </FormItem>
+                </div>
+              )
+            })}
             <Button type="submit" disabled={isLoading}>
               {isLoading ? "Uploading..." : "Submit"}
             </Button>
