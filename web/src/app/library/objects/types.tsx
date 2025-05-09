@@ -82,6 +82,20 @@ export type Conversation = {
   step: number;
 }
 
+export type Question = {
+  id: number;
+  documentId: string;
+  title: string;
+  showDefault: boolean;
+  choices: Choice[];
+}
+
+export type Choice = {
+  id: number;
+  title: string;
+  question: Question[];
+  action: string;
+}
 
 export type Answer = {
   question_id: string;

@@ -9,15 +9,27 @@ import {Attachments} from "@/app/components/ui/steps/Attachments";
 import {Messages} from "@/app/components/ui/steps/Messages";
 import {toast} from "sonner";
 
-export function Steps({conversationId}: {
+export function Steps({locale, productId, conversationId}: {
   locale: string;
   productId: string;
   conversationId: string
 }) {
   const [currentStep, setCurrentStep] = useState(0)
 
+  // session
+  const {data: session} = useSession();
+  const userToken = session?.user?.access_token
+  if (!userToken) {
+    redirect("/auth/login")
+  }
+
   const stepList = [
-    {title: "Step 1", description: "Answer some questions", component: <Questions conversationId={conversationId}/>},
+    {
+      title: "Step 1",
+      description: "Answer some questions",
+      component: <Questions userToken={userToken} productId={productId} conversationId={conversationId}
+                            locale={locale}/>
+    },
     {title: "Step 2", description: "Upload documents", component: <Attachments conversationId={conversationId}/>},
     {
       title: "Step 3",
@@ -25,12 +37,6 @@ export function Steps({conversationId}: {
       component: <Messages conversationId={conversationId}/>
     },
   ]
-  // session
-  const {data: session} = useSession();
-  const userToken = session?.user?.access_token
-  if (!userToken) {
-    redirect("/auth/login")
-  }
   // 获取当前会话的详情
   useEffect(() => {
     const fetchConversation = async () => {
