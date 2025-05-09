@@ -18,106 +18,130 @@ export function Questions({productId, locale}: {
   locale: string;
 }) {
   const [questionList, setQuestionList] = useState<Question[]>([]);
+  const [visibleQuestions, setVisibleQuestions] = useState<Set<string>>(new Set());
+  const [selectedChoices, setSelectedChoices] = useState<Record<string, string>>({});
 
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-  })
+  // Create a dynamic form schema based on visible questions
+  const formSchema = z.object({
+    answers: z.record(z.string())
+  });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      answers: {}
+    }
+  });
+
+  function onSubmit(data: z.infer<typeof formSchema>) {
     toast.info("You submitted the following values: " + JSON.stringify(data, null, 2))
   }
 
-  // 获取问题列表
+  // Fetch question list
   useEffect(() => {
     const fetchQuestionList = async () => {
       const questions: Question[] = await getQuestionList(productId, locale);
-      if (!questions) {
-        toast.error("No question found, please try again")
+      if (!questions || questions.length === 0) {
+        toast.error("No questions found, please try again")
         return
       }
+
+      // Find root questions (those that should be visible by default)
+      const rootQuestions = new Set<string>();
+      questions.forEach(question => {
+        if (question.showDefault) {
+          rootQuestions.add(question.documentId);
+        }
+      });
+
       setQuestionList(questions);
+      setVisibleQuestions(rootQuestions);
     };
 
     fetchQuestionList();
   }, [locale, productId]);
 
-  const handleChoiceChange = (choice: Choice) => {
-    const nextQuestion = choice.question
-    if (nextQuestion) {
-      questionList.forEach((question: Question) => {
-        if (question.id === nextQuestion.id) {
-          question.showDefault = true
-        }
-      })
-      setQuestionList(questionList)
-    }
-  }
+  const handleChoiceChange = (questionId: string, choiceId: string) => {
+    // Update selected choices
+    const newSelectedChoices = {...selectedChoices, [questionId]: choiceId};
+    setSelectedChoices(newSelectedChoices);
+
+    // Update form value
+    form.setValue(`answers.${questionId}`, choiceId);
+
+    // Calculate which questions should be visible based on the current selections
+    const newVisibleQuestions = new Set<string>();
+
+    // First add root questions
+    questionList.forEach(question => {
+      if (question.showDefault) {
+        newVisibleQuestions.add(question.documentId);
+      }
+    });
+
+    // Then add questions that should be visible based on selected choices
+    Object.entries(newSelectedChoices).forEach(([qId, cId]) => {
+      const q = questionList.find(q => q.documentId === qId);
+      const c = q?.choices?.find(choice => choice.id.toString() === cId);
+
+      if (c?.question) {
+        newVisibleQuestions.add(c.question.documentId);
+      }
+    });
+
+    setVisibleQuestions(newVisibleQuestions);
+  };
 
   return (
     <Card className="mb-4">
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
-            {
-              questionList.map((question: Question) => {
-                const isShow = question.showDefault
-                if (!isShow) {
-                  return
-                }
-                return (
-                  <FormField
-                    key={question.documentId}
-                    control={form.control}
-                    name="type"
-                    render={({field}) => (
-                      <FormItem className="space-y-3">
-                        <FormLabel>{question.title}</FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={(value) => {
-                              field.onChange(value);
-                              // find which selected
-                              const selectedChoice = question.choices?.find(choice => choice.id.toString() === value);
-                              if (selectedChoice) {
-                                handleChoiceChange(selectedChoice);
-                              }
-                            }}
-                            defaultValue={field.value}
-                            className="flex flex-col space-y-1"
-                          >
-                            {
-                              question?.choices?.map((choice: Choice) => {
-                                return (
-                                  <FormItem key={choice.id} className="flex items-center space-x-3 space-y-0">
-                                    <FormControl>
-                                      <RadioGroupItem value={choice.id.toString()}/>
-                                    </FormControl>
-                                    <FormLabel className="font-normal">
-                                      {choice.title}
-                                    </FormLabel>
-                                  </FormItem>
-                                )
-                              })
-                            }
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage/>
-                      </FormItem>
-                    )}
-                  />
-                )
-              })
-            }
+            {questionList.map((question: Question) => {
+              // Only render questions that should be visible
+              if (!visibleQuestions.has(question.documentId)) {
+                return null;
+              }
+
+              return (
+                <FormField
+                  key={question.documentId}
+                  control={form.control}
+                  name={`answers.${question.documentId}`}
+                  render={({field}) => (
+                    <FormItem className="space-y-3">
+                      <FormLabel>{question.title}</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            handleChoiceChange(question.documentId, value);
+                          }}
+                          value={field.value}
+                          className="flex flex-col space-y-1"
+                        >
+                          {question?.choices?.map((choice: Choice) => (
+                            <FormItem key={choice.id} className="flex items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <RadioGroupItem value={choice.id.toString()}/>
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                {choice.title}
+                              </FormLabel>
+                            </FormItem>
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage/>
+                    </FormItem>
+                  )}
+                />
+              );
+            })}
             <Button type="submit">Submit</Button>
           </form>
         </Form>
       </CardContent>
     </Card>
-  )
+  );
 }
-
-const FormSchema = z.object({
-  type: z.enum(["all", "mentions", "none"], {
-    required_error: "You need to select a notification type.",
-  }),
-})

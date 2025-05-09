@@ -83,7 +83,6 @@ export type Conversation = {
 }
 
 export type Question = {
-  id: number;
   documentId: string;
   title: string;
   showDefault: boolean;
