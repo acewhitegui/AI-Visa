@@ -75,5 +75,5 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   // Matcher ignoring `/_next/` and `/api/`
-  matcher: ['/((?!_next|any-converters/api|api|img).*)'],
+  matcher: ['/((?!_next|ai-visa/api|api|img).*)'],
 };
