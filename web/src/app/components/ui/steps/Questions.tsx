@@ -8,15 +8,15 @@ import {zodResolver} from "@hookform/resolvers/zod"
 import {toast} from "sonner";
 import {Card, CardContent} from "@/app/components/ui/shadcn/card";
 import {useEffect, useState} from "react";
-import {Choice, Question} from "@/app/library/objects/types";
+import {Choice, Conversation, Question} from "@/app/library/objects/types";
 import {getQuestionList} from "@/app/library/services/question_service";
 import {updateConversation} from "@/app/library/services/conversation_service";
 
-export function Questions({userToken, productId, conversationId, conversationName, locale, onStepChange}: {
+export function Questions({userToken, productId, conversationId, conversation, locale, onStepChange}: {
   userToken: string;
   productId: string;
   conversationId: string
-  conversationName: string;
+  conversation?: Conversation;
   locale: string;
   onStepChange: (step: number) => void;
 }) {
@@ -39,7 +39,13 @@ export function Questions({userToken, productId, conversationId, conversationNam
   });
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    const result = await updateConversation(userToken, productId, conversationId, conversationName, data)
+    const conversationName = conversation?.name
+    if (!conversationName) {
+      toast.warning("Please enter a valid conversation name");
+      return
+    }
+
+    const result = await updateConversation(userToken, productId, conversationId, conversation?.name, data.answers)
     if (!result) {
       toast.error("Submit failed, Please try again later")
       return
@@ -60,7 +66,30 @@ export function Questions({userToken, productId, conversationId, conversationNam
         // 找到第一个根问题（链式结构只允许一个入口）
         const rootQuestion = questions.find(q => q.showDefault);
         setQuestionList(questions);
-        setVisibleQuestions(rootQuestion ? new Set([rootQuestion.documentId]) : new Set());
+        const visibleQuestions = rootQuestion ? new Set([rootQuestion.documentId]) : new Set<string>()
+        // 已经选择答案也要赋值
+        let newSelectedChoices = {...selectedChoices}
+        const answeredChoices = conversation?.answers
+        if (answeredChoices && answeredChoices.length > 0) {
+          // 如果存在选择的答案
+          for (const question of questions) {
+            const questionId = question.documentId
+            const answer = answeredChoices.get(questionId)
+            if (!answer) {
+              continue
+            }
+            visibleQuestions.add(questionId)
+            const chosenChoiceId = answer.choice_id
+            newSelectedChoices = {...selectedChoices, [questionId]: chosenChoiceId};
+            // 更新表单值
+            form.setValue(`answers.${questionId}`, {
+              choice_id: chosenChoiceId,
+              question_id: questionId
+            });
+          }
+        }
+        setSelectedChoices(newSelectedChoices)
+        setVisibleQuestions(visibleQuestions);
       } catch (error) {
         toast.error("Failed to fetch questions: " + (error instanceof Error ? error.message : String(error)));
       }

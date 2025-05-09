@@ -78,7 +78,7 @@ export type Product = {
 export type Conversation = {
   conversation_id: string;
   name: string;
-  answers: string
+  answers: any;
   step: number;
 }
 
