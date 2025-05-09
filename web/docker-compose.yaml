@@ -18,7 +18,13 @@ services:
       HOST: 0.0.0.0
       PORT: 3002
       NEXT_PUBLIC_BASE_URL: http://localhost:3002
-      AI_VISA_API_BASE_URL: http://192.168.50.24:8001/ai-visa/api/v1
       STRIPE_BASE_URL: https://api.stripe.com
       STRIPE_SECRET_KEY: sk_texxxxxx
       NEXT_PUBLIC_STRIPE_PUBLIC_KEY: pk_test_xxxxx
+      AUTH_SECRET: DtRKjJoWsiTb9L~Hw0tDGz*%@kFVKvN!Z-UxHpr9hq}.~ZfqfpX]-L!%:v)ZtQ,i^u9rxx?xE66xQR
+      STRAPI_API_TOKEN: xxxxx
+      NEXT_PUBLIC_PAGE_LIMIT: 5
+      STRAPI_FORM_SUBMISSION_TOKEN: your-form-submission-token
+      NEXT_PUBLIC_STRAPI_API_URL: http://192.168.50.24:1339
+      STRAPI_API_URL: http://192.168.50.24:1339
+      AI_VISA_API_BASE_URL: http://192.168.50.24:8001/ai-visa/api/v1
