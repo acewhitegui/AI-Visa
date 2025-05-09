@@ -31,7 +31,7 @@ async def get_uploaded_files(conversation_id):
     return file_dict
 
 
-async def store_file(conversation_id, file_name, file_type, file_path):
+async def store_file(conversation_id, material_id, file_name, file_type, file_path):
     with GLOBALS.get_postgres_wrapper().session_scope() as session:
         log.info(
             f"Try to store file: {file_name} with, conversation id: {conversation_id}, file type: {file_type}, file path: {file_path}")
@@ -41,6 +41,7 @@ async def store_file(conversation_id, file_name, file_type, file_path):
         if not existed_file:
             upload_file = UploadFile()
             upload_file.conversation_id = conversation_id
+            upload_file.material_id = material_id
             upload_file.name = file_name
             upload_file.file_path = file_path
             upload_file.type = file_type

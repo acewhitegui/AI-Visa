@@ -56,6 +56,7 @@ async def get_uploaded_files_endpoint(conversation_id: Optional[str],
 async def upload_files(
         files: list[UploadFile] = Form(...),
         conversation_id: str = Form(...),
+        material_id: str = Form(...),
         file_type: str = Form(...),
         current_user: Annotated[User, Depends(get_current_user)] = None
 ):
@@ -72,6 +73,6 @@ async def upload_files(
         bucket_key = f"users/{user_id}/{file_name}"
         oss_service.upload_file(bucket, bucket_key, data=content)
         # Store file info in database
-        await file_service.store_file(conversation_id, file_name, file_type, bucket_key)
+        await file_service.store_file(conversation_id, material_id, file_name, file_type, bucket_key)
 
     return utils.resp_success()
