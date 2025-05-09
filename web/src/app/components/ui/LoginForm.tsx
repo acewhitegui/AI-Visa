@@ -17,14 +17,12 @@ export function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-  const {data: session, update} = useSession();
+  const {data: session} = useSession();
 
   useEffect(() => {
     // 检查用户是否已经登录
     const checkLoginStatus = async () => {
       try {
-        // update session before checking
-        await update()
         // 例如检查localStorage中的token或者通过API请求验证会话状态
         const expiredAt = session?.user?.expired_at
         if (expiredAt) {
@@ -43,10 +41,11 @@ export function LoginForm() {
     };
 
     checkLoginStatus();
-  }, []);
+  }, [callbackUrl, router, session?.user?.expired_at]);
 
   const navigateToRegister = () => {
-    router.push("/register");
+    router.refresh();
+    router.push("/auth/register");
   };
 
   return (

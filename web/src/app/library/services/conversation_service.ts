@@ -28,6 +28,10 @@ export async function getConversationList(userToken: string, productId: string):
   return data.data;
 }
 
+export async function getConversation(userToken: string, conversationId: string): Promise<Conversation> {
+  return null
+}
+
 export async function createNewConversation(userToken: string, productId: string, name: string): Promise<Conversation | null> {
   const apiBaseUrl = getApiBaseUrl();
   const url = `${apiBaseUrl}/conversation`;

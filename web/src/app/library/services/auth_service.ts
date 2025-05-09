@@ -4,6 +4,7 @@ import {AuthError} from 'next-auth';
 import {FormState, SignupFormSchema} from "@/app/library/definitions/form";
 import {redirect} from "next/navigation";
 import {getApiBaseUrl} from "@/app/library/common/api-helpers";
+import {RedirectType} from "next/dist/client/components/redirect-error";
 
 export async function signup(state: FormState, formData: FormData) {
   // Validate form fields
@@ -50,15 +51,15 @@ async function registerUser(username: string, email: string, password: string) {
       }).toString(),
     });
 
-    const data = await response.json();
-
     if (!response.ok) {
+      const respText = await response.text();
+      console.error("ERROR to register user, resp info: ", respText)
       return {
-        errors: data.error || 'Failed to register user',
+        errors: respText || 'Failed to register user',
       };
     }
-
-    console.log("Successfully registered user:", username, "at endpoint:", url);
+    const data = await response.json();
+    console.log("Successfully registered user:", username, "at endpoint:", url, "resp data: ", data.data);
     return {success: true};
   } catch (err) {
     // @ts-expect-error error any
@@ -120,7 +121,7 @@ export async function authenticate(
       redirect: false
     }); // find logic to -> auth.js
     const callbackUrl: string = formData.get('callbackUrl')?.toString() || '/';
-    return redirect(callbackUrl);
+    return redirect(callbackUrl, RedirectType.replace);
   } catch (error) {
     if (error instanceof AuthError) {
       console.error("Auth error: ", error);
