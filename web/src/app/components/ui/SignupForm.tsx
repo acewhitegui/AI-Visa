@@ -2,9 +2,14 @@
 import {Button} from "@headlessui/react";
 import {useActionState, useState} from 'react'
 import {signup} from "@/app/library/services/auth_service";
+import {FormState} from "@/app/library/definitions/form";
+
+async function signupReducer(prevState: FormState, formData: FormData): Promise<FormState> {
+  return await signup(prevState, formData);
+}
 
 export function SignUpForm() {
-  const [state, action, pending] = useActionState(signup, undefined)
+  const [state, action, pending] = useActionState<FormState, FormData>(signupReducer, undefined)
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -28,6 +33,9 @@ export function SignUpForm() {
                 className="rounded-md relative block w-full px-3 py-2 border"
               />
             </div>
+            {state?.errors?.email && Array.isArray(state.errors.email) && (
+              <p className="text-red-500">{state.errors.email.join(', ')}</p>
+            )}
             <div className="mb-4">
               <label htmlFor="username" className="block text-sm font-bold mb-2">Username</label>
               <input
@@ -40,7 +48,9 @@ export function SignUpForm() {
                 className="rounded-md relative block w-full px-3 py-2 border"
               />
             </div>
-            {state?.errors?.username && <p>{state.errors.username}</p>}
+            {state?.errors?.username && Array.isArray(state.errors.username) && (
+              <p className="text-red-500">{state.errors.username.join(', ')}</p>
+            )}
             <div className="mb-4">
               <label htmlFor="password" className="block text-sm font-bold mb-2">Password</label>
               <input
@@ -53,15 +63,13 @@ export function SignUpForm() {
                 className="rounded-md relative block w-full px-3 py-2 border"
               />
             </div>
-            {state?.errors?.password && (
-              <div>
+            {state?.errors?.password && Array.isArray(state.errors.password) && (
+              <div className="text-red-500">
                 <p>Password must:</p>
                 <ul>
-                  {
-                    // @ts-expect-error don not know type
-                    state.errors.password.map((error) => (
-                      <li key={error}>- {error}</li>
-                    ))}
+                  {state.errors.password.map((error) => (
+                    <li key={error}>- {error}</li>
+                  ))}
                 </ul>
               </div>
             )}
@@ -78,6 +86,9 @@ export function SignUpForm() {
                 className="rounded-md relative block w-full px-3 py-2 border"
               />
             </div>
+            {state?.errors?.confirm_password && Array.isArray(state.errors.confirm_password) && (
+              <p className="text-red-500">{state.errors.confirm_password.join(', ')}</p>
+            )}
           </div>
           <div>
             <Button
