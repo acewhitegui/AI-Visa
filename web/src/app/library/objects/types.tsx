@@ -121,8 +121,8 @@ export type UploadFile = {
 export type Message = {
   message_id: string;
   conversation_id: string;
-  created_at: string;
-  updated_at: string;
+  created_at: number;
+  updated_at: number;
   answer: string;
 }
 
