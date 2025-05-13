@@ -45,6 +45,8 @@ async def get_material_list(user_id: int, params: MaterialVO):
             if choice_id == int(user_choice_id):
                 default_materials.extend(choice.get(CONST.MATERIALS))
 
+    # 按照指定顺序排序
+    default_materials.sort(key=lambda x: CONST.MATERIAL_TYPES.index(x.get(CONST.TYPE)))
     return default_materials
 
 

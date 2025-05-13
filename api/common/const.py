@@ -125,7 +125,6 @@ class _Const(object):
     LIMITS = "limits"
     MATERIAL = "material"
     MATERIALS = "materials"
-    PASSPORT = "passport"
     STANDARD = "standard"
     # question
     CHOICES = "choices"
@@ -161,6 +160,31 @@ class _Const(object):
         'image/heif',
         'image/jxl',
         'image/jp2'
+    ]
+
+    PASSPORT = "passport"
+    APPLICATION_FORM = "application_form"
+    CAS = "CAS"
+    BRP = "BRP"
+    EVISA = "eVisa"
+    FINANCIAL_EVIDENCE = "financial_evidence"
+    PARENTS_EVIDENCE = "parents_evidence"
+    PARENTS_SIGNED = "parents_signed"
+    RESIDENCE_EVIDENCE = "residence_evidence"
+
+    OTHER = "other"
+
+    MATERIAL_TYPES = [
+        PASSPORT,
+        APPLICATION_FORM,
+        CAS,
+        BRP,
+        EVISA,
+        FINANCIAL_EVIDENCE,
+        PARENTS_EVIDENCE,
+        PARENTS_SIGNED,
+        RESIDENCE_EVIDENCE,
+        OTHER
     ]
 
 
