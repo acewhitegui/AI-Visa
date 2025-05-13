@@ -146,6 +146,7 @@ def extract_report_info(prompt: str, file_id_list: list) -> dict:
     # transfer to markdown template
     content = get_rendered_md_content(report_details)
     message_dict[CONST.CONTENT] = content
+    log.info(f"SUCCESS to extract report info, get rendered md content: {content}")
     return result
 
 
