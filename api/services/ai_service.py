@@ -60,7 +60,7 @@ async def submit_ai_check(product_id: str, conversation_id: str, locale: str):
         # 3. 上传ai文件
         oss_file_key = upload_obj.file_path
         filename = oss_file_key.split("/")[-1]
-        with TemporaryDirectory() as tmp_dir:
+        with TemporaryDirectory(delete=False) as tmp_dir:
             full_path = os.path.join(tmp_dir, filename)
             with open(full_path, "wb") as file:
                 content = oss_service.download_file(bucket, oss_file_key)

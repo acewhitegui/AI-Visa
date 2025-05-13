@@ -6,7 +6,10 @@
 @Date  : 2025/5/8
 @Desc :
 """
+import os
 from datetime import datetime
+
+import comtypes.client
 
 from common.const import CONST
 from common.globals import GLOBALS
@@ -55,3 +58,30 @@ async def store_file(conversation_id, material_id, file_name, file_type, file_pa
             session.commit()
             log.info(
                 f"SUCCESS to rewrite file: {file_name} with, file type: {file_type}, file path: {file_path}")
+
+
+def convert_word_to_pdf(word_path: str):
+    # Get the PDF file path by replacing the extension
+    pdf_path = os.path.splitext(word_path)[0] + '.pdf'
+
+    # Create Word application
+    word = comtypes.client.CreateObject('Word.Application')
+    word.Visible = False
+
+    try:
+        # Open the word document
+        doc = word.Documents.Open(word_path)
+
+        # Save as PDF
+        doc.SaveAs(pdf_path, FileFormat=17)  # 17 represents PDF format
+
+        # Close the document
+        doc.Close()
+
+        return pdf_path
+    except Exception as e:
+        log.exception(f"ERROR to convert word to pdf, file path: {word_path}, error info: {str(e)}")
+        raise e
+    finally:
+        # Quit Word application
+        word.Quit()
