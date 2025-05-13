@@ -6,6 +6,7 @@ import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} f
 import {toast} from "sonner";
 import {Message} from "@/app/library/objects/types";
 import {formatDate} from "@/app/library/common/utils";
+import "@/app/assets/css/article.css"
 
 interface MessageProps {
   userToken: string;
@@ -66,7 +67,7 @@ export function Messages({userToken, productId, conversationId}: MessageProps) {
       )}
       <CardContent>
         {hasContent ? (
-          <div dangerouslySetInnerHTML={{__html: htmlBuffer.toString()}}/>
+          <div className="markdown" dangerouslySetInnerHTML={{__html: htmlBuffer.toString()}}/>
         ) : (
           <Button onClick={generateAIResult} disabled={isGenerating}>
             {isGenerating ? 'Generating' : 'Generate'}

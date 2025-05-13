@@ -2,3 +2,134 @@
 @import "tailwindcss";
 @import "./globals.css";
 
+.markdown {
+    /* Typography */
+    @apply text-foreground leading-relaxed;
+
+    /* Headings */
+
+    & h1 {
+        @apply text-3xl font-bold mt-8 mb-4 text-foreground/90 tracking-tight;
+    }
+
+    & h2 {
+        @apply text-2xl font-semibold mt-6 mb-3 text-foreground/90 tracking-tight border-b border-border pb-1;
+    }
+
+    & h3 {
+        @apply text-xl font-medium mt-5 mb-2 text-foreground/90;
+    }
+
+    & h4 {
+        @apply text-lg font-medium mt-4 mb-2 text-foreground/80;
+    }
+
+    & h5, & h6 {
+        @apply text-base font-medium mt-3 mb-1 text-foreground/80;
+    }
+
+    /* Paragraphs and spacing */
+
+    & p {
+        @apply my-4 text-foreground/80;
+    }
+
+    /* Lists */
+
+    & ul, & ol {
+        @apply my-4 ml-6;
+    }
+
+    & ul {
+        @apply list-disc;
+    }
+
+    & ol {
+        @apply list-decimal;
+    }
+
+    & li {
+        @apply mb-1;
+    }
+
+    & li > ul, & li > ol {
+        @apply my-1;
+    }
+
+    /* Blockquotes */
+
+    & blockquote {
+        @apply pl-4 border-l-4 border-primary/30 italic my-6 text-foreground/70 bg-muted/50 py-2 pr-4 rounded-sm;
+    }
+
+    /* Code blocks */
+
+    & pre {
+        @apply bg-muted p-4 rounded-lg my-6 overflow-x-auto text-sm;
+    }
+
+    & code {
+        @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-primary;
+    }
+
+    & pre code {
+        @apply bg-transparent p-0 text-foreground;
+    }
+
+    /* Links */
+
+    & a {
+        @apply text-primary hover:text-primary/80 underline underline-offset-2 transition-colors;
+    }
+
+    /* Images */
+
+    & img {
+        @apply max-w-full h-auto my-6 rounded-lg mx-auto;
+    }
+
+    /* Tables */
+
+    & table {
+        @apply w-full my-6 border-collapse;
+    }
+
+    & th {
+        @apply bg-muted px-4 py-2 text-left font-medium border border-border;
+    }
+
+    & td {
+        @apply px-4 py-2 border border-border;
+    }
+
+    /* Horizontal rule */
+
+    & hr {
+        @apply my-8 border-t border-border;
+    }
+
+    /* Custom content */
+
+    & .note {
+        @apply bg-accent/10 border-l-4 border-accent p-4 rounded-r-lg my-6;
+    }
+
+    & .warning {
+        @apply bg-destructive/10 border-l-4 border-destructive p-4 rounded-r-lg my-6;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 640px) {
+        & h1 {
+            @apply text-2xl;
+        }
+
+        & h2 {
+            @apply text-xl;
+        }
+
+        & h3 {
+            @apply text-lg;
+        }
+    }
+}
