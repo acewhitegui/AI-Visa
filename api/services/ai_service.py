@@ -137,12 +137,12 @@ def extract_report_info(prompt: str, file_id_list: list) -> dict:
     """
     log.info(f"Try to extract passport info by openai file id list: {file_id_list}")
     result = chat_messages_with_response_format(prompt, file_id_list, ReportDetails)
-    # transfer to markdown template
     message_dict = result.get(CONST.CHOICES, [])[0].get(CONST.MESSAGE, {})
     report_details = message_dict.get(CONST.PARSED, {})
+    # transfer to markdown template
     content = __get_rendered_md_content(report_details)
     message_dict[CONST.CONTENT] = content
-    return message_dict
+    return result
 
 
 def __get_rendered_md_content(report_details):
