@@ -13,7 +13,6 @@ import {Material, UploadFile} from "@/app/library/objects/types";
 import {toast} from "sonner";
 import {getUploadedFiles, uploadFile} from "@/app/library/services/file_service";
 import Link from "next/link";
-import {useRouter} from "@/i18n/routing";
 
 const formSchema = z.object({});
 type FormSchema = z.infer<typeof formSchema>;
@@ -36,8 +35,6 @@ export function Attachments({
   const [materialList, setMaterialList] = useState<Material[]>([]);
   const [uploadedFilesMap, setUploadedFilesMap] = useState<Record<string, UploadFile | undefined>>({});
   const [isLoading, setIsLoading] = useState(false);
-
-  const router = useRouter();
 
   // Store selected files outside of react-hook-form
   const fileInputsRef = useRef<Record<string, FileList | null>>({});
