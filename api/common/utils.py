@@ -23,6 +23,7 @@ def get_file_extension(file_path: str):
 
     return ""
 
+
 def generate_uuid():
     return str(uuid.uuid4())
 
