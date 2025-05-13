@@ -9,7 +9,6 @@
 from typing import Annotated
 from typing import Dict, Any, Optional
 
-import markdown
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi import Body
 
@@ -17,7 +16,7 @@ from common import utils
 from common.const import CONST
 from common.logger import log
 from models import User
-from services.ai_service import submit_ai_check
+from services.ai_service import submit_ai_check, convert_markdown_to_html
 from services.auth_service import get_current_user
 from services.message_service import get_latest_message
 
@@ -37,7 +36,7 @@ async def get_ai_result(
         raise HTTPException(status_code=400, detail="Failed to get message")
 
     answer = message_dict.get(CONST.ANSWER)
-    message_dict[CONST.ANSWER] = markdown.markdown(answer)
+    message_dict[CONST.ANSWER] = await convert_markdown_to_html(answer)
     data = {
         CONST.MESSAGE: message_dict
     }
@@ -60,7 +59,7 @@ async def submit_ai_result(
     message_dict = get_latest_message(product_id, conversation_id)
     if message_dict:
         answer = message_dict.get(CONST.ANSWER)
-        message_dict[CONST.ANSWER] = markdown.markdown(answer)
+        message_dict[CONST.ANSWER] = await convert_markdown_to_html(answer)
         response_data = {
             CONST.MESSAGE: message_dict
         }

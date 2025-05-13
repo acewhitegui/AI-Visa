@@ -109,8 +109,12 @@ async def submit_ai_check(product_id: str, conversation_id: str, locale: str):
     message_dict = save_message(product_id, conversation_id, ai_message)
     # 6. 标准化返回
     answer = message_dict.get(CONST.ANSWER)
-    message_dict[CONST.ANSWER] = markdown.markdown(answer)
+    message_dict[CONST.ANSWER] = await convert_markdown_to_html(answer)
     return message_dict
+
+
+async def convert_markdown_to_html(md_text: str):
+    return markdown.markdown(md_text, extensions=['tables'])
 
 
 def extract_passport_info(file_id) -> dict:
@@ -140,12 +144,12 @@ def extract_report_info(prompt: str, file_id_list: list) -> dict:
     message_dict = result.get(CONST.CHOICES, [])[0].get(CONST.MESSAGE, {})
     report_details = message_dict.get(CONST.PARSED, {})
     # transfer to markdown template
-    content = __get_rendered_md_content(report_details)
+    content = get_rendered_md_content(report_details)
     message_dict[CONST.CONTENT] = content
     return result
 
 
-def __get_rendered_md_content(report_details):
+def get_rendered_md_content(report_details):
     with open('./models/templates/report.md', 'r') as file:
         template = Template(file.read(), trim_blocks=True)
         rendered_text = template.render(**report_details)
