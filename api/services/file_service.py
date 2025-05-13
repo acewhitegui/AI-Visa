@@ -9,7 +9,7 @@
 import os
 from datetime import datetime
 
-import comtypes.client
+from spire.doc import Document, FileFormat
 
 from common.const import CONST
 from common.globals import GLOBALS
@@ -63,25 +63,24 @@ async def store_file(conversation_id, material_id, file_name, file_type, file_pa
 def convert_word_to_pdf(word_path: str):
     # Get the PDF file path by replacing the extension
     pdf_path = os.path.splitext(word_path)[0] + '.pdf'
-
-    # Create Word application
-    word = comtypes.client.CreateObject('Word.Application')
-    word.Visible = False
-
+    doc = None
     try:
-        # Open the word document
-        doc = word.Documents.Open(word_path)
+        # Create a Spire.Doc document
+        doc = Document()
+
+        # Load the Word document
+        doc.LoadFromFile(word_path)
 
         # Save as PDF
-        doc.SaveAs(pdf_path, FileFormat=17)  # 17 represents PDF format
+        doc.SaveToFile(pdf_path, FileFormat.PDF)
 
         # Close the document
-        doc.Close()
-
+        log.info(f"SUCCESS to convert doc to pdf, word path: {word_path}")
         return pdf_path
     except Exception as e:
         log.exception(f"ERROR to convert word to pdf, file path: {word_path}, error info: {str(e)}")
         raise e
     finally:
         # Quit Word application
-        word.Quit()
+        if doc:
+            doc.Close()
