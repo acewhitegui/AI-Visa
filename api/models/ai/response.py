@@ -33,7 +33,7 @@ class MaterialCheckItem(BaseModel):
 
 class RiskEvaluationItem(BaseModel):
     project: str
-    result: str
+    status: str
     note: str
 
 
