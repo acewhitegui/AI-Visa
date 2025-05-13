@@ -12,6 +12,7 @@ import mimetypes
 
 import openai
 
+from common import utils
 from common.const import CONST
 from common.logger import log
 from services import file_service
@@ -77,12 +78,13 @@ def function_call(tools: list, message_contents: list):
 
 def file_upload(file_path: str):
     client = __get_open_client()
+    extension = utils.get_file_extension(file_path)
     guess_type, _ = mimetypes.guess_type(file_path)
     if guess_type in CONST.ALLOW_MIMETYPES:
         # Image like
         return file_path
 
-    if guess_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+    if CONST.DOC_MIME_TYPE == guess_type or extension in ["doc", "docx"]:
         file_path = file_service.convert_word_to_pdf(file_path)
 
     # PDF processing

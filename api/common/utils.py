@@ -17,6 +17,12 @@ from common.const import CONST
 from common.logger import log
 
 
+def get_file_extension(file_path: str):
+    if "." in file_path:
+        return file_path.split(".")[-1]
+
+    return ""
+
 def generate_uuid():
     return str(uuid.uuid4())
 

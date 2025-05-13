@@ -144,6 +144,9 @@ class _Const(object):
     STEP = "step"
     PARSED = "parsed"
 
+    # MIME
+    DOC_MIME_TYPE = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+
     ALLOW_MIMETYPES = [
         'image/jpeg',
         'image/png',
