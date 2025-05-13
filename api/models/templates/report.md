@@ -1,8 +1,8 @@
 ## Overview
 
-Name: {{ passport_info.name }}
-Gender: {{ passport_info.sex }}
-Passport Number: {{ passport_info.passport_number }}
+- Name: {{ passport_info.name }}
+- Gender: {{ passport_info.sex }}
+- Passport Number: {{ passport_info.passport_number }}
 
 ## Materials
 

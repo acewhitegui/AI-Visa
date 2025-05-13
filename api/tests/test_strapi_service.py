@@ -7,6 +7,7 @@
 @Desc :
 """
 import pprint
+import shutil
 import unittest
 
 from services.ai_service import get_rendered_md_content, convert_markdown_to_html
@@ -37,6 +38,7 @@ class TestTemplate(unittest.IsolatedAsyncioTestCase):
         pprint.pprint(result)
 
     async def test_get_rendered_md_content(self):
+        shutil.copyfile("../models/templates/report.md", "./models/templates/report.md")
         test_data = {
             'passport_info': {'passport_number_length': 9, 'passport_number': 'EJ5863095', 'name': 'YANG, XINGLAI',
                               'sex': 'F', 'nationality': 'CHINESE', 'date_of_birth': '2006-03-14',
@@ -68,6 +70,7 @@ class TestTemplate(unittest.IsolatedAsyncioTestCase):
                             {'project': 'Xinglai Yang CAS.pdf', 'result': 'Fully consistent and correct.',
                              'note': 'CAS information — including passport number, name, sex, nationality, and date of birth — precisely matches the passport. No discrepancies found.'}]}
         result = get_rendered_md_content(test_data)
+        print(f"md content:\n {result}")
         final = await convert_markdown_to_html(result)
         print(final)
 
