@@ -169,7 +169,7 @@ def chat_messages_with_response_format(prompt: str, file_id_list: list, response
         completion = client.beta.chat.completions.parse(
             **options
         )
-        resp_json = completion.choices[0].message.parsed
+        resp_json = completion.model_dump()
         log.info(f"SUCCESS to ask file info from server, resp data: {resp_json}")
         return resp_json
     except Exception as e:

@@ -10,6 +10,7 @@ import os.path
 from tempfile import TemporaryDirectory
 
 import markdown
+from jinja2 import Template
 
 from common.const import CONST
 from common.globals import GLOBALS
@@ -17,7 +18,7 @@ from common.logger import log
 from dao.ai import openai
 from dao.ai.openai import chat_messages_with_response_format
 from dao.aliyun import oss_service
-from models.ai.response import PassportDetails
+from models.ai.response import PassportDetails, ReportDetails
 from models.db import UploadFile
 from services import product_service, material_service
 from services.message_service import save_message
@@ -100,9 +101,10 @@ async def submit_ai_check(product_id: str, conversation_id: str, locale: str):
         """
         prompt = prefix_prompt + prompt
 
-    ai_message = openai.chat_messages_with_files(prompt, file_id_list)
+    ai_message = extract_report_info(prompt, file_id_list)
     if not ai_message:
         raise ValueError("ERROR to get ai message")
+
     # 5. 存储会话
     message_dict = save_message(product_id, conversation_id, ai_message)
     # 6. 标准化返回
@@ -111,7 +113,7 @@ async def submit_ai_check(product_id: str, conversation_id: str, locale: str):
     return message_dict
 
 
-def extract_passport_info(file_id):
+def extract_passport_info(file_id) -> dict:
     file_id_list = [file_id]
     log.info(f"Try to extract passport info by openai file id: {file_id}")
     prompt = (
@@ -122,4 +124,29 @@ def extract_passport_info(file_id):
         "- The information in the bottom two lines of the passport must be disregarded.\n"
     )
     result = chat_messages_with_response_format(prompt, file_id_list, PassportDetails)
-    return result
+    passport_details = result.get(CONST.CHOICES, [])[0].get(CONST.MESSAGE, {}).get(CONST.PARSED, {})
+    return passport_details
+
+
+def extract_report_info(prompt: str, file_id_list: list) -> dict:
+    """
+        提取报告模板中的参数
+    :param prompt:
+    :param file_id_list:
+    :return:
+    """
+    log.info(f"Try to extract passport info by openai file id list: {file_id_list}")
+    result = chat_messages_with_response_format(prompt, file_id_list, ReportDetails)
+    # transfer to markdown template
+    message_dict = result.get(CONST.CHOICES, [])[0].get(CONST.MESSAGE, {})
+    report_details = message_dict.get(CONST.PARSED, {})
+    content = __get_rendered_md_content(report_details)
+    message_dict[CONST.CONTENT] = content
+    return message_dict
+
+
+def __get_rendered_md_content(report_details):
+    with open('./models/templates/report.md', 'r') as file:
+        template = Template(file.read(), trim_blocks=True)
+        rendered_text = template.render(**report_details)
+        return rendered_text

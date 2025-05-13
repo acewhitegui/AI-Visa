@@ -6,6 +6,8 @@
 @Date  : 2025/4/15
 @Desc :
 """
+from typing import List
+
 from pydantic import BaseModel
 
 
@@ -21,3 +23,21 @@ class PassportDetails(BaseModel):
     place_of_issue: str
     date_of_expiry: str
     authority: str
+
+
+class MaterialCheckItem(BaseModel):
+    requirement: str
+    status: str
+    note: str
+
+
+class RiskEvaluationItem(BaseModel):
+    project: str
+    result: str
+    note: str
+
+
+class ReportDetails(BaseModel):
+    passport_info: PassportDetails
+    materials: List[MaterialCheckItem]
+    evaluations: List[RiskEvaluationItem]

@@ -143,6 +143,7 @@ class _Const(object):
     USAGE = "usage"
     CONTENT = "content"
     STEP = "step"
+    PARSED = "parsed"
 
     ALLOW_MIMETYPES = [
         'image/jpeg',
