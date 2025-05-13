@@ -37,12 +37,12 @@ async def get_material_list(user_id: int, params: MaterialVO):
         return default_materials
 
     for question_id, choice_dict in answers_dict.items():
-        user_choice_id = choice_dict.get(CONST.CHOICE_ID)
+        user_choice_id = choice_dict.get(CONST.CHOICE_ID, 0)
         question_details = await question_service.get_question_details(question_id, params.locale)
         choices = question_details.get(CONST.CHOICES)
         for choice in choices:
             choice_id = choice.get(CONST.ID)
-            if choice_id == user_choice_id:
+            if choice_id == int(user_choice_id):
                 default_materials.extend(choice.get(CONST.MATERIALS))
 
     return default_materials
