@@ -97,7 +97,7 @@ def file_upload(file_path: str):
         return ""
 
     log.info(
-        f"SUCCESS to get file upload result from server: {CONST.OPENAI_BASE_URL}/files/upload, resp data: {response}")
+        f"SUCCESS to get file upload result from server: {CONST.OPENAI_BASE_URL}/files/upload,file path: {file_path},guess mime type: {guess_type}, resp data: {response}")
     file_id = response.id
     return file_id
 

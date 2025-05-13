@@ -75,7 +75,7 @@ def convert_word_to_pdf(word_path: str):
         doc.SaveToFile(pdf_path, FileFormat.PDF)
 
         # Close the document
-        log.info(f"SUCCESS to convert doc to pdf, word path: {word_path}")
+        log.info(f"SUCCESS to convert doc to pdf, word path: {word_path}, pdf path: {pdf_path}")
         return pdf_path
     except Exception as e:
         log.exception(f"ERROR to convert word to pdf, file path: {word_path}, error info: {str(e)}")
