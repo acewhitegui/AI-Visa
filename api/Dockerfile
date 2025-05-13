@@ -2,7 +2,7 @@ FROM python:3.12-slim AS base
 
 # Install curl and clean up in a single layer
 RUN apt-get update && \
-    apt-get install -y curl libicu&& \
+    apt-get install -y curl libicu-dev&& \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
