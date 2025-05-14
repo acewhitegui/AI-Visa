@@ -50,7 +50,43 @@ async def handle_stripe_event(stripe_event: dict):
 
 
 async def _handle_checkout_session_created(payment_intent, db_session: Session):
-    pass
+    """Handle checkout session created event"""
+    session_id = payment_intent['id']
+    log.info(f"Checkout session created: {session_id}")
+
+    # Extract payment intent ID if available
+    payment_intent_id = payment_intent.get('payment_intent')
+    if not payment_intent_id:
+        log.warning(f"No payment_intent found in checkout session: {session_id}")
+        return None
+
+    # Find the order by payment_intent_id
+    stmt = select(Order).where(Order.payment_intent_id == payment_intent_id)
+    result = db_session.execute(stmt)
+    order = result.scalars().first()
+
+    if not order:
+        log.warning(f"Order not found for payment_intent_id: {payment_intent_id}")
+        return None
+
+    # Update order with checkout session data
+    order.checkout_session_id = session_id
+
+    # Update customer ID if available
+    if 'customer' in payment_intent:
+        order.customer_id = payment_intent['customer']
+
+    # Update payment method if available
+    if 'payment_method_types' in payment_intent:
+        order.payment_method_types = payment_intent['payment_method_types']
+
+    # Update order status to indicate checkout has started
+    order.status = 'checkout_started'
+
+    db_session.commit()
+    log.info(f"Order {order.order_number} updated with checkout session data")
+    return order
+
 
 async def _handle_payment_intent_succeeded(payment_intent, db_session: Session):
     """Handle successful payment intent"""
