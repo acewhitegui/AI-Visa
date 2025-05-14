@@ -55,10 +55,15 @@ async def _handle_payment_intent_created(payment_intent: dict, db_session: Sessi
     """Handle created payment intent"""
     metadata = payment_intent.get(CONST.METADATA)
     if not metadata:
+        log.warning(f"WARNING to get empty metadata from payment intent: {payment_intent}")
+        return None
+
+    user_id = metadata.get(CONST.USER_ID)
+    if not user_id:
+        log.warning(f"WARNING to get emtry user id from payment intent: {payment_intent}")
         return None
 
     payment_intent_id = payment_intent['id']
-    user_id = payment_intent.get(CONST.USER_ID)
     amount = payment_intent.get(CONST.DATA, {}).get(CONST.AMOUNT)
     currency = payment_intent.get(CONST.DATA, {}).get(CONST.CURRENCY, "").upper()
 
