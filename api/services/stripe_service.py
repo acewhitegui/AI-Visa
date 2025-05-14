@@ -38,6 +38,9 @@ async def handle_stripe_event(stripe_event: dict):
         if event_type == 'payment_intent.created':
             return await _handle_payment_intent_created(event_data, db_session)
 
+        if event_type == 'charge.succeeded':
+            return await _handle_charge_succeeded(event_data, db_session)
+
         if event_type == 'payment_intent.succeeded':
             return await _handle_payment_intent_succeeded(event_data, db_session)
 
@@ -69,7 +72,7 @@ async def _handle_payment_intent_created(payment_intent: dict, db_session: Sessi
     if customer:
         customer_id = customer.get(CONST.ID)
 
-    payment_intent_id = payment_intent.get(CONST.PAYMENT_INTENT)
+    payment_intent_id = payment_intent.get(CONST.ID)
     amount = payment_intent.get(CONST.AMOUNT)
     currency = payment_intent.get(CONST.CURRENCY, "").lower()
 
@@ -88,7 +91,6 @@ async def _handle_payment_intent_created(payment_intent: dict, db_session: Sessi
             currency=currency,
             status='pending',
             customer_id=customer_id,
-            charge_id=payment_intent.get(CONST.ID),
             payment_intent_id=payment_intent_id,
             payment_method_id=payment_intent.get(CONST.PAYMENT_METHOD),
             payment_method_details=payment_intent.get(CONST.PAYMENT_METHOD_DETAILS),
@@ -103,6 +105,10 @@ async def _handle_payment_intent_created(payment_intent: dict, db_session: Sessi
     except Exception as e:
         log.exception(f"ERROR to create order from payment intent: {payment_intent}, error inf: {str(e)}")
         return None
+
+
+async def _handle_charge_succeeded(charge_data: dict, db_session: Session):
+    pass
 
 
 async def _handle_payment_intent_succeeded(payment_intent, db_session: Session):
