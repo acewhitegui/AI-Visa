@@ -32,7 +32,6 @@ class Order(Base, BaseModel):
     customer_id = mapped_column(String(255), index=True, comment='Stripe customer ID')
     charge_id = mapped_column(String(255), index=True, comment='Stripe charge ID')
 
-    payment_method_type = mapped_column(String(50), comment='Payment method type')
     payment_method_details = mapped_column(JSON, comment='Payment method details')
     paid_at = mapped_column(DateTime(), comment='Payment time')
     # Relations

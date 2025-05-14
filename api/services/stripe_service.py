@@ -12,6 +12,7 @@ from datetime import datetime
 from sqlalchemy.future import select
 from sqlalchemy.orm import Session
 
+from common import utils
 from common.const import CONST
 from common.globals import GLOBALS
 from common.logger import log
@@ -63,7 +64,12 @@ async def _handle_payment_intent_created(payment_intent: dict, db_session: Sessi
         log.warning(f"WARNING to get emtry user id from payment intent: {payment_intent}")
         return None
 
-    payment_intent_id = payment_intent['id']
+    customer_id = ""
+    customer = metadata.get(CONST.CUSTOMER)
+    if customer:
+        customer_id = customer.get(CONST.ID)
+
+    payment_intent_id = payment_intent.get(CONST.PAYMENT_INTENT)
     amount = payment_intent.get(CONST.AMOUNT)
     currency = payment_intent.get(CONST.CURRENCY, "").upper()
 
@@ -81,7 +87,12 @@ async def _handle_payment_intent_created(payment_intent: dict, db_session: Sessi
             amount=amount,
             currency=currency,
             status='pending',
+            customer_id=customer_id,
+            charge_id=payment_intent.get(CONST.ID),
             payment_intent_id=payment_intent_id,
+            payment_method_id=payment_intent.get(CONST.PAYMENT_METHOD),
+            payment_method_details=payment_intent.get(CONST.PAYMENT_METHOD_DETAILS),
+            paid_at=utils.timestamp_to_datetime(payment_intent.get(CONST.CREATED))
         )
 
         db_session.add(order)

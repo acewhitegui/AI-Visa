@@ -152,6 +152,11 @@ class _Const(object):
     USER_ID = "user_id"
     AMOUNT = "amount"
     CURRENCY = "currency"
+    PAYMENT_INTENT = "payment_intent"
+    PAYMENT_METHOD = "payment_method"
+    PAYMENT_METHOD_DETAILS = "payment_method_details"
+    CUSTOMER = "customer"
+    CREATED = "created"
 
     ALLOW_MIMETYPES = [
         'image/jpeg',
