@@ -32,6 +32,9 @@ async def handle_stripe_event(stripe_event: dict):
 
     with GLOBALS.get_postgres_wrapper().session_scope() as db_session:
         # Handle the event
+        if event_type == 'checkout.session.created':
+            return await _handle_checkout_session_created(event_data, db_session)
+
         if event_type == 'payment_intent.succeeded':
             return await _handle_payment_intent_succeeded(event_data, db_session)
 
@@ -45,6 +48,9 @@ async def handle_stripe_event(stripe_event: dict):
             log.info(f"Unhandled event type: {event_type}")
             return None
 
+
+async def _handle_checkout_session_created(payment_intent, db_session: Session):
+    pass
 
 async def _handle_payment_intent_succeeded(payment_intent, db_session: Session):
     """Handle successful payment intent"""
