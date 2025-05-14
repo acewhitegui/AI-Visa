@@ -61,7 +61,7 @@ async def _handle_payment_intent_created(payment_intent: dict, db_session: Sessi
 
     user_id = metadata.get(CONST.USER_ID)
     if not user_id:
-        log.warning(f"WARNING to get emtry user id from payment intent: {payment_intent}")
+        log.warning(f"WARNING to get empty user id from payment intent: {payment_intent}")
         return None
 
     customer_id = ""
@@ -71,7 +71,7 @@ async def _handle_payment_intent_created(payment_intent: dict, db_session: Sessi
 
     payment_intent_id = payment_intent.get(CONST.PAYMENT_INTENT)
     amount = payment_intent.get(CONST.AMOUNT)
-    currency = payment_intent.get(CONST.CURRENCY, "").upper()
+    currency = payment_intent.get(CONST.CURRENCY, "").lower()
 
     log.info(f"Creating new order for user {user_id} with amount {amount} {currency}, payment id: {payment_intent_id}")
 
