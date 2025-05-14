@@ -36,6 +36,10 @@ def get_timestamp(millisecond=False):
     return timestamp
 
 
+def timestamp_to_datetime(timestamp: int):
+    from datetime import datetime
+    return datetime.fromtimestamp(timestamp)
+
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:

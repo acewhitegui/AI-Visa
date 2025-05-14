@@ -147,6 +147,17 @@ class _Const(object):
     # MIME
     DOC_MIME_TYPE = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
 
+    # stripe
+    METADATA = "metadata"
+    USER_ID = "user_id"
+    AMOUNT = "amount"
+    CURRENCY = "currency"
+    PAYMENT_INTENT = "payment_intent"
+    PAYMENT_METHOD = "payment_method"
+    PAYMENT_METHOD_DETAILS = "payment_method_details"
+    CUSTOMER = "customer"
+    CREATED = "created"
+
     ALLOW_MIMETYPES = [
         'image/jpeg',
         'image/png',

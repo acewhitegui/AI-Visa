@@ -8,4 +8,5 @@
 """
 from models.db.conversation import Conversation
 from models.db.message import Message
+from models.db.order import Order
 from models.db.upload_file import UploadFile
