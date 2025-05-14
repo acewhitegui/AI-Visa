@@ -6,11 +6,13 @@
 @Date  : 2025/5/14
 @Desc :
 """
+import uuid
 from datetime import datetime
 
 from sqlalchemy.future import select
 from sqlalchemy.orm import Session
 
+from common.const import CONST
 from common.globals import GLOBALS
 from common.logger import log
 from models.db.order import Order
@@ -32,8 +34,8 @@ async def handle_stripe_event(stripe_event: dict):
 
     with GLOBALS.get_postgres_wrapper().session_scope() as db_session:
         # Handle the event
-        if event_type == 'checkout.session.created':
-            return await _handle_checkout_session_created(event_data, db_session)
+        if event_type == 'payment_intent.created':
+            return await _handle_payment_intent_created(event_data, db_session)
 
         if event_type == 'payment_intent.succeeded':
             return await _handle_payment_intent_succeeded(event_data, db_session)
@@ -49,43 +51,42 @@ async def handle_stripe_event(stripe_event: dict):
             return None
 
 
-async def _handle_checkout_session_created(payment_intent, db_session: Session):
-    """Handle checkout session created event"""
-    session_id = payment_intent['id']
-    log.info(f"Checkout session created: {session_id}")
-
-    # Extract payment intent ID if available
-    payment_intent_id = payment_intent.get('payment_intent')
-    if not payment_intent_id:
-        log.warning(f"No payment_intent found in checkout session: {session_id}")
+async def _handle_payment_intent_created(payment_intent: dict, db_session: Session):
+    """Handle created payment intent"""
+    metadata = payment_intent.get(CONST.METADATA)
+    if not metadata:
         return None
 
-    # Find the order by payment_intent_id
-    stmt = select(Order).where(Order.payment_intent_id == payment_intent_id)
-    result = db_session.execute(stmt)
-    order = result.scalars().first()
+    payment_intent_id = payment_intent['id']
+    user_id = payment_intent.get(CONST.USER_ID)
+    amount = payment_intent.get(CONST.DATA, {}).get(CONST.AMOUNT)
+    currency = payment_intent.get(CONST.DATA, {}).get(CONST.CURRENCY, "").upper()
 
-    if not order:
-        log.warning(f"Order not found for payment_intent_id: {payment_intent_id}")
+    log.info(f"Creating new order for user {user_id} with amount {amount} {currency}, payment id: {payment_intent_id}")
+
+    # Generate unique order number
+    order_number = f"ORD-{uuid.uuid4().hex[:8].upper()}-{int(datetime.now().timestamp())}"
+
+    # Create payment intent with Stripe
+    try:
+        # Create order in database
+        order = Order(
+            user_id=user_id,
+            order_number=order_number,
+            amount=amount,
+            currency=currency,
+            status='pending',
+            payment_intent_id=payment_intent_id,
+        )
+
+        db_session.add(order)
+        db_session.commit()
+
+        log.info(f"Created order {order_number} with payment intent {payment_intent_id}")
+        return order
+    except Exception as e:
+        log.exception(f"ERROR to create order from payment intent: {payment_intent}, error inf: {str(e)}")
         return None
-
-    # Update order with checkout session data
-    order.checkout_session_id = session_id
-
-    # Update customer ID if available
-    if 'customer' in payment_intent:
-        order.customer_id = payment_intent['customer']
-
-    # Update payment method if available
-    if 'payment_method_types' in payment_intent:
-        order.payment_method_types = payment_intent['payment_method_types']
-
-    # Update order status to indicate checkout has started
-    order.status = 'checkout_started'
-
-    db_session.commit()
-    log.info(f"Order {order.order_number} updated with checkout session data")
-    return order
 
 
 async def _handle_payment_intent_succeeded(payment_intent, db_session: Session):
@@ -149,7 +150,7 @@ async def _handle_payment_intent_failed(payment_intent, db_session: Session):
 async def _handle_checkout_session_completed(checkout_session, db_session: Session):
     """Handle completed checkout session"""
     session_id = checkout_session['id']
-    log.info(f"Checkout session completed: {session_id}")
+    log.info(f"_id Checkout session completed: {session_id}")
 
     # If the checkout session has a payment_intent, find the order
     if 'payment_intent' in checkout_session:
@@ -159,20 +160,4 @@ async def _handle_checkout_session_completed(checkout_session, db_session: Sessi
         order = result.scalars().first()
 
         if not order:
-            log.warning(f"Order not found for payment_intent_id: {payment_intent_id}")
-            return None
-
-        # Update customer ID if available
-        if 'customer' in checkout_session:
-            order.customer_id = checkout_session['customer']
-
-        # Update payment method if available
-        if 'payment_method' in checkout_session:
-            order.payment_method_id = checkout_session['payment_method']
-
-        db_session.commit()
-        log.info(f"Order {order.order_number} updated with checkout session data")
-        return order
-
-    log.warning(f"No payment_intent found in checkout session: {session_id}")
-    return None
+            Noneone

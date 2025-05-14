@@ -6,7 +6,7 @@
 @Date  : 2025/5/14
 @Desc :
 """
-from sqlalchemy import Integer, ForeignKey, String, Numeric, Enum, JSON, DateTime
+from sqlalchemy import Integer, ForeignKey, String, Enum, JSON, DateTime
 from sqlalchemy.orm import mapped_column, relationship
 
 from models.db.base import Base, BaseModel
@@ -21,8 +21,8 @@ class Order(Base, BaseModel):
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id = mapped_column(Integer, ForeignKey('user.id'), nullable=False, index=True)
     order_number = mapped_column(String(64), unique=True, nullable=False, index=True)
-    amount = mapped_column(Numeric(10, 2), nullable=False, comment='Order amount')
-    currency = mapped_column(String(3), nullable=False, default='USD', comment='Currency type')
+    amount = mapped_column(Integer, nullable=False, comment='Order amount')
+    currency = mapped_column(String(3), nullable=False, default='usd', comment='Currency type')
     status = mapped_column(Enum('pending', 'paid', 'failed', 'refunded', 'canceled', name="status"), default='pending',
                            nullable=False)
 
