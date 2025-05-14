@@ -12,4 +12,4 @@
   - invoice.upcoming
   - charge.captured
   - invoice.payment_succeed
-- 会话开始事件：stripe trigger payment_intent.created --add payment_intent:metadata['user_id']=testing
+- 会话开始事件：stripe trigger payment_intent.created --add payment_intent:metadata['user_id']=1

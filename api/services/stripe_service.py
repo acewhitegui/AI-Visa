@@ -64,8 +64,8 @@ async def _handle_payment_intent_created(payment_intent: dict, db_session: Sessi
         return None
 
     payment_intent_id = payment_intent['id']
-    amount = payment_intent.get(CONST.DATA, {}).get(CONST.AMOUNT)
-    currency = payment_intent.get(CONST.DATA, {}).get(CONST.CURRENCY, "").upper()
+    amount = payment_intent.get(CONST.AMOUNT)
+    currency = payment_intent.get(CONST.CURRENCY, "").upper()
 
     log.info(f"Creating new order for user {user_id} with amount {amount} {currency}, payment id: {payment_intent_id}")
 
