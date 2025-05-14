@@ -38,14 +38,14 @@ async def handle_stripe_event(stripe_event: dict):
         if event_type == 'payment_intent.created':
             return await _handle_payment_intent_created(event_data, db_session)
 
-        if event_type == 'charge.succeeded':
-            return await _handle_charge_succeeded(event_data, db_session)
-
         if event_type == 'payment_intent.succeeded':
             return await _handle_payment_intent_succeeded(event_data, db_session)
 
         elif event_type == 'payment_intent.payment_failed':
             return await _handle_payment_intent_failed(event_data, db_session)
+
+        if event_type == 'charge.succeeded':
+            return await _handle_charge_succeeded(event_data, db_session)
 
         elif event_type == 'checkout.session.completed':
             return await _handle_checkout_session_completed(event_data, db_session)
@@ -182,4 +182,11 @@ async def _handle_checkout_session_completed(checkout_session, db_session: Sessi
         order = result.scalars().first()
 
         if not order:
-            Noneone
+            log.warning(f"WARNING to get not existed order by checkout obj: {checkout_session}")
+            return None
+
+        order.status = 'paid'
+        db_session.commit()
+        return order
+
+    return None
