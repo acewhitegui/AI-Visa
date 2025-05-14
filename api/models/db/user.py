@@ -47,6 +47,7 @@ class User(Base, BaseModel):
 
     # Relationships
     roles = relationship('Role', secondary=user_role, back_populates='users', lazy="joined")
+    orders = relationship("Order", lazy="joined")
 
     # Use a join condition instead of direct secondary for permissions
     def get_permissions(self):

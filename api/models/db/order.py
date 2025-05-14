@@ -23,7 +23,8 @@ class Order(Base, BaseModel):
     order_number = mapped_column(String(64), unique=True, nullable=False, index=True)
     amount = mapped_column(Numeric(10, 2), nullable=False, comment='Order amount')
     currency = mapped_column(String(3), nullable=False, default='USD', comment='Currency type')
-    status = mapped_column(Enum('pending', 'paid', 'failed', 'refunded', 'canceled'), default='pending', nullable=False)
+    status = mapped_column(Enum('pending', 'paid', 'failed', 'refunded', 'canceled', name="status"), default='pending',
+                           nullable=False)
 
     # Stripe related fields
     payment_intent_id = mapped_column(String(255), unique=True, index=True, comment='Stripe payment intent ID')
