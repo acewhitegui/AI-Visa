@@ -25,71 +25,79 @@ export function Messages({userId, userToken, productId, conversationId}: Message
   const [htmlBuffer, setHtmlBuffer] = useState<Buffer | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [sessionId, setSessionId] = useState("")
 
-  const pathname = usePathname()
+  const pathname = usePathname();
 
-  const handleAIOperation = useCallback(async (operation: (token: string, prodId: string, convId: string, sessionId: string) => Promise<any>) => {
-    setIsGenerating(true);
-    try {
-      const result = await operation(userToken, productId, conversationId, sessionId);
-      if (!result) {
-        toast.error("Error creating AI result, please try again later");
-        return;
+  const showToastError = (msg: string) => toast.error(msg);
+
+  const handleAIOperation = useCallback(
+    async (sessionId: string, operation: (token: string, prodId: string, convId: string, sessionId: string) => Promise<any>) => {
+      setIsGenerating(true);
+      try {
+        const result = await operation(userToken, productId, conversationId, sessionId);
+        if (!result) {
+          showToastError("Error creating AI result, please try again later");
+          return;
+        }
+        toast.success("Successfully created AI result");
+        window.location.reload();
+      } catch (error) {
+        console.error("ERROR with AI operation:", error);
+        showToastError("Error creating AI result, please try again later");
+      } finally {
+        setIsGenerating(false);
       }
-      toast.success("Successfully created AI result");
-      window.location.reload()
-    } catch (error) {
-      console.error("ERROR with AI operation:", error);
-      toast.error("Error creating AI result, please try again later");
-    } finally {
-      setIsGenerating(false);
-    }
-  }, [userToken, productId, conversationId, sessionId]);
+    },
+    [userToken, productId, conversationId]
+  );
 
-  const handlePayment = useCallback(async (isRegeneration: boolean) => {
-    setIsProcessingPayment(true);
-    try {
-      const stripePublicKey = env("NEXT_PUBLIC_STRIPE_PUBLIC_KEY")
-      if (!stripePublicKey) {
-        console.warn("Stripe public key is missing");
-        return;
+  const handlePayment = useCallback(
+    async (isRegeneration: boolean) => {
+      setIsProcessingPayment(true);
+      try {
+        const stripePublicKey = env("NEXT_PUBLIC_STRIPE_PUBLIC_KEY");
+        if (!stripePublicKey) {
+          console.warn("Stripe public key is missing");
+          return;
+        }
+        const priceId = env("NEXT_PUBLIC_STRIPE_PRICE_ID") || "";
+        const stripe = await loadStripe(stripePublicKey);
+        const newSessionId = await createStripeSession(
+          userId,
+          conversationId,
+          isRegeneration,
+          priceId,
+          pathname,
+          pathname
+        );
+        if (newSessionId) {
+          await stripe?.redirectToCheckout({sessionId: newSessionId});
+        }
+      } catch (error) {
+        console.error("Payment error:", error);
+        showToastError("Payment processing failed. Please try again.");
+      } finally {
+        setIsProcessingPayment(false);
       }
-      const priceId = env("NEXT_PUBLIC_STRIPE_PRICE_ID") || ""
-      const stripe = await loadStripe(stripePublicKey);
-      const sessionId = await createStripeSession(userId, conversationId, isRegeneration, priceId, pathname, pathname)
-      if (sessionId) {
-        await stripe?.redirectToCheckout({sessionId});
-      }
-    } catch (error) {
-      console.error("Payment error:", error);
-      toast.error("Payment processing failed. Please try again.");
-    } finally {
-      setIsProcessingPayment(false);
-    }
-  }, [conversationId, pathname, userId]);
+    },
+    [conversationId, pathname, userId]
+  );
 
-  // Check URL parameters on component mount to see if we're returning from a successful payment
+  // Handle successful payment redirect
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const sessionId = urlParams.get('session_id');
-    const returnedConversationId = urlParams.get('conversation_id');
-    const isRegeneration = urlParams.get('is_regeneration') === 'true';
+    const urlSessionId = urlParams.get("session_id");
+    const returnedConversationId = urlParams.get("conversation_id");
+    const isRegeneration = urlParams.get("is_regeneration") === "true";
 
-    if (sessionId && returnedConversationId === conversationId) {
-      toast.success("You have paid successfully")
-      setSessionId(sessionId)
-      // Payment was successful, proceed with AI generation
-      if (isRegeneration) {
-        handleAIOperation(updateAIResult);
-      } else {
-        handleAIOperation(submitAI);
-      }
-      // Clean up URL parameters
+    if (urlSessionId && returnedConversationId === conversationId) {
+      toast.success("You have paid successfully");
+      handleAIOperation(urlSessionId, isRegeneration ? updateAIResult : submitAI);
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, [handleAIOperation, productId, conversationId]);
+  }, [handleAIOperation, conversationId]);
 
+  // Fetch AI result on mount or when dependencies change
   useEffect(() => {
     const fetchAIResult = async () => {
       const messageObj = await getAIResult(userToken, productId, conversationId);
@@ -101,10 +109,16 @@ export function Messages({userId, userToken, productId, conversationId}: Message
     fetchAIResult();
   }, [conversationId, productId, userToken]);
 
-  const hasContent = htmlBuffer && htmlBuffer.length > 0;
+  const hasContent = !!(htmlBuffer && htmlBuffer.length > 0);
   const isButtonDisabled = isGenerating || isProcessingPayment;
-  const buttonText = isProcessingPayment ? 'Processing Payment...' : (isGenerating ? 'Generating' : 'Generate');
-  const regenerateButtonText = isProcessingPayment ? 'Processing Payment...' : (isGenerating ? 'Generating' : 'Regenerate');
+  const getButtonText = (isRegenerate: boolean) =>
+    isProcessingPayment
+      ? "Processing Payment..."
+      : isGenerating
+        ? "Generating"
+        : isRegenerate
+          ? "Regenerate"
+          : "Generate";
 
   return (
     <Card className="mb-4">
@@ -119,14 +133,14 @@ export function Messages({userId, userToken, productId, conversationId}: Message
           <div className="markdown" dangerouslySetInnerHTML={{__html: htmlBuffer.toString()}}/>
         ) : (
           <Button onClick={() => handlePayment(false)} disabled={isButtonDisabled}>
-            {buttonText}
+            {getButtonText(false)}
           </Button>
         )}
       </CardContent>
       {hasContent && (
         <CardFooter>
           <Button onClick={() => handlePayment(true)} disabled={isButtonDisabled}>
-            {regenerateButtonText}
+            {getButtonText(true)}
           </Button>
         </CardFooter>
       )}
