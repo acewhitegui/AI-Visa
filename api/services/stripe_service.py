@@ -122,10 +122,41 @@ async def _handle_payment_intent_created(payment_intent: dict, db_session: Sessi
 
 
 async def _handle_charge_succeeded(charge_data: dict, db_session: Session):
-    pass
+    """
+        处理支付成功的事件
+    :param charge_data:
+    :param db_session:
+    :return:
+    """
+    charge_id = charge_data.get(CONST.ID)
+    payment_intent_id = charge_data.get(CONST.PAYMENT_INTENT)
+    log.info(f"Try to handle charge succeeded with payintent id: {payment_intent_id}")
+    # Find the order by payment_intent_id
+    stmt = select(Order).where(Order.payment_intent_id == payment_intent_id)
+    result = db_session.execute(stmt)
+    order = result.scalars().first()
+
+    if not order:
+        log.warning(f"Order not found for payment_intent_id: {payment_intent_id}")
+        return None
+
+    # Update order details
+    order.status = 'paid'
+    order.paid_at = utils.timestamp_to_datetime(charge_data.get(CONST.CREATED))
+
+    # Update payment details
+    order.charge_id = charge_id
+
+    if 'payment_method_details' in charge_data:
+        order.payment_method_details = charge_data['payment_method_details']
+    order.payment_method_type = charge_data['payment_method_details']['type']
+
+    db_session.commit()
+    log.info(f"Order {order.order_number} marked as paid, charge data: {charge_data}")
+    return order
 
 
-async def _handle_payment_intent_succeeded(payment_intent, db_session: Session):
+async def _handle_payment_intent_succeeded(payment_intent: dict, db_session: Session):
     """Handle successful payment intent"""
     payment_intent_id = payment_intent['id']
     log.info(f"Payment intent succeeded: {payment_intent_id}")
@@ -141,7 +172,7 @@ async def _handle_payment_intent_succeeded(payment_intent, db_session: Session):
 
     # Update order details
     order.status = 'paid'
-    order.paid_at = datetime.now()
+    order.paid_at = utils.timestamp_to_datetime(payment_intent.get(CONST.CREATED))
 
     # Update payment details
     if 'charges' in payment_intent and 'data' in payment_intent['charges'] and payment_intent['charges']['data']:
@@ -153,7 +184,7 @@ async def _handle_payment_intent_succeeded(payment_intent, db_session: Session):
             order.payment_method_type = charge['payment_method_details']['type']
 
     db_session.commit()
-    log.info(f"Order {order.order_number} marked as paid")
+    log.info(f"Order {order.order_number} marked as paid, payment intent: {payment_intent}")
     return order
 
 
