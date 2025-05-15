@@ -63,7 +63,7 @@ async def submit_ai_result(
     product_id = data.product_id
     conversation_id = data.conversation_id
     locale = data.locale
-    result = await submit_ai_check(product_id, conversation_id, locale)
+    result = await submit_ai_check(product_id, conversation_id, payment_intent_id, locale)
     response_data = {
         CONST.MESSAGE: result
     }
