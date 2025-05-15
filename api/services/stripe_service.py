@@ -237,10 +237,10 @@ async def _handle_payment_intent_succeeded(payment_intent: dict, db_session: Ses
         charge = payment_intent['charges']['data'][0]
         order.charge_id = charge['id']
 
-        if 'payment_method_details' in payment_intent:
-            order.payment_method_id = payment_intent.get(CONST.PAYMENT_METHOD),
-            order.payment_method_details = payment_intent['payment_method_details']
-            order.payment_method_type = payment_intent['payment_method_details']['type']
+        if 'payment_method_details' in charge:
+            order.payment_method_id = charge.get(CONST.PAYMENT_METHOD),
+            order.payment_method_details = charge['payment_method_details']
+            order.payment_method_type = charge['payment_method_details']['type']
 
     db_session.commit()
     log.info(f"Order {order.order_number} marked as paid, payment intent: {payment_intent}")
