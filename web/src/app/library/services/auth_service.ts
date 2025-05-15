@@ -108,7 +108,7 @@ export async function login(username: string, password: string) {
     return {};
   }
 
-  console.log("Successfully authenticated user:", username, "at endpoint:", url);
+  console.log("Successfully authenticated user:", JSON.stringify(data, null, 2), "at endpoint:", url);
   return data;
 }
 

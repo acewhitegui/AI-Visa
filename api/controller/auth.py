@@ -48,6 +48,7 @@ async def login_for_access_token(
         }, expires_delta=access_token_expires
     )
     return Token(
+        id=user.id,
         username=user.username,
         email=email,
         access_token=access_token,
