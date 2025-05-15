@@ -16,6 +16,7 @@ from common import utils
 from common.const import CONST
 from common.globals import GLOBALS
 from common.logger import log
+from dao.dao.strapi_cli import get_stripe_client
 from models.db.order import Order
 
 
@@ -53,6 +54,19 @@ async def handle_stripe_event(stripe_event: dict):
         else:
             log.info(f"Unhandled event type: {event_type}")
             return None
+
+
+async def get_charge_details(payment_intent_id: str):
+    try:
+        stripe_cli = await get_stripe_client()
+        payment_intent = stripe_cli.PaymentIntent.retrieve(payment_intent_id)
+        payment_intent_dict = dict(payment_intent)
+        charge_id = payment_intent_dict.get(CONST.LATEST_CHARGE)
+        charge = stripe_cli.Charge.retrieve(charge_id)
+        return dict(charge)
+    except Exception as e:
+        log.exception(f"ERROR to get charget details by payment intent id: {payment_intent_id}, error info: {str(e)}")
+        return {}
 
 
 async def _handle_payment_intent_created(payment_intent: dict, db_session: Session):

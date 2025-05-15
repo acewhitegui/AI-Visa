@@ -27,7 +27,8 @@ class Order(Base, BaseModel):
                            nullable=False)
 
     # Stripe related fields
-    payment_intent_id = mapped_column(String(255), unique=True, index=True, comment='Stripe payment intent ID')
+    payment_intent_id = mapped_column(String(255), unique=True, index=True, nullable=False,
+                                      comment='Stripe payment intent ID')
     payment_method_id = mapped_column(String(255), index=True, comment='Stripe payment method ID')
     customer_id = mapped_column(String(255), index=True, comment='Stripe customer ID')
     charge_id = mapped_column(String(255), index=True, comment='Stripe charge ID')
