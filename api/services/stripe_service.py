@@ -69,6 +69,17 @@ async def get_charge_details(payment_intent_id: str):
         return {}
 
 
+async def get_payment_intent_details(payment_intent_id: str) -> dict:
+    try:
+        stripe_cli = await get_stripe_client()
+        payment_intent = stripe_cli.PaymentIntent.retrieve(payment_intent_id)
+        payment_intent_dict = dict(payment_intent)
+        return payment_intent_dict
+    except Exception as e:
+        log.exception(f"ERROR to get payment details by payment intent id: {payment_intent_id}, error info: {str(e)}")
+        return {}
+
+
 async def _handle_payment_intent_created(payment_intent: dict, db_session: Session):
     """Handle created payment intent"""
     metadata = payment_intent.get(CONST.METADATA)
@@ -138,7 +149,8 @@ async def _handle_charge_succeeded(charge_data: dict, db_session: Session):
 
     if not order:
         log.warning(f"Order not found for payment_intent_id: {payment_intent_id}")
-        return None
+        payment_intent = await get_payment_intent_details(payment_intent_id)
+        order = await _handle_payment_intent_created(payment_intent, db_session)
 
     # Update order details
     order.status = 'paid'
@@ -168,7 +180,7 @@ async def _handle_payment_intent_succeeded(payment_intent: dict, db_session: Ses
 
     if not order:
         log.warning(f"Order not found for payment_intent_id: {payment_intent_id}")
-        return None
+        order = await _handle_payment_intent_created(payment_intent, db_session)
 
     # Update order details
     order.status = 'paid'
@@ -200,7 +212,7 @@ async def _handle_payment_intent_failed(payment_intent, db_session: Session):
 
     if not order:
         log.warning(f"Order not found for payment_intent_id: {payment_intent_id}")
-        return None
+        order = await _handle_payment_intent_created(payment_intent, db_session)
 
     # Update order status
     order.status = 'failed'

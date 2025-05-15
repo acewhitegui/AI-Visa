@@ -13,5 +13,3 @@
   - charge.captured
   - invoice.payment_succeed
 - 会话开始事件：stripe trigger payment_intent.created --add payment_intent:metadata['user_id']=1
-- 指定同一事件的不同状态：stripe trigger payment_intent.succeeded --override payment_intent:
-  id=pi_3ROc004N0ZpvGvcG14ggcWg5 --add payment_intent:metadata['user_id']=1
