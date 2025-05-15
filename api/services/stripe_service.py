@@ -48,6 +48,9 @@ async def handle_stripe_event(stripe_event: dict):
         if event_type == 'charge.succeeded':
             return await _handle_charge_succeeded(event_data, db_session)
 
+        if event_type == 'charge.updated':
+            return await _handle_charge_updated(event_data, db_session)
+
         elif event_type == 'checkout.session.completed':
             return await _handle_checkout_session_completed(event_data, db_session)
 
@@ -140,6 +143,39 @@ async def _handle_payment_intent_created(payment_intent: dict, db_session: Sessi
         return None
 
 
+async def _handle_charge_updated(charge_data: dict, db_session: Session):
+    charge_id = charge_data.get(CONST.ID)
+    payment_intent_id = charge_data.get(CONST.PAYMENT_INTENT)
+    log.info(f"Try to handle charge updated with payment_intent id: {payment_intent_id}")
+    # Find the order by payment_intent_id
+    stmt = select(Order).where(Order.payment_intent_id == payment_intent_id)
+    result = db_session.execute(stmt)
+    order = result.scalars().first()
+
+    if not order:
+        log.warning(f"Order not found for payment_intent_id: {payment_intent_id}")
+        payment_intent = await get_payment_intent_details(payment_intent_id)
+        order = await _handle_payment_intent_created(payment_intent, db_session)
+
+    # Update order details
+    status = charge_data.get(CONST.STATUS)
+    if charge_data.get(CONST.PAID):
+        status = CONST.PAID
+    order.status = status
+    order.paid_at = utils.timestamp_to_datetime(charge_data.get(CONST.CREATED))
+
+    # Update payment details
+    order.charge_id = charge_id
+
+    if 'payment_method_details' in charge_data:
+        order.payment_method_details = charge_data['payment_method_details']
+    order.payment_method_type = charge_data['payment_method_details']['type']
+
+    db_session.commit()
+    log.info(f"event: charge.updated, Order {order.order_number} marked as {status}, charge data: {charge_data}")
+    return order
+
+
 async def _handle_charge_succeeded(charge_data: dict, db_session: Session):
     """
         处理支付成功的事件
@@ -149,7 +185,7 @@ async def _handle_charge_succeeded(charge_data: dict, db_session: Session):
     """
     charge_id = charge_data.get(CONST.ID)
     payment_intent_id = charge_data.get(CONST.PAYMENT_INTENT)
-    log.info(f"Try to handle charge succeeded with payintent id: {payment_intent_id}")
+    log.info(f"Try to handle charge succeeded with payment_intent id: {payment_intent_id}")
     # Find the order by payment_intent_id
     stmt = select(Order).where(Order.payment_intent_id == payment_intent_id)
     result = db_session.execute(stmt)
@@ -172,7 +208,7 @@ async def _handle_charge_succeeded(charge_data: dict, db_session: Session):
     order.payment_method_type = charge_data['payment_method_details']['type']
 
     db_session.commit()
-    log.info(f"Order {order.order_number} marked as paid, charge data: {charge_data}")
+    log.info(f"event: charge.succeeded, Order {order.order_number} marked as paid, charge data: {charge_data}")
     return order
 
 
