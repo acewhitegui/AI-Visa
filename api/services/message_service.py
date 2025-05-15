@@ -11,6 +11,7 @@ import json
 from common.const import CONST
 from common.globals import GLOBALS
 from models.db import Message, Conversation
+from models.db.message import MessageStatus
 
 
 def get_latest_message(product_id: str, conversation_id: str):
@@ -34,7 +35,7 @@ def save_message(product_id: str, conversation_id: str, payment_intent_id: str, 
         message.conversation_id = conversation_id
         message.product_id = product_id
         message.payment_intent_id = payment_intent_id
-        message.status = CONST.SUCCESS
+        message.status = MessageStatus.success
         message.answer = ai_message.get(CONST.CHOICES, [])[0].get(CONST.MESSAGE, {}).get(CONST.CONTENT, "")
         message.metafield = metadata
         session.add(message)
