@@ -152,6 +152,7 @@ class _Const(object):
     # stripe
     STATUS = "status"
     METADATA = "metadata"
+    USER = "user"
     USER_ID = "user_id"
     AMOUNT = "amount"
     CURRENCY = "currency"

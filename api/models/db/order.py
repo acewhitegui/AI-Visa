@@ -9,6 +9,7 @@
 from sqlalchemy import Integer, ForeignKey, String, Enum, JSON, DateTime
 from sqlalchemy.orm import mapped_column, relationship
 
+from common.const import CONST
 from models.db.base import Base, BaseModel
 
 
@@ -37,3 +38,8 @@ class Order(Base, BaseModel):
     paid_at = mapped_column(DateTime(), comment='Payment time')
     # Relations
     user = relationship('User', back_populates='orders')
+
+    def to_dict(self):
+        result = super().to_dict()
+        del result[CONST.USER]
+        return result

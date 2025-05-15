@@ -43,14 +43,16 @@ async def refresh_order_details(order_number: str, current_user: Annotated[User,
     # go stripe to refresh order info
     charge_details = await stripe_service.get_charge_details(order.payment_intent_id)
     # refresh order info
-    new_order = await order_service.refresh_order_details(order, charge_details)
+    new_order = await order_service.refresh_order_details(order.order_number, charge_details)
     return utils.resp_success(data=new_order.to_dict())
 
 
 @router.get("/orders")
-async def get_order_list():
+async def get_order_list(current_user: Annotated[User, Depends(get_current_user)]):
     """
         获取订单列表
     :return:
     """
-    pass
+    user_id = current_user.id
+    order_list = await order_service.get_order_list(user_id)
+    return order_list

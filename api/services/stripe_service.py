@@ -65,7 +65,7 @@ async def get_charge_details(payment_intent_id: str):
         charge = stripe_cli.Charge.retrieve(charge_id)
         return dict(charge)
     except Exception as e:
-        log.exception(f"ERROR to get charget details by payment intent id: {payment_intent_id}, error info: {str(e)}")
+        log.exception(f"ERROR to get charge details by payment intent id: {payment_intent_id}, error info: {str(e)}")
         return {}
 
 
