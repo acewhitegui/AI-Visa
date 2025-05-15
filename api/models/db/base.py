@@ -42,6 +42,9 @@ class BaseModel(object):
         # Process each field
         for field in fields:
             # Use getattr consistently instead of mixing with __getattribute__
+            if field in ["registry"]:
+                continue
+
             value = getattr(self, field)
 
             # Format value based on type

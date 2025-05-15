@@ -87,6 +87,8 @@ class _Const(object):
     SMTP_USER = os.getenv("SMTP_USER", "")
     SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
 
+    STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
+
     TITLE = "title"
 
     VERIFY_URL = "verify_url"
@@ -148,7 +150,9 @@ class _Const(object):
     DOC_MIME_TYPE = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
 
     # stripe
+    STATUS = "status"
     METADATA = "metadata"
+    USER = "user"
     USER_ID = "user_id"
     AMOUNT = "amount"
     CURRENCY = "currency"
@@ -157,6 +161,9 @@ class _Const(object):
     PAYMENT_METHOD_DETAILS = "payment_method_details"
     CUSTOMER = "customer"
     CREATED = "created"
+    LATEST_CHARGE = "latest_charge"
+    PAID = "paid"
+    CHARGE_ID = "charge_id"
 
     ALLOW_MIMETYPES = [
         'image/jpeg',

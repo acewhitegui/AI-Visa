@@ -9,6 +9,7 @@
 from sqlalchemy import Integer, ForeignKey, String, Enum, JSON, DateTime
 from sqlalchemy.orm import mapped_column, relationship
 
+from common.const import CONST
 from models.db.base import Base, BaseModel
 
 
@@ -27,7 +28,8 @@ class Order(Base, BaseModel):
                            nullable=False)
 
     # Stripe related fields
-    payment_intent_id = mapped_column(String(255), unique=True, index=True, comment='Stripe payment intent ID')
+    payment_intent_id = mapped_column(String(255), unique=True, index=True, nullable=False,
+                                      comment='Stripe payment intent ID')
     payment_method_id = mapped_column(String(255), index=True, comment='Stripe payment method ID')
     customer_id = mapped_column(String(255), index=True, comment='Stripe customer ID')
     charge_id = mapped_column(String(255), index=True, comment='Stripe charge ID')
@@ -36,3 +38,8 @@ class Order(Base, BaseModel):
     paid_at = mapped_column(DateTime(), comment='Payment time')
     # Relations
     user = relationship('User', back_populates='orders')
+
+    def to_dict(self):
+        result = super().to_dict()
+        del result[CONST.USER]
+        return result
