@@ -98,6 +98,14 @@ async def _handle_payment_intent_created(payment_intent: dict, db_session: Sessi
         customer_id = customer.get(CONST.ID)
 
     payment_intent_id = payment_intent.get(CONST.ID)
+    # Find the order by payment_intent_id
+    stmt = select(Order).where(Order.payment_intent_id == payment_intent_id)
+    result = db_session.execute(stmt)
+    order = result.scalars().first()
+    if order:
+        log.warning(f"Order has existed try skip intent created event, order info: {order.to_dict()}")
+        return order
+
     amount = payment_intent.get(CONST.AMOUNT)
     currency = payment_intent.get(CONST.CURRENCY, "").lower()
 
