@@ -24,7 +24,7 @@ def get_latest_message(product_id: str, conversation_id: str):
         return message.to_dict()
 
 
-def save_message(product_id: str, conversation_id: str, ai_message: dict):
+def save_message(product_id: str, conversation_id: str, payment_intent_id: str, ai_message: dict):
     with GLOBALS.get_postgres_wrapper().session_scope() as session:
         session.query(Conversation).filter(Conversation.conversation_id == conversation_id).update({CONST.STEP: 2})
 
@@ -33,6 +33,8 @@ def save_message(product_id: str, conversation_id: str, ai_message: dict):
         message.message_id = ai_message.get(CONST.ID)
         message.conversation_id = conversation_id
         message.product_id = product_id
+        message.payment_intent_id = payment_intent_id
+        message.status = CONST.SUCCESS
         message.answer = ai_message.get(CONST.CHOICES, [])[0].get(CONST.MESSAGE, {}).get(CONST.CONTENT, "")
         message.metafield = metadata
         session.add(message)

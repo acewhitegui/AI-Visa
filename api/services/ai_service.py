@@ -24,7 +24,7 @@ from services import product_service, material_service
 from services.message_service import save_message
 
 
-async def submit_ai_check(product_id: str, conversation_id: str, locale: str):
+async def submit_ai_check(product_id: str, conversation_id: str, payment_intent_id: str, locale: str):
     """
         提交AI的检查结果
         1. 读取会话下所有提交的材料
@@ -32,6 +32,7 @@ async def submit_ai_check(product_id: str, conversation_id: str, locale: str):
         3. 上传AI文件
         4. 构造提示词进行对话
         5. 存储会话
+    :param payment_intent_id: 绑定支付信息
     :param locale:
     :param product_id:
     :param conversation_id:
@@ -106,7 +107,7 @@ async def submit_ai_check(product_id: str, conversation_id: str, locale: str):
         raise ValueError("ERROR to get ai message")
 
     # 5. 存储会话
-    message_dict = save_message(product_id, conversation_id, ai_message)
+    message_dict = save_message(product_id, conversation_id, payment_intent_id, ai_message)
     # 6. 标准化返回
     answer = message_dict.get(CONST.ANSWER)
     message_dict[CONST.ANSWER] = await convert_markdown_to_html(answer)
