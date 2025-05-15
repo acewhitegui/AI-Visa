@@ -46,7 +46,7 @@ export function Messages({userId, userToken, productId, conversationId}: Message
     }
   }, [userToken, productId, conversationId]);
 
-  const handlePayment = useCallback(async () => {
+  const handlePayment = useCallback(async (isRegeneration: boolean) => {
     setIsProcessingPayment(true);
     try {
       const stripePublicKey = env("NEXT_PUBLIC_STRIPE_PUBLIC_KEY")
@@ -56,7 +56,7 @@ export function Messages({userId, userToken, productId, conversationId}: Message
       }
       const priceId = env("NEXT_PUBLIC_STRIPE_PRICE_ID") || ""
       const stripe = await loadStripe(stripePublicKey);
-      const sessionId = await createStripeSession(userId, conversationId, priceId, pathname, pathname)
+      const sessionId = await createStripeSession(userId, conversationId, isRegeneration, priceId, pathname, pathname)
       if (sessionId) {
         await stripe?.redirectToCheckout({sessionId});
       }
@@ -66,24 +66,23 @@ export function Messages({userId, userToken, productId, conversationId}: Message
     } finally {
       setIsProcessingPayment(false);
     }
-  }, []);
+  }, [conversationId, pathname, userId]);
 
   // Check URL parameters on component mount to see if we're returning from a successful payment
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const sessionId = urlParams.get('session_id');
-    const returnedProductId = urlParams.get('product_id');
     const returnedConversationId = urlParams.get('conversation_id');
     const isRegeneration = urlParams.get('is_regeneration') === 'true';
 
-    if (sessionId && returnedProductId === productId && returnedConversationId === conversationId) {
+    if (sessionId && returnedConversationId === conversationId) {
+      toast.success("You have paid successfully")
       // Payment was successful, proceed with AI generation
       if (isRegeneration) {
         handleAIOperation(updateAIResult);
       } else {
         handleAIOperation(submitAI);
       }
-
       // Clean up URL parameters
       window.history.replaceState({}, document.title, window.location.pathname);
     }
@@ -117,14 +116,14 @@ export function Messages({userId, userToken, productId, conversationId}: Message
         {hasContent ? (
           <div className="markdown" dangerouslySetInnerHTML={{__html: htmlBuffer.toString()}}/>
         ) : (
-          <Button onClick={() => handlePayment()} disabled={isButtonDisabled}>
+          <Button onClick={() => handlePayment(false)} disabled={isButtonDisabled}>
             {buttonText}
           </Button>
         )}
       </CardContent>
       {hasContent && (
         <CardFooter>
-          <Button onClick={() => handlePayment()} disabled={isButtonDisabled}>
+          <Button onClick={() => handlePayment(true)} disabled={isButtonDisabled}>
             {regenerateButtonText}
           </Button>
         </CardFooter>
