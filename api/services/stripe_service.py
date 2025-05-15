@@ -130,6 +130,7 @@ async def _handle_payment_intent_created(payment_intent: dict, db_session: Sessi
             payment_intent_id=payment_intent_id,
             payment_method_id=payment_intent.get(CONST.PAYMENT_METHOD),
             payment_method_details=payment_intent.get(CONST.PAYMENT_METHOD_DETAILS),
+            metadata=payment_intent.get(CONST.METADATA),
             paid_at=utils.timestamp_to_datetime(payment_intent.get(CONST.CREATED))
         )
 

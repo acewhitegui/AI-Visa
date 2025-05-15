@@ -35,6 +35,7 @@ class Order(Base, BaseModel):
     charge_id = mapped_column(String(255), index=True, comment='Stripe charge ID')
 
     payment_method_details = mapped_column(JSON, comment='Payment method details')
+    metadata = mapped_column(JSON)
     paid_at = mapped_column(DateTime(), comment='Payment time')
     # Relations
     user = relationship('User', back_populates='orders')
