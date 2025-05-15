@@ -20,6 +20,7 @@ export function Steps({locale, productId, conversationId}: {
   // session
   const {data: session} = useSession();
   const userToken = session?.user?.access_token
+  const userId = session?.user?.id || 0
   if (!userToken) {
     redirect("/auth/login")
   }
@@ -41,7 +42,7 @@ export function Steps({locale, productId, conversationId}: {
     {
       title: "Step 3",
       description: "Confirm check results with AI",
-      component: <Messages userToken={userToken} productId={productId} conversationId={conversationId}
+      component: <Messages userId={userId} userToken={userToken} productId={productId} conversationId={conversationId}
                            locale={locale}/>
     },
   ]

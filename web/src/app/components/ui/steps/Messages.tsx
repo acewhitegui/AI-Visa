@@ -13,13 +13,14 @@ import {loadStripe} from "@stripe/stripe-js";
 import {usePathname} from "next/navigation";
 
 interface MessageProps {
+  userId: number;
   userToken: string;
   productId: string;
   conversationId: string;
   locale: string; // Unused prop
 }
 
-export function Messages({userToken, productId, conversationId}: MessageProps) {
+export function Messages({userId, userToken, productId, conversationId}: MessageProps) {
   const [message, setMessage] = useState<Message | null>(null);
   const [htmlBuffer, setHtmlBuffer] = useState<Buffer | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -55,8 +56,10 @@ export function Messages({userToken, productId, conversationId}: MessageProps) {
       }
       const priceId = env("NEXT_PUBLIC_STRIPE_PRICE_ID") || ""
       const stripe = await loadStripe(stripePublicKey);
-      const session = await createStripeSession(priceId, pathname, pathname)
-      await stripe?.redirectToCheckout(session);
+      const sessionId = await createStripeSession(userId, conversationId, priceId, pathname, pathname)
+      if (sessionId) {
+        await stripe?.redirectToCheckout({sessionId});
+      }
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Payment processing failed. Please try again.");
