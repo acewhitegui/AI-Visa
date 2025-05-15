@@ -7,18 +7,19 @@
 @Desc :
 """
 from typing import Annotated
-from typing import Dict, Any, Optional
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi import Body
 
 from common import utils
 from common.const import CONST
 from common.logger import log
 from models import User
+from models.view.ai import AIVO
 from services.ai_service import submit_ai_check, convert_markdown_to_html
 from services.auth_service import get_current_user
 from services.message_service import get_latest_message
+from services.stripe_service import validate_stripe_session
 
 router = APIRouter()
 
@@ -47,45 +48,48 @@ async def get_ai_result(
 @router.post("/ai")
 async def submit_ai_result(
         current_user: Annotated[User, Depends(get_current_user)],
-        data: Dict[str, Any] = Body(...)
+        data: AIVO
 ):
     """
         提交审核结果
     """
-    log.info(f"Try to submit ai check with post data: {data}")
-    product_id = data.get(CONST.PRODUCT_ID)
-    conversation_id = data.get(CONST.CONVERSATION_ID)
-    locale = data.get(CONST.LOCALE)
-    message_dict = get_latest_message(product_id, conversation_id)
-    if message_dict:
-        answer = message_dict.get(CONST.ANSWER)
-        message_dict[CONST.ANSWER] = await convert_markdown_to_html(answer)
-        response_data = {
-            CONST.MESSAGE: message_dict
-        }
-        log.info(f"SUCCESS to reuse the post data: {data}, result data: {response_data}")
-    else:
-        result = await submit_ai_check(product_id, conversation_id, locale)
-        response_data = {
-            CONST.MESSAGE: result
-        }
-        log.info(f"SUCCESS to submit ai check, post data: {data},get result data: {response_data}")
+    log.info(f"Try to submit ai check with post data: {data.model_dump()}")
+    user_id = current_user.id
+    session_id = data.session_id
+    is_valid, payment_intent_id = await validate_stripe_session(user_id, session_id)
+    if not is_valid:
+        raise HTTPException(400, detail=f"Invalid session id: {session_id}")
 
+    product_id = data.product_id
+    conversation_id = data.conversation_id
+    locale = data.locale
+    result = await submit_ai_check(product_id, conversation_id, payment_intent_id, locale)
+    response_data = {
+        CONST.MESSAGE: result
+    }
+    log.info(f"SUCCESS to submit ai check, post data: {data},get result data: {response_data}")
     return utils.resp_success(data=response_data)
 
 
 @router.put("/ai")
 async def regenerate_ai_result(
-        data: Dict[str, Any] = Body(...)
+        current_user: Annotated[User, Depends(get_current_user)],
+        data: AIVO
 ):
     """
         重新生成AI结果
     """
-    log.info(f"Try to submit ai check with post data: {data}")
-    product_id = data.get(CONST.PRODUCT_ID)
-    conversation_id = data.get(CONST.CONVERSATION_ID)
-    locale = data.get(CONST.LOCALE)
-    result = await submit_ai_check(product_id, conversation_id, locale)
+    log.info(f"Try to submit ai check with post data: {data.model_dump()}")
+    user_id = current_user.id
+    session_id = data.session_id
+    is_valid, payment_intent_id = await validate_stripe_session(user_id, session_id)
+    if not is_valid:
+        raise HTTPException(400, detail=f"Invalid session id: {session_id}")
+
+    product_id = data.product_id
+    conversation_id = data.conversation_id
+    locale = data.locale
+    result = await submit_ai_check(product_id, conversation_id, payment_intent_id, locale)
     response_data = {
         CONST.MESSAGE: result
     }

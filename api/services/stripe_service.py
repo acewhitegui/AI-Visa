@@ -18,6 +18,46 @@ from common.globals import GLOBALS
 from common.logger import log
 from dao.dao.strapi_cli import get_stripe_client
 from models.db.order import Order
+from services import order_service
+
+
+async def validate_stripe_session(current_user_id: int, session_id: str):
+    try:
+        stripe_cli = await get_stripe_client()
+        session = stripe_cli.checkout.Session.retrieve(session_id)
+        payment_intent = stripe_cli.PaymentIntent.retrieve(session.payment_intent)
+        payment_intent_id = payment_intent.id
+        with GLOBALS.get_postgres_wrapper().session_scope() as session:
+            order = session.query(Order).filter(Order.payment_intent_id == payment_intent_id).one_or_none()
+            if not order:
+                order = await _handle_payment_intent_created(dict(payment_intent), session)
+
+            # go stripe to refresh order info
+            charge_details = await get_charge_details(order.payment_intent_id)
+            # refresh order info
+            new_order = await order_service.refresh_order_details(order.order_number, charge_details)
+            metadata = new_order.payment_metadata
+            if not metadata:
+                log.warning(
+                    f"WARNING to get empty meta from session id: {session_id}, payment_intent_id: {payment_intent_id}")
+                return False, payment_intent_id
+
+            user_id = int(metadata.get(CONST.USER_ID, 0))
+            if current_user_id != user_id:
+                log.warning(
+                    f"WARNING to get not matched user, expected: {user_id},but got: {current_user_id}, session id: {session_id}, payment_intent_id: {payment_intent_id}")
+                return False, payment_intent_id
+
+            if CONST.PAID != new_order.status:
+                log.warning(
+                    f"WARNING to get unpaid order from session id: {session_id}, payment_intent_id: {payment_intent_id}")
+                return False, payment_intent_id
+
+        log.info(f"SUCCESS to validate stripe session: {session_id}, payment_intent_id: {payment_intent_id}")
+        return True, payment_intent_id
+    except Exception as e:
+        log.exception(f"ERROR to validate stripe session, session id: {session_id}, error info: {str(e)}")
+        return False, ""
 
 
 async def handle_stripe_event(stripe_event: dict):
