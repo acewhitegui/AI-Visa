@@ -4,13 +4,14 @@ import {logger} from "@/app/library/common/logger";
 import {redirect} from "next/navigation";
 import {Message} from "@/app/library/objects/types";
 
-export async function submitAI(userToken: string, productId: string, conversationId: string): Promise<boolean> {
+export async function submitAI(userToken: string, productId: string, conversationId: string, sessionId: string): Promise<boolean> {
   const apiBaseUrl = getApiBaseUrl();
   const url = `${apiBaseUrl}/ai`;
 
   const postData = JSON.stringify({
     product_id: productId,
     conversation_id: conversationId,
+    session_id: sessionId
   });
 
   logger.info(`Try to generate ai to url: ${url}, with data: ${postData}`)
@@ -35,13 +36,14 @@ export async function submitAI(userToken: string, productId: string, conversatio
   return true
 }
 
-export async function updateAIResult(userToken: string, productId: string, conversationId: string): Promise<boolean> {
+export async function updateAIResult(userToken: string, productId: string, conversationId: string, sessionId: string): Promise<boolean> {
   const apiBaseUrl = getApiBaseUrl();
   const url = `${apiBaseUrl}/ai`;
 
   const postData = JSON.stringify({
     product_id: productId,
     conversation_id: conversationId,
+    session_id: sessionId
   });
 
   logger.info(`Try to generate ai to url: ${url}, with data: ${postData}`)

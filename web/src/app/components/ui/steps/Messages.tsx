@@ -25,13 +25,14 @@ export function Messages({userId, userToken, productId, conversationId}: Message
   const [htmlBuffer, setHtmlBuffer] = useState<Buffer | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [sessionId, setSessionId] = useState("")
 
   const pathname = usePathname()
 
-  const handleAIOperation = useCallback(async (operation: (token: string, prodId: string, convId: string) => Promise<any>) => {
+  const handleAIOperation = useCallback(async (operation: (token: string, prodId: string, convId: string, sessionId: string) => Promise<any>) => {
     setIsGenerating(true);
     try {
-      const result = await operation(userToken, productId, conversationId);
+      const result = await operation(userToken, productId, conversationId, sessionId);
       if (!result) {
         toast.error("Error creating AI result, please try again later");
         return;
@@ -44,7 +45,7 @@ export function Messages({userId, userToken, productId, conversationId}: Message
     } finally {
       setIsGenerating(false);
     }
-  }, [userToken, productId, conversationId]);
+  }, [userToken, productId, conversationId, sessionId]);
 
   const handlePayment = useCallback(async (isRegeneration: boolean) => {
     setIsProcessingPayment(true);
@@ -77,6 +78,7 @@ export function Messages({userId, userToken, productId, conversationId}: Message
 
     if (sessionId && returnedConversationId === conversationId) {
       toast.success("You have paid successfully")
+      setSessionId(sessionId)
       // Payment was successful, proceed with AI generation
       if (isRegeneration) {
         handleAIOperation(updateAIResult);
