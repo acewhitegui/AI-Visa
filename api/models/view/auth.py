@@ -110,6 +110,7 @@ class UserRegistrationForm(OAuth2PasswordRequestForm):
 
 
 class Token(BaseModel):
+    id: int
     username: str
     email: str
     access_token: str
