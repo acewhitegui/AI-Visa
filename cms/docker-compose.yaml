@@ -1,6 +1,6 @@
 services:
   cms:
-    image: registry.ap-southeast-1.aliyuncs.com/whitedit/ai-visa-cms
+    image: crpi-ka5m16o5z8ea5t9p.eu-west-1.personal.cr.aliyuncs.com/gotoiom/ai-visa-cms
     deploy:
       mode: replicated
       replicas: 1

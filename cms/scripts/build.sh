@@ -4,7 +4,7 @@ cd ..
 ls
 
 # 定义变量
-REGISTRY="registry.ap-southeast-1.aliyuncs.com/whitedit"
+REGISTRY="crpi-ka5m16o5z8ea5t9p.eu-west-1.personal.cr.aliyuncs.com/gotoiom"
 IMAGE_NAME="ai-visa-cms"
 DOCKER_VERSION="${DOKCER_VERSION:-latest}"
 
