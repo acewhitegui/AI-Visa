@@ -9,7 +9,7 @@
 import datetime
 from datetime import timedelta
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Form
 from fastapi import Depends, status
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
@@ -20,7 +20,8 @@ from common.const import CONST
 from models import User
 from models.view.auth import UserRegistrationForm, Token
 from services import jwt_service, auth_service, user_service
-from services.auth_service import create_access_token, authenticate_user, send_verify_email, get_current_user
+from services.auth_service import create_access_token, authenticate_user, send_verify_email, get_current_user, \
+    send_reset_email
 
 router = APIRouter()
 
@@ -78,6 +79,20 @@ async def register_user_endpoint(
         expires_delta=timedelta(minutes=CONST.ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     verify_url = await send_verify_email(email, access_token)
+    return utils.resp_success(data={
+        CONST.VERIFY_URL: verify_url
+    })
+
+
+@router.post("/reset-password")
+async def reset_user_password_endpoint(email: Form(...)):
+    access_token, _ = create_access_token(
+        data={
+            CONST.EMAIL: email,
+        },
+        expires_delta=timedelta(minutes=CONST.ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    verify_url = await send_reset_email(email, access_token)
     return utils.resp_success(data={
         CONST.VERIFY_URL: verify_url
     })

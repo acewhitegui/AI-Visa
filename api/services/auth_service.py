@@ -46,6 +46,23 @@ async def send_verify_email(email: str, access_token: str):
     return verify_url
 
 
+async def send_reset_email(email: str, access_token: str):
+    verify_url = f"{CONST.WEB_SERVER_URL}/api/reset-email?token={access_token}"
+    log.info(f"Try to reset email with url: {verify_url}")
+    path = "./models/templates/reset_confirm.html"
+    from_addr = CONST.SMTP_USER
+    to_addrs = [email]
+    subject = "Reset Password Email"
+    with open(path, "r", encoding=CONST.CODE_UTF8) as file:
+        body_temp = file.read()
+
+    body = body_temp.replace("{{verifyUrl}}", verify_url)
+    # TODO add support email
+    body = body_temp.replace("{{support_email}}", CONST.SUPPORT_EMAIL)
+    send_email(from_addr, to_addrs, subject, body)
+    log.info(f"SUCCESS to send reset password email,confirm url: {verify_url}")
+    return verify_url
+
 async def get_query_params(
         websocket: WebSocket,
         token: Annotated[str | None, Query()] = None,
