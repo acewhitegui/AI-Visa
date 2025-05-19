@@ -35,6 +35,7 @@ export function Attachments({
   const [materials, setMaterials] = useState<Material[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, UploadFile[]>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [fileChangeCounter, setFileChangeCounter] = useState(0);
 
   // Store selected files outside of react-hook-form
   const fileInputsRef = useRef<Record<string, FileList>>({});
@@ -63,6 +64,7 @@ export function Attachments({
       try {
         const fileMap = await getUploadedFiles(userToken, conversationId);
         setUploadedFiles(fileMap);
+        setFileChangeCounter(prev => prev + 1);
       } catch (error) {
         console.error("Failed to fetch uploaded files:", error);
       }
@@ -106,8 +108,8 @@ export function Attachments({
       toast.success("Successfully uploaded!");
       onStepChange(2);
     }
-    window.location.reload();
-  }, [materials, onStepChange, userToken, productId, conversationId, locale]);
+    setFileChangeCounter(prev => prev + 1);
+  }, [materials, uploadMaterialFiles, onStepChange]);
 
   const handleFileChange = (material: Material, files: FileList | null) => {
     if (!files) return;
@@ -117,6 +119,7 @@ export function Attachments({
       toast.info(`Selected files: ${fileNames}`);
     }
     fileInputsRef.current[material.title] = files;
+    setFileChangeCounter(prev => prev + 1);
   };
 
   const removeUploadedFile = (material: Material) => {
@@ -133,6 +136,7 @@ export function Attachments({
     if (fileInput) fileInput.value = "";
     fileInputsRef.current[material.title] = undefined as unknown as FileList;
     toast.success(`Removed ${material.title}`);
+    setFileChangeCounter(prev => prev + 1);
   };
 
   const removePreparedFile = (material: Material, idx: number) => {
@@ -148,6 +152,7 @@ export function Attachments({
     );
     if (fileInput) fileInput.files = dataTransfer.files;
     toast.success("Removed file from upload list");
+    setFileChangeCounter(prev => prev + 1);
   };
 
   const renderFiles = (material: Material) => {
@@ -209,7 +214,7 @@ export function Attachments({
             }}
           >
             {materials.map(material => (
-              <div key={material.documentId} className="upload-section my-8">
+              <div key={`${material.documentId}-${fileChangeCounter}`} className="upload-section my-8">
                 <FormItem>
                   <FormLabel>{material.title}</FormLabel>
                   <FormControl>
@@ -217,7 +222,9 @@ export function Attachments({
                       type="file"
                       multiple
                       data-material={material.documentId}
-                      onChange={e => handleFileChange(material, e.target.files)}
+                      onChange={(e) => {
+                        handleFileChange(material, e.target.files);
+                      }}
                     />
                   </FormControl>
                   {renderFiles(material)}
