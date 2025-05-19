@@ -12,7 +12,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/app/components/ui/shadcn/sidebar"
-import {ChevronDown, ChevronUp, EditIcon, Home, Search, User2} from "lucide-react"
+import {ChevronDown, ChevronUp, EditIcon, Home, User2} from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,6 +43,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from "@/app/components/ui/shadcn/alert-dialog";
+import {IoAddCircle} from "react-icons/io5";
 
 
 export function AppSidebar({defaultProductName, productList}: {
@@ -199,18 +200,11 @@ export function AppSidebar({defaultProductName, productList}: {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/search">
-                    <Search/>
-                    <span>Search</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
                 <SidebarMenuButton onClick={async () =>
                   createConversation("New Conversation")
                 }>
                   <span>New Conversation</span>
+                  <IoAddCircle/>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
