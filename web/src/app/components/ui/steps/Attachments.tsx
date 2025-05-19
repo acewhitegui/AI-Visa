@@ -33,11 +33,11 @@ export function Attachments({
                               onStepChange,
                             }: AttachmentProps) {
   const [materialList, setMaterialList] = useState<Material[]>([]);
-  const [uploadedFilesMap, setUploadedFilesMap] = useState<Record<string, UploadFile | undefined>>({});
+  const [uploadedFilesMap, setUploadedFilesMap] = useState<Record<string, UploadFile[] | undefined>>({});
   const [isLoading, setIsLoading] = useState(false);
 
   // Store selected files outside of react-hook-form
-  const fileInputsRef = useRef<Record<string, FileList | null>>({});
+  const fileInputsRef = useRef<Record<string, FileList | []>>({});
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema)
@@ -74,7 +74,7 @@ export function Attachments({
     fetchUploadedFiles();
   }, [conversationId, userToken]);
 
-  const handleUploadFile = async (material: Material, files: FileList): Promise<boolean> => {
+  const handleUploadFile = async (material: Material, files: [] | FileList): Promise<boolean> => {
     const formData = new FormData();
 
     Array.from(files).forEach(file => {
@@ -87,8 +87,7 @@ export function Attachments({
     formData.append('file_type', material.type);
 
     try {
-      const result = await uploadFile(userToken, formData);
-      return result;
+      return await uploadFile(userToken, formData);
     } catch (error) {
       console.error('Error during upload:', error);
       toast.error(`Error uploading ${material.title}`);
@@ -120,9 +119,11 @@ export function Attachments({
     window.location.reload()
   }, [materialList, handleUploadFile, onStepChange]);
 
-  const handleFileChange = (material: Material, files: FileList | null) => {
+  const handleFileChange = (material: Material, files: FileList | []) => {
     if (files && files.length > material.limits) {
       toast.warning(`Maximum ${material.limits} files allowed`);
+      const fileNames = Array.from(files).map(file => file.name).join(', ');
+      toast.info(`Selected files: ${fileNames}`);
     }
     fileInputsRef.current[material.title] = files;
   };
@@ -137,38 +138,76 @@ export function Attachments({
     if (fileInput) {
       fileInput.value = '';
     }
-    fileInputsRef.current[material.title] = null;
-
+    fileInputsRef.current[material.title] = [];
     toast.success(`Removed ${material.title}`);
   };
 
+  const removePreparedFile = (material: Material, idx: number) => {
+    const currentFiles = fileInputsRef.current[material.title];
+    if (!currentFiles || currentFiles.length === 0) return;
+    const dataTransfer = new DataTransfer();
+    Array.from(currentFiles).forEach((file: File, i: number) => {
+      if (i !== idx) dataTransfer.items.add(file);
+    });
+    fileInputsRef.current[material.title] = dataTransfer.files;
+    const fileInput = document.querySelector(`input[type="file"][data-material="${material.documentId}"]`) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.files = dataTransfer.files;
+    }
+    toast.success("Removed file from upload list");
+  };
+
   const renderUploadedFile = (material: Material) => {
-    const uploadedFile = uploadedFilesMap[material.type];
-    if (!uploadedFile) return null;
+    const uploadedFiles = uploadedFilesMap[material.type];
+    const prepareFiles = fileInputsRef.current[material.title];
+    if ((!uploadedFiles || uploadedFiles.length === 0) && (!prepareFiles || prepareFiles.length === 0)) return null;
 
     return (
-      <div className="uploaded-file-container mt-2 flex items-center">
-        <Link
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            const fileUrl = uploadedFile.url;
-            if (fileUrl) {
-              window.open(fileUrl, '_blank', 'noopener,noreferrer');
-            }
-          }}
-          className="uploaded-file-name underline text-blue-500 hover:text-blue-700 mr-2"
-        >
-          {uploadedFile.name}
-        </Link>
-        <Button
-          type="button"
-          variant="destructive"
-          size="sm"
-          onClick={() => removeUploadedFile(material)}
-        >
-          Remove
-        </Button>
+      <div className="uploaded-file-container mt-2 flex items-center flex-wrap gap-2">
+        {
+          uploadedFiles?.map((uploadedFile: UploadFile) => (
+            <div key={uploadedFile.file_id} className="flex items-center">
+              <Link
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const fileUrl = uploadedFile.url;
+                  if (fileUrl) {
+                    window.open(fileUrl, '_blank', 'noopener,noreferrer');
+                  }
+                }}
+                className="uploaded-file-name underline text-blue-500 hover:text-blue-700 mr-2"
+              >
+                {uploadedFile.name}
+              </Link>
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                onClick={() => removeUploadedFile(material)}
+              >
+                Remove
+              </Button>
+            </div>
+          ))
+        }
+        {
+          prepareFiles && Array.from(prepareFiles).map((prepareFile: File, idx: number) => (
+            <div key={prepareFile.name + idx} className="flex items-center">
+              <span className="uploaded-file-name text-gray-700 mr-2">
+                {prepareFile.name}
+              </span>
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                onClick={() => removePreparedFile(material, idx)}
+              >
+                Remove
+              </Button>
+            </div>
+          ))
+        }
       </div>
     );
   };
@@ -193,7 +232,7 @@ export function Attachments({
                       type="file"
                       multiple
                       data-material={material.documentId}
-                      onChange={(e) => handleFileChange(material, e.target.files)}
+                      onChange={(e) => handleFileChange(material, e.target.files || [])}
                     />
                   </FormControl>
                   {renderUploadedFile(material)}
