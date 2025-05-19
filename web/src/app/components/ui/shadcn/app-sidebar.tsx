@@ -44,6 +44,7 @@ import {
   AlertDialogTrigger
 } from "@/app/components/ui/shadcn/alert-dialog";
 import {IoAddCircle} from "react-icons/io5";
+import Logo from "@/app/components/ui/Logo";
 
 
 export function AppSidebar({defaultProductName, productList}: {
@@ -151,6 +152,11 @@ export function AppSidebar({defaultProductName, productList}: {
   return (
     <Sidebar>
       <SidebarHeader>
+        <div className="flex items-center">
+          <Logo src="/img/logo.svg">
+            <span>AI Visa</span>
+          </Logo>
+        </div>
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
