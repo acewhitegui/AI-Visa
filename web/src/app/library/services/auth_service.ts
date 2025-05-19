@@ -1,6 +1,6 @@
 "use server"
 import {signIn} from '@/auth';
-import {AuthError} from 'next-auth';
+import {AuthError, User} from 'next-auth';
 import {FormState, SignupFormSchema} from "@/app/library/definitions/form";
 import {redirect} from "next/navigation";
 import {getApiBaseUrl} from "@/app/library/common/api-helpers";
@@ -87,7 +87,7 @@ export async function verifyToken(token: string) {
   return data;
 }
 
-export async function login(username: string, password: string) {
+export async function login(username: string, password: string): Promise<User | null> {
   const apiBaseUrl = getApiBaseUrl();
   const url = `${apiBaseUrl}/login`;
 
@@ -104,7 +104,7 @@ export async function login(username: string, password: string) {
 
   if (!response.ok) {
     console.error(data.reason || 'Authentication failed');
-    return {};
+    return null;
   }
 
   console.log("Successfully authenticated user:", JSON.stringify(data, null, 2), "at endpoint:", url);
