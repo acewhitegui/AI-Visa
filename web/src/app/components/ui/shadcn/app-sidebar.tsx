@@ -45,6 +45,7 @@ import {
 } from "@/app/components/ui/shadcn/alert-dialog";
 import {IoAddCircle} from "react-icons/io5";
 import Logo from "@/app/components/ui/Logo";
+import {env} from "next-runtime-env";
 
 
 export function AppSidebar({defaultProductName, productList}: {
@@ -57,6 +58,9 @@ export function AppSidebar({defaultProductName, productList}: {
   const [editingConversation, setEditingConversation] = useState<string | null>(null)
   const [newName, setNewName] = useState("")
   const {data: session} = useSession();
+
+  const publicUrl = env("NEXT_PUBLIC_BASE_URL")
+
   // Menu items.
   const items = [
     {
@@ -313,7 +317,10 @@ export function AppSidebar({defaultProductName, productList}: {
                       <span>Billing</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                      <Link href="#" onClick={async () => await signOut({redirectTo: "/auth/login", redirect: true})}>Sign
+                      <Link href="#" onClick={async () => await signOut({
+                        redirectTo: `${publicUrl}/auth/login`,
+                        redirect: true
+                      })}>Sign
                         out</Link>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
