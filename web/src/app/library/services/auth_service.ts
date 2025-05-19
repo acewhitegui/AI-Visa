@@ -4,7 +4,6 @@ import {AuthError} from 'next-auth';
 import {FormState, SignupFormSchema} from "@/app/library/definitions/form";
 import {redirect} from "next/navigation";
 import {getApiBaseUrl} from "@/app/library/common/api-helpers";
-import {RedirectType} from "next/dist/client/components/redirect-error";
 
 export async function signup(prevState: FormState | undefined, formData: FormData): Promise<FormState | undefined> {
   // Validate form fields
@@ -115,22 +114,32 @@ export async function login(username: string, password: string) {
 export async function authenticate(
   prevState: string | undefined,
   formData: FormData,
-) {
+): Promise<any> {
   try {
     await signIn('credentials', {
       ...Object.fromEntries(formData),
       redirect: false
     }); // find logic to -> auth.js
     const callbackUrl: string = formData.get('callbackUrl')?.toString() || '/';
-    return redirect(callbackUrl, RedirectType.replace);
+    return {
+      "status": "success",
+      "callbackUrl": callbackUrl,
+      "msg": ""
+    }
   } catch (error) {
     if (error instanceof AuthError) {
       console.error("Auth error: ", error);
       switch (error.type) {
         case 'CredentialsSignin':
-          return 'Invalid credentials.';
+          return {
+            "status": "failure",
+            "msg": "Invalid credentials."
+          };
         default:
-          return 'Something went wrong.';
+          return {
+            "status": "failure",
+            "msg": "Something went wrong."
+          };
       }
     }
     throw error;
