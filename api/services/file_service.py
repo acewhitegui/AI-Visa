@@ -29,7 +29,11 @@ async def get_uploaded_files(conversation_id):
             file_path = obj.file_path
             file_url = oss_service.generate_file_url(file_path)
             item[CONST.URL] = file_url
-            file_dict[file_type] = item
+            file_list = file_dict.get(file_type)
+            if not file_list:
+                file_dict[file_type] = []
+
+            file_dict[file_type].append(item)
 
     return file_dict
 
