@@ -16,5 +16,5 @@ export async function GET(
   }
 
   await verifyToken(token)
-  return redirect("/login")
+  return redirect("/auth/login")
 }
