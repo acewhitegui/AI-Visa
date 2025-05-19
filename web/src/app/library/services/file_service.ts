@@ -32,7 +32,7 @@ export async function uploadFile(userToken: string, formData: FormData): Promise
   }
 }
 
-export async function getUploadedFiles(userToken: string, conversationId: string): Promise<Record<string, UploadFile | undefined>> {
+export async function getUploadedFiles(userToken: string, conversationId: string): Promise<Record<string, UploadFile[] | []>> {
   const apiBaseUrl = getApiBaseUrl();
   const url = `${apiBaseUrl}/files?conversation_id=${conversationId}`;
 
