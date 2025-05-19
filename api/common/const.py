@@ -86,6 +86,7 @@ class _Const(object):
     SMTP_PORT = os.getenv("SMTP_PORT", 587)
     SMTP_USER = os.getenv("SMTP_USER", "")
     SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+    SMTP_MSG_DOMAIN = os.getenv("SMTP_MSG_DOMAIN", "")
 
     STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
 

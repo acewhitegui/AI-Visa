@@ -7,6 +7,7 @@
 @Desc :
 """
 import smtplib
+from email import utils
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -25,6 +26,7 @@ def send_email(from_addr: str, to_addrs: list, subject: str, body: str):
     server = smtplib.SMTP(smtp_server, smtp_port)
     try:
         msg = MIMEMultipart()
+        msg['message-id'] = utils.make_msgid(domain=CONST.SMTP_MSG_DOMAIN)
         msg['From'] = from_addr
         msg['To'] = ', '.join(to_addrs)
         msg['Subject'] = Header(subject, 'utf-8')
