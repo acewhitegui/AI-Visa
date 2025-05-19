@@ -24,7 +24,6 @@ export const authConfig = {
     },
     // Authorized runs on protected routes
     async authorized({auth, request: {nextUrl}}) {
-      console.log(auth);
       const isLoggedIn = !!auth?.user;
       if (isLoggedIn) {
         return Response.redirect(new URL('/', nextUrl));

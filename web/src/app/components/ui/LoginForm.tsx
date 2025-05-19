@@ -13,27 +13,34 @@ import {getTimestamp} from "@/app/library/common/utils";
 export function LoginForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
-  const [errorMessage, formAction] = useActionState(authenticate, undefined);
+  const [errorMessage, formAction] = useActionState(authenticate, {
+    msg: "",
+    status: "idle"
+  });
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-  const {data: session} = useSession();
+  const {data: session, update: updateSession} = useSession();
 
   useEffect(() => {
     // 检查用户是否已经登录
     const checkLoginStatus = async () => {
       try {
-        // 例如检查localStorage中的token或者通过API请求验证会话状态
-        const expiredAt = session?.user?.expired_at
-        if (expiredAt) {
-          if (expiredAt < getTimestamp()) {
-            toast.warning("Your session has expired");
-            await signOut()
-            return
+        if (errorMessage.status === 'failed') {
+          toast.error(errorMessage.msg);
+        } else if (errorMessage.status === 'success') {
+          updateSession();
+          const expiredAt = session?.user?.expired_at
+          if (expiredAt) {
+            if (expiredAt < getTimestamp()) {
+              toast.warning("Your session has expired");
+              await signOut()
+              return
+            }
           }
           toast.success("You are logged in");
-          // 如果已登录，重定向到callbackUrl或首页
           router.push(callbackUrl);
+          return
         }
       } catch (error) {
         console.error('Error checking login status:', error);
@@ -41,7 +48,7 @@ export function LoginForm() {
     };
 
     checkLoginStatus();
-  }, [callbackUrl, router, session?.user?.expired_at]);
+  }, [errorMessage.status]);
 
   const navigateToRegister = () => {
     router.refresh();
@@ -91,10 +98,10 @@ export function LoginForm() {
             aria-live="polite"
             aria-atomic="true"
           >
-            {errorMessage && (
+            {errorMessage.msg && (
               <>
                 <ExclamationCircleIcon className="h-5 w-5 text-red-500"/>
-                <p className="text-sm text-red-500">{errorMessage}</p>
+                <p className="text-sm text-red-500">{errorMessage.msg}</p>
               </>
             )}
           </div>
