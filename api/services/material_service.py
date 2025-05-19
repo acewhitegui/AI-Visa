@@ -10,6 +10,7 @@
 from fastapi import HTTPException
 
 from common.const import CONST
+from common.logger import log
 from dao.cms import strapi
 from models.view.material import MaterialVO
 from services import product_service, conversation_service, question_service
@@ -37,6 +38,10 @@ async def get_material_list(user_id: int, params: MaterialVO):
         return default_materials
 
     for question_id, choice_dict in answers_dict.items():
+        if not choice_dict:
+            log.warning(f"Get empty choice dict from {answers_dict}, checked question id: {question_id}")
+            continue
+
         user_choice_id = choice_dict.get(CONST.CHOICE_ID, 0)
         question_details = await question_service.get_question_details(question_id, params.locale)
         choices = question_details.get(CONST.CHOICES)
