@@ -44,8 +44,9 @@ class TestTemplate(unittest.IsolatedAsyncioTestCase):
         decoded_check_result = verify_password(plain, decoded_hash)
         self.assertTrue(decoded_check_result)
 
+        zero_password = "AUgp@8789502"
         hashed = "$2b$12$CpYLpJyXlqlw1ZPuFPVmCuAjls2i299hSfKMUcggwlsHxnvxJCHXq"
-        result = verify_password(plain, hashed)
+        result = verify_password(zero_password, hashed)
         self.assertTrue(result)
 
 

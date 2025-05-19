@@ -30,7 +30,7 @@ export async function signup(prevState: FormState | undefined, formData: FormDat
   const {username, email, password} = validatedFields.data;
   const resp = await registerUser(username, email, password);
   if (resp.success) {
-    redirect("/submitted?email=" + email);
+    redirect("/auth/submitted?email=" + email);
     return undefined; // This line is unreachable, but for type safety
   }
   return prevState;
