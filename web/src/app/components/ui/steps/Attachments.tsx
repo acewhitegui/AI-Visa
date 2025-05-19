@@ -122,10 +122,11 @@ export function Attachments({
     setFileChangeCounter(prev => prev + 1);
   };
 
-  const removeUploadedFile = (material: Material) => {
+  const removeUploadedFile = (material: Material, fileId: string) => {
     setUploadedFiles(prev => {
       const updated = {...prev};
-      delete updated[material.type];
+      const fileList = updated[material.type];
+      updated[material.type] = fileList.filter(file => file.file_id !== fileId)
       return updated;
     });
 
@@ -178,7 +179,7 @@ export function Attachments({
               type="button"
               variant="destructive"
               size="sm"
-              onClick={() => removeUploadedFile(material)}
+              onClick={() => removeUploadedFile(material, file.file_id)}
             >
               Remove
             </Button>
