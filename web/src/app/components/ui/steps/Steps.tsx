@@ -41,7 +41,7 @@ export function Steps({locale, productId, conversationId}: {
     },
     {
       title: "Step 3",
-      description: "Confirm check results with AI",
+      description: "Pay and generate AI report",
       component: <Messages userId={userId} userToken={userToken} productId={productId} conversationId={conversationId}
                            locale={locale}/>
     },
