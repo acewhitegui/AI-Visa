@@ -33,7 +33,7 @@ async def send_verify_email(email: str, access_token: str):
     """
     verify_url = f"{CONST.WEB_SERVER_URL}/api/verify-email?token={access_token}"
     path = "./models/templates/email_confirm.html"
-    from_addr = "no-reply@anyconverter.com"
+    from_addr = CONST.SMTP_USER
     to_addrs = [email]
     subject = "Verify Email"
     with open(path, "r", encoding=CONST.CODE_UTF8) as file:
