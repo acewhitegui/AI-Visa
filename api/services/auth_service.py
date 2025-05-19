@@ -32,6 +32,7 @@ async def send_verify_email(email: str, access_token: str):
         发送确认邮件
     """
     verify_url = f"{CONST.WEB_SERVER_URL}/api/verify-email?token={access_token}"
+    log.info(f"Try to verify email with url: {verify_url}")
     path = "./models/templates/email_confirm.html"
     from_addr = CONST.SMTP_USER
     to_addrs = [email]
