@@ -151,7 +151,7 @@ export function Attachments({
       `input[type="file"][data-material="${material.documentId}"]`
     );
     if (fileInput) fileInput.files = dataTransfer.files;
-    toast.success("Removed file from upload list");
+    toast.success("Removed file from uploading list");
     setFileChangeCounter(prev => prev + 1);
   };
 
