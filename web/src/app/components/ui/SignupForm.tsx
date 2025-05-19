@@ -1,8 +1,8 @@
 "use client"
-import {Button} from "@headlessui/react";
 import {useActionState, useState} from 'react'
 import {signup} from "@/app/library/services/auth_service";
 import {FormState} from "@/app/library/definitions/form";
+import {Button} from "@/app/components/ui/shadcn/button";
 
 async function signupReducer(prevState: FormState, formData: FormData): Promise<FormState> {
   return await signup(prevState, formData);
@@ -93,6 +93,7 @@ export function SignUpForm() {
           <div>
             <Button
               type="submit"
+              variant="default"
               disabled={pending}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md"
             >

@@ -51,7 +51,6 @@ export function LoginForm() {
   }, [errorMessage.status]);
 
   const navigateToRegister = () => {
-    router.refresh();
     router.push("/auth/register");
   };
 
