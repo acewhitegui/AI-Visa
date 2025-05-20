@@ -2,7 +2,6 @@
 import {z} from "zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/app/components/ui/shadcn/form";
 import {RadioGroup, RadioGroupItem,} from "@/app/components/ui/shadcn/radio-group";
-import {Button} from "@/app/components/ui/shadcn/button";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {toast} from "sonner";
@@ -26,6 +25,11 @@ const formSchema = z.object({
 
 type FormSchema = z.infer<typeof formSchema>;
 
+// Define the methods you want to expose
+export interface QuestionsRef {
+  stepperSubmit: () => void;
+}
+
 interface QuestionsProps {
   userToken: string;
   productId: string;
@@ -35,7 +39,7 @@ interface QuestionsProps {
   onStepChange: (step: number) => void;
 }
 
-export const Questions = forwardRef<{stepperSubmit:()=>Promise<void>}, QuestionsProps>(({
+export const Questions = forwardRef<QuestionsRef, QuestionsProps>(({
                                                                                      userToken,
                                                                                      productId,
                                                                                      conversationId,

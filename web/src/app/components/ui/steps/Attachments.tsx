@@ -7,7 +7,7 @@ import {Button} from "@/app/components/ui/shadcn/button";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
-import {useCallback, useEffect, useRef, useState} from "react";
+import {forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState} from "react";
 import {getMaterialList} from "@/app/library/services/material_service";
 import {Material, UploadFile} from "@/app/library/objects/types";
 import {toast} from "sonner";
@@ -17,6 +17,11 @@ import Link from "next/link";
 const formSchema = z.object({});
 type FormSchema = z.infer<typeof formSchema>;
 
+// Define the methods you want to expose
+export interface AttachmentsRef {
+  stepperSubmit: () => void;
+}
+
 interface AttachmentProps {
   userToken: string;
   productId: string;
@@ -25,13 +30,14 @@ interface AttachmentProps {
   onStepChange: (step: number) => void;
 }
 
-export function Attachments({
-                              userToken,
-                              productId,
-                              conversationId,
-                              locale,
-                              onStepChange,
-                            }: AttachmentProps) {
+export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function Attachments(
+  {
+    userToken,
+    productId,
+    conversationId,
+    locale,
+    onStepChange,
+  }, ref) {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, UploadFile[]>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -88,7 +94,7 @@ export function Attachments({
     }
   };
 
-  const handleSubmit = useCallback(async () => {
+  const stepperSubmit = useCallback(async () => {
     setIsLoading(true);
     let allSuccessful = true;
 
@@ -109,7 +115,12 @@ export function Attachments({
       onStepChange(2);
     }
     setFileChangeCounter(prev => prev + 1);
-  }, [materials, uploadMaterialFiles, onStepChange]);
+  }, [materials, onStepChange, productId, conversationId, userToken]);
+
+  // Expose methods to parent component
+  useImperativeHandle(ref, () => ({
+    stepperSubmit
+  }));
 
   const handleFileChange = (material: Material, files: FileList | null) => {
     if (!files) return;
@@ -209,10 +220,6 @@ export function Attachments({
         <Form {...form}>
           <form
             className="flex flex-col justify-center"
-            onSubmit={e => {
-              e.preventDefault();
-              handleSubmit();
-            }}
           >
             {materials.map(material => (
               <div key={`${material.documentId}-${fileChangeCounter}`} className="upload-section my-8">
@@ -233,12 +240,9 @@ export function Attachments({
                 </FormItem>
               </div>
             ))}
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Uploading..." : "Submit"}
-            </Button>
           </form>
         </Form>
       </CardContent>
     </Card>
   );
-}
+});

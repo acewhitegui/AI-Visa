@@ -5,7 +5,6 @@ import {Check, ChevronRight} from "lucide-react"
 import {cn} from "@/app/library/common/utils"
 import {Button} from "@/app/components/ui/shadcn/button"
 import {useRouter} from "next/navigation";
-import {useRef} from "react";
 
 interface StepProps {
   title: string
@@ -63,6 +62,7 @@ export function Stepper({steps, currentStep, onStepChange, stepperRef,children, 
       </Button>
       <Button onClick={() => {
         router.refresh()
+        console.log("stepper: ", JSON.stringify(stepperRef?.current, null, 2))
         stepperRef?.current?.stepperSubmit()
         onStepChange(currentStep + 1)
       }} disabled={currentStep === steps.length - 1}>
