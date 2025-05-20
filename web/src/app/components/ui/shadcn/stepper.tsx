@@ -62,9 +62,7 @@ export function Stepper({steps, currentStep, onStepChange, stepperRef,children, 
       </Button>
       <Button onClick={() => {
         router.refresh()
-        console.log("stepper: ", JSON.stringify(stepperRef?.current, null, 2))
         stepperRef?.current?.stepperSubmit()
-        onStepChange(currentStep + 1)
       }} disabled={currentStep === steps.length - 1}>
         {currentStep === steps.length - 1 ? "Finish" : "Next"}
       </Button>
