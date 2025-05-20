@@ -59,7 +59,8 @@ async def update_conversation(conversation: ModifyConversationVO,
     if row_count <= 0:
         raise HTTPException(status_code=404, detail="Item not found")
 
-    return utils.resp_success()
+    conversation = await conversation_service.get_conversation(user_id, conversation.conversation_id)
+    return utils.resp_success(data=conversation.to_dict())
 
 
 @router.delete("/conversation")
