@@ -178,7 +178,7 @@ async def _handle_payment_intent_created(payment_intent: dict, db_session: Sessi
         db_session.add(order)
         await conversation_service.update_conversation_final_step(user_id,conversation_id,db_session)
         db_session.commit()
-        log.info(f"Created order {order_number} with payment intent {payment_intent_id}")
+        log.info(f"Created order {order_number} with payment intent {payment_intent_id},user id: {user_id}, conversation id: {conversation_id}")
         return order
     except Exception as e:
         log.exception(f"ERROR to create order from payment intent: {payment_intent}, error inf: {str(e)}")
