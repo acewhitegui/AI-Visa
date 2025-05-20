@@ -8,6 +8,9 @@
 """
 from typing import List
 
+from sqlalchemy.orm import Session
+
+from common.const import CONST
 from common.globals import GLOBALS
 from models.db import Conversation
 from models.view.conversation import PostConversationVO, ModifyConversationVO, ConversationListVO, DeleteConversationVO
@@ -45,6 +48,11 @@ async def get_conversation(user_id: int, conversation_id: str) -> Conversation:
 
     return conversation
 
+async def update_conversation_final_step(user_id:int,conversation_id:str,session:Session):
+    update_result = session.query(Conversation).filter(Conversation.user_id == user_id,
+                                                       Conversation.conversation_id == conversation_id).update(
+        {CONST.STEP:2})
+    return update_result
 
 async def update_conversation(user_id: int, conversation: ModifyConversationVO):
     with GLOBALS.get_postgres_wrapper().session_scope() as session:

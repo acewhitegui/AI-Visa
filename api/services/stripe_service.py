@@ -18,7 +18,7 @@ from common.globals import GLOBALS
 from common.logger import log
 from dao.dao.strapi_cli import get_stripe_client
 from models.db.order import Order
-from services import order_service
+from services import order_service, conversation_service
 
 
 async def validate_stripe_session(current_user_id: int, session_id: str):
@@ -135,6 +135,7 @@ async def _handle_payment_intent_created(payment_intent: dict, db_session: Sessi
         log.warning(f"WARNING to get empty user id from payment intent: {payment_intent}")
         return None
 
+    conversation_id=metadata.get(CONST.CONVERSATION_ID)
     customer_id = ""
     customer = metadata.get(CONST.CUSTOMER)
     if customer:
@@ -175,8 +176,8 @@ async def _handle_payment_intent_created(payment_intent: dict, db_session: Sessi
         )
 
         db_session.add(order)
+        await conversation_service.update_conversation_final_step(user_id,conversation_id,db_session)
         db_session.commit()
-
         log.info(f"Created order {order_number} with payment intent {payment_intent_id}")
         return order
     except Exception as e:
