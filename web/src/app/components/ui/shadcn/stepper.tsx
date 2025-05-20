@@ -5,6 +5,7 @@ import {Check, ChevronRight} from "lucide-react"
 import {cn} from "@/app/library/common/utils"
 import {Button} from "@/app/components/ui/shadcn/button"
 import {useRouter} from "next/navigation";
+import {useRef} from "react";
 
 interface StepProps {
   title: string
@@ -43,12 +44,13 @@ const Step: React.FC<StepProps> = ({title, description, isCompleted, isActive}) 
 interface StepperProps {
   steps: Array<{ title: string; description?: string }>
   currentStep: number
-  onStepChange: (step: number) => void
+  onStepChange: (step: number) => void,
+  stepperRef?:React.RefObject<any>
   children?: React.ReactNode
   buttonPosition?: 'top' | 'bottom' | 'both'
 }
 
-export function Stepper({steps, currentStep, onStepChange, children, buttonPosition = 'bottom'}: StepperProps) {
+export function Stepper({steps, currentStep, onStepChange, stepperRef,children, buttonPosition = 'bottom'}: StepperProps) {
   const router = useRouter();
   currentStep = parseInt(String(currentStep))
   const renderNavigationButtons = () => (
@@ -61,6 +63,7 @@ export function Stepper({steps, currentStep, onStepChange, children, buttonPosit
       </Button>
       <Button onClick={() => {
         router.refresh()
+        stepperRef?.current?.stepperSubmit()
         onStepChange(currentStep + 1)
       }} disabled={currentStep === steps.length - 1}>
         {currentStep === steps.length - 1 ? "Finish" : "Next"}

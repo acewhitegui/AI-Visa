@@ -7,7 +7,7 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {toast} from "sonner";
 import {Card, CardContent} from "@/app/components/ui/shadcn/card";
-import {useCallback, useEffect, useState} from "react";
+import {forwardRef, useCallback, useEffect, useImperativeHandle, useState} from "react";
 import {Conversation, Question,} from "@/app/library/objects/types";
 import {getQuestionList} from "@/app/library/services/question_service";
 import {updateConversation} from "@/app/library/services/conversation_service";
@@ -35,14 +35,14 @@ interface QuestionsProps {
   onStepChange: (step: number) => void;
 }
 
-export function Questions({
-                            userToken,
-                            productId,
-                            conversationId,
-                            conversation,
-                            locale,
-                            onStepChange,
-                          }: QuestionsProps) {
+export const Questions = forwardRef<{stepperSubmit:()=>Promise<void>}, QuestionsProps>(({
+                                                                                     userToken,
+                                                                                     productId,
+                                                                                     conversationId,
+                                                                                     conversation,
+                                                                                     locale,
+                                                                                     onStepChange,
+                                                                                   }, ref) => {
   const [questionList, setQuestionList] = useState<Question[]>([]);
   const [visibleQuestions, setVisibleQuestions] = useState<Set<string>>(new Set());
   const [selectedChoices, setSelectedChoices] = useState<Record<string, string>>({});
@@ -203,7 +203,8 @@ export function Questions({
   }, [locale, productId, conversation]);
 
   // Handle form submission
-  const onSubmit = async (data: FormSchema) => {
+  const stepperSubmit = async () => {
+    const data = form.getValues();
     const conversationName = conversation?.name;
     if (!conversationName) {
       toast.warning("Please enter a valid conversation name");
@@ -225,12 +226,16 @@ export function Questions({
     onStepChange(1);
   };
 
+  // Expose the method via ref
+  useImperativeHandle(ref, () => ({
+    stepperSubmit
+  }));
+
   return (
     <Card className="mb-4">
       <CardContent>
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
             className="w-2/3 space-y-6"
           >
             {questionList.map((question) =>
@@ -271,10 +276,9 @@ export function Questions({
                 />
               ) : null
             )}
-            <Button type="submit">Submit</Button>
           </form>
         </Form>
       </CardContent>
     </Card>
   );
-}
+});
