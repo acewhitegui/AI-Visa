@@ -36,7 +36,8 @@ export function Steps({locale, productId, conversationId}: {
       description: "Answer some questions",
       component: <Questions userToken={userToken} productId={productId} conversationId={conversationId}
                             conversation={conversation}
-                            locale={locale} onStepChange={setCurrentStep} onLoadingChange={setIsLoading}
+                            locale={locale} onConversationChange={setConversation} onStepChange={setCurrentStep}
+                            onLoadingChange={setIsLoading}
                             ref={questionsRef}/>,
       stepperRef:questionsRef
     },

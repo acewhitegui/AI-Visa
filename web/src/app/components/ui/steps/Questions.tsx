@@ -36,19 +36,21 @@ interface QuestionsProps {
   conversationId: string;
   conversation?: Conversation;
   locale: string;
+  onConversationChange: (conversation: Conversation) => void,
   onLoadingChange: (isLoading: boolean) => void;
   onStepChange: (step: number) => void;
 }
 
 export const Questions = forwardRef<QuestionsRef, QuestionsProps>(({
-                                                                                     userToken,
-                                                                                     productId,
-                                                                                     conversationId,
-                                                                                     conversation,
-                                                                                     locale,
+                                                                     userToken,
+                                                                     productId,
+                                                                     conversationId,
+                                                                     conversation,
+                                                                     locale,
+                                                                     onConversationChange,
                                                                      onLoadingChange,
-                                                                                     onStepChange,
-                                                                                   }, ref) => {
+                                                                     onStepChange,
+                                                                   }, ref) => {
   const [questionList, setQuestionList] = useState<Question[]>([]);
   const [visibleQuestions, setVisibleQuestions] = useState<Set<string>>(new Set());
   const [selectedChoices, setSelectedChoices] = useState<Record<string, string>>({});
@@ -230,6 +232,7 @@ export const Questions = forwardRef<QuestionsRef, QuestionsProps>(({
         toast.error("Submit failed, Please try again later");
         return;
       }
+      onConversationChange(result)
       toast.success("Submit successfully.");
       onStepChange(1);
     } finally {
