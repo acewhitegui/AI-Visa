@@ -36,6 +36,7 @@ interface QuestionsProps {
   conversationId: string;
   conversation?: Conversation;
   locale: string;
+  onLoadingChange: (isLoading: boolean) => void;
   onStepChange: (step: number) => void;
 }
 
@@ -45,6 +46,7 @@ export const Questions = forwardRef<QuestionsRef, QuestionsProps>(({
                                                                                      conversationId,
                                                                                      conversation,
                                                                                      locale,
+                                                                     onLoadingChange,
                                                                                      onStepChange,
                                                                                    }, ref) => {
   const [questionList, setQuestionList] = useState<Question[]>([]);
@@ -208,26 +210,31 @@ export const Questions = forwardRef<QuestionsRef, QuestionsProps>(({
 
   // Handle form submission
   const stepperSubmit = async () => {
-    const data = form.getValues();
-    const conversationName = conversation?.name;
-    if (!conversationName) {
-      toast.warning("Please enter a valid conversation name");
-      return;
+    try {
+      onLoadingChange(true)
+      const data = form.getValues();
+      const conversationName = conversation?.name;
+      if (!conversationName) {
+        toast.warning("Please enter a valid conversation name");
+        return;
+      }
+      const result = await updateConversation(
+        userToken,
+        productId,
+        conversationId,
+        conversationName,
+        1,
+        data.answers
+      );
+      if (!result) {
+        toast.error("Submit failed, Please try again later");
+        return;
+      }
+      toast.success("Submit successfully.");
+      onStepChange(1);
+    } finally {
+      onLoadingChange(false)
     }
-    const result = await updateConversation(
-      userToken,
-      productId,
-      conversationId,
-      conversationName,
-      1,
-      data.answers
-    );
-    if (!result) {
-      toast.error("Submit failed, Please try again later");
-      return;
-    }
-    toast.success("Submit successfully.");
-    onStepChange(1);
   };
 
   // Expose the method via ref
@@ -286,3 +293,5 @@ export const Questions = forwardRef<QuestionsRef, QuestionsProps>(({
     </Card>
   );
 });
+
+Questions.displayName = "Questions"

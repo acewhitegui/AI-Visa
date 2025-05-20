@@ -43,13 +43,22 @@ const Step: React.FC<StepProps> = ({title, description, isCompleted, isActive}) 
 interface StepperProps {
   steps: Array<{ title: string; description?: string }>
   currentStep: number
+  isLoading?: boolean
   onStepChange: (step: number) => void,
   stepperRef?:React.RefObject<any>
   children?: React.ReactNode
   buttonPosition?: 'top' | 'bottom' | 'both'
 }
 
-export function Stepper({steps, currentStep, onStepChange, stepperRef,children, buttonPosition = 'bottom'}: StepperProps) {
+export function Stepper({
+                          steps,
+                          currentStep,
+                          isLoading,
+                          onStepChange,
+                          stepperRef,
+                          children,
+                          buttonPosition = 'bottom'
+                        }: StepperProps) {
   const router = useRouter();
   currentStep = parseInt(String(currentStep))
   const renderNavigationButtons = () => (
@@ -63,8 +72,8 @@ export function Stepper({steps, currentStep, onStepChange, stepperRef,children, 
       <Button onClick={() => {
         router.refresh()
         stepperRef?.current?.stepperSubmit()
-      }} disabled={currentStep === steps.length - 1}>
-        {currentStep === steps.length - 1 ? "Finish" : "Next"}
+      }} disabled={currentStep === steps.length - 1 || isLoading}>
+        {isLoading ? "Loading..." : currentStep === steps.length - 1 ? "Finish" : "Next"}
       </Button>
     </div>
   )

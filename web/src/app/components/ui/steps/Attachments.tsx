@@ -27,6 +27,7 @@ interface AttachmentProps {
   productId: string;
   conversationId: string;
   locale: string;
+  onLoadingChange: (isLoading: boolean) => void;
   onStepChange: (step: number) => void;
 }
 
@@ -36,11 +37,11 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
     productId,
     conversationId,
     locale,
+    onLoadingChange,
     onStepChange,
   }, ref) {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, UploadFile[]>>({});
-  const [isLoading, setIsLoading] = useState(false);
   const [fileChangeCounter, setFileChangeCounter] = useState(0);
 
   // Store selected files outside of react-hook-form
@@ -95,26 +96,28 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
   };
 
   const stepperSubmit = useCallback(async () => {
-    setIsLoading(true);
-    let allSuccessful = true;
+    try {
+      onLoadingChange(true);
+      let allSuccessful = true;
 
-    for (const material of materials) {
-      const files = fileInputsRef.current[material.title];
-      if (!files || files.length === 0) continue;
-      const success = await uploadMaterialFiles(material, files);
-      if (!success) {
-        toast.error(`Failed to upload ${material.title}`);
-        allSuccessful = false;
+      for (const material of materials) {
+        const files = fileInputsRef.current[material.title];
+        if (!files || files.length === 0) continue;
+        const success = await uploadMaterialFiles(material, files);
+        if (!success) {
+          toast.error(`Failed to upload ${material.title}`);
+          allSuccessful = false;
+        }
       }
-    }
 
-    setIsLoading(false);
-
-    if (allSuccessful) {
-      toast.success("Successfully uploaded!");
-      onStepChange(2);
+      if (allSuccessful) {
+        toast.success("Successfully uploaded!");
+        onStepChange(2);
+      }
+      setFileChangeCounter(prev => prev + 1);
+    } finally {
+      onLoadingChange(false);
     }
-    setFileChangeCounter(prev => prev + 1);
   }, [materials, onStepChange, productId, conversationId, userToken]);
 
   // Expose methods to parent component
@@ -246,3 +249,5 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
     </Card>
   );
 });
+
+Attachments.displayName = "Attachments"
