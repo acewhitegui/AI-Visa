@@ -902,6 +902,9 @@ export interface ApiMaterialMaterial extends Struct.CollectionTypeSchema {
     >;
     products: Schema.Attribute.Relation<'manyToMany', 'api::product.product'>;
     publishedAt: Schema.Attribute.DateTime;
+    required: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
     standard: Schema.Attribute.Text &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -921,7 +924,7 @@ export interface ApiMaterialMaterial extends Struct.CollectionTypeSchema {
         };
       }> &
       Schema.Attribute.SetMinMaxLength<{
-        maxLength: 120;
+        maxLength: 1024;
         minLength: 1;
       }>;
     type: Schema.Attribute.Enumeration<

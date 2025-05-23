@@ -52,7 +52,7 @@
       "type": "string",
       "unique": true,
       "required": true,
-      "maxLength": 120,
+      "maxLength": 1024,
       "minLength": 1,
       "pluginOptions": {
         "i18n": {
@@ -67,6 +67,11 @@
       "unique": false,
       "max": 15,
       "min": 1
+    },
+    "required": {
+      "type": "boolean",
+      "default": false,
+      "required": true
     }
   }
 }
