@@ -15,7 +15,7 @@ async def get_question_details(question_id: str, locale: str):
         CONST.CHOICES: {
             CONST.POPULATE: {
                 CONST.MATERIALS: {
-                    CONST.FIELDS: [CONST.TITLE, CONST.TYPE, CONST.LIMITS]
+                    CONST.FIELDS: [CONST.TITLE, CONST.TYPE, CONST.LIMITS, CONST.REQUIRED]
                 }
             },
         }

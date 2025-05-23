@@ -13,7 +13,7 @@ from dao.cms import strapi
 async def get_product_details(product_id: str, locale: str) -> dict:
     populate = {
         CONST.MATERIALS: {
-            CONST.FIELDS: [CONST.TITLE, CONST.TYPE, CONST.LIMITS]
+            CONST.FIELDS: [CONST.TITLE, CONST.TYPE, CONST.LIMITS, CONST.REQUIRED]
         }
     }
     result = await strapi.get_resource_list(f"products/{product_id}", locale, populate=populate)

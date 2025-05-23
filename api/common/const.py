@@ -125,6 +125,7 @@ class _Const(object):
     DOCUMENT_ID = "documentId"
     POPULATE = "populate"
     # material
+    REQUIRED = "required"
     LIMITS = "limits"
     MATERIAL = "material"
     MATERIALS = "materials"
