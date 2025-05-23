@@ -245,6 +245,13 @@ export const Questions = forwardRef<QuestionsRef, QuestionsProps>(({
     stepperSubmit
   }));
 
+  // Sort questions to display non-default questions first
+  const sortedQuestionList = [...questionList].sort((a, b) => {
+    if (a.showDefault && !b.showDefault) return -1;
+    if (!a.showDefault && b.showDefault) return 1;
+    return 0;
+  });
+
   return (
     <Card className="mb-4">
       <CardContent>
@@ -252,7 +259,7 @@ export const Questions = forwardRef<QuestionsRef, QuestionsProps>(({
           <form
             className="w-2/3 space-y-6"
           >
-            {questionList.map((question) =>
+            {sortedQuestionList.map((question) =>
               visibleQuestions.has(question.documentId) ? (
                 <FormField
                   key={question.documentId}
