@@ -46,7 +46,8 @@ import {
 import {IoAddCircle} from "react-icons/io5";
 import Logo from "@/app/components/ui/Logo";
 import {env} from "next-runtime-env";
-import {setCookie,} from 'cookies-next/client';
+import {getCookie, setCookie,} from 'cookies-next/client';
+import clsx from "clsx";
 
 
 export function AppSidebar({defaultProductName, productList}: {
@@ -54,6 +55,7 @@ export function AppSidebar({defaultProductName, productList}: {
   productList: Product[];
 }) {
   const {setConversationId, productId, setProductId} = useSidebar()
+  const [currentConversationId, setCurrentConversationId] = useState(getCookie("current_conversation_id"));
   const [productName, setProductName] = useState(defaultProductName)
   const [conversationList, setConversationList] = useState([] as Conversation[])
   const [editingConversation, setEditingConversation] = useState<string | null>(null)
@@ -232,7 +234,12 @@ export function AppSidebar({defaultProductName, productList}: {
                   const conversationId = conversation.conversation_id
                   const conversationName = conversation.name
                   return (
-                    <SidebarMenuItem key={conversationId}>
+                    <SidebarMenuItem key={conversationId} className={
+                      clsx({
+                          ["bg-primary rounded-sm"]: currentConversationId == conversationId,
+                        }
+                      )
+                    }>
                       {editingConversation === conversationId ? (
                         <div className="flex flex-col items-center justify-between w-full p-2">
                           <input
@@ -278,6 +285,7 @@ export function AppSidebar({defaultProductName, productList}: {
                       ) : (
                         <SidebarMenuButton asChild onClick={async () => {
                           setConversationId(conversationId)
+                          setCurrentConversationId(conversationId)
                         }}>
                           <Link href={`/steps/${productId}/${conversationId}`}>
                             <span>{conversationName}</span>
