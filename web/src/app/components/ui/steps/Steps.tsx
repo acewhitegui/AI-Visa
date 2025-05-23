@@ -17,6 +17,7 @@ export function Steps({locale, productId, conversationId}: {
 }) {
   const [currentStep, setCurrentStep] = useState(0)
   const [isLoading, setIsLoading] = useState(false);
+  const [isDisabledNext, setIsDisabledNext] = useState(false);
   const [conversation, setConversation] = useState<Conversation>();
   // Create refs at the top level
   const questionsRef = useRef<QuestionsRef>(null);
@@ -38,6 +39,7 @@ export function Steps({locale, productId, conversationId}: {
                             conversation={conversation}
                             locale={locale} onConversationChange={setConversation} onStepChange={setCurrentStep}
                             onLoadingChange={setIsLoading}
+                            onContactChange={setIsDisabledNext}
                             ref={questionsRef}/>,
       stepperRef:questionsRef
     },
@@ -75,7 +77,8 @@ export function Steps({locale, productId, conversationId}: {
   }, [conversationId, userToken]);
 
   return (
-    <Stepper steps={stepList} currentStep={currentStep} isLoading={isLoading} onStepChange={setCurrentStep}
+    <Stepper steps={stepList} currentStep={currentStep} isLoading={isLoading} isDisabledNext={isDisabledNext}
+             onStepChange={setCurrentStep}
              stepperRef={stepList[currentStep].stepperRef}>
       {/* 这部分是实际要展示的内容，根据step需要修改逻辑 */}
       {
