@@ -27,6 +27,5 @@ if __name__ == '__main__':
         start_all()
     except Exception as e:
         log.exception(f"ERROR to start websocket server, error info: {str(e)}")
-        stop_all()
     finally:
-        exit(0)
+        stop_all()
