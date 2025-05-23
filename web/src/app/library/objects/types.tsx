@@ -107,6 +107,7 @@ export type Material = {
   title: string;
   type: string;
   limits: number;
+  required: boolean;
 }
 
 export type UploadFile = {

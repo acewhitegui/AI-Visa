@@ -17,7 +17,6 @@ import Link from "next/link";
 const formSchema = z.object({});
 type FormSchema = z.infer<typeof formSchema>;
 
-// Define the methods you want to expose
 export interface AttachmentsRef {
   stepperSubmit: () => void;
 }
@@ -29,31 +28,32 @@ interface AttachmentProps {
   locale: string;
   onLoadingChange: (isLoading: boolean) => void;
   onStepChange: (step: number) => void;
+  onFileChange: (isDisabledNext: boolean) => void;
 }
 
 export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function Attachments(
-  {
-    userToken,
-    productId,
-    conversationId,
-    locale,
-    onLoadingChange,
-    onStepChange,
-  }, ref) {
+  {userToken, productId, conversationId, locale, onLoadingChange, onStepChange, onFileChange}, ref) {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, UploadFile[]>>({});
   const [fileChangeCounter, setFileChangeCounter] = useState(0);
 
   // Store selected files outside of react-hook-form
   const fileInputsRef = useRef<Record<string, FileList>>({});
+  const form = useForm<FormSchema>({resolver: zodResolver(formSchema)});
 
-  const form = useForm<FormSchema>({
-    resolver: zodResolver(formSchema),
-  });
+  const updateNextButtonState = useCallback(() => {
+    const isNextDisabled = materials.some(material => {
+      if (!material.required) return false;
+      const uploadedForType = uploadedFiles[material.type] || [];
+      const preparedFiles = fileInputsRef.current[material.title];
+      return uploadedForType.length === 0 && (!preparedFiles || preparedFiles.length === 0);
+    });
+    onFileChange(isNextDisabled);
+  }, [materials, uploadedFiles, onFileChange]);
 
   // Fetch material list on mount
   useEffect(() => {
-    (async () => {
+    const fetchMaterials = async () => {
       try {
         const result = await getMaterialList(userToken, productId, conversationId, locale);
         setMaterials(result);
@@ -61,13 +61,15 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
         console.error("Failed to fetch material list:", error);
         toast.error("Failed to load required documents");
       }
-    })();
+    };
+    fetchMaterials();
   }, [userToken, productId, conversationId, locale]);
 
   // Fetch already uploaded files
   useEffect(() => {
     if (!conversationId) return;
-    (async () => {
+
+    const fetchUploadedFiles = async () => {
       try {
         const fileMap = await getUploadedFiles(userToken, conversationId);
         setUploadedFiles(fileMap);
@@ -75,8 +77,16 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
       } catch (error) {
         console.error("Failed to fetch uploaded files:", error);
       }
-    })();
+    };
+    fetchUploadedFiles();
   }, [conversationId, userToken]);
+
+  // Update next button state when files or materials change
+  useEffect(() => {
+    if (materials.length > 0) {
+      updateNextButtonState();
+    }
+  }, [materials, uploadedFiles, fileChangeCounter, updateNextButtonState]);
 
   const uploadMaterialFiles = async (material: Material, files: FileList): Promise<boolean> => {
     const formData = new FormData();
@@ -103,6 +113,7 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
       for (const material of materials) {
         const files = fileInputsRef.current[material.title];
         if (!files || files.length === 0) continue;
+
         const success = await uploadMaterialFiles(material, files);
         if (!success) {
           toast.error(`Failed to upload ${material.title}`);
@@ -118,20 +129,20 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
     } finally {
       onLoadingChange(false);
     }
-  }, [materials, onStepChange, productId, conversationId, userToken]);
+  }, [materials, onLoadingChange, onStepChange]);
 
   // Expose methods to parent component
-  useImperativeHandle(ref, () => ({
-    stepperSubmit
-  }));
+  useImperativeHandle(ref, () => ({stepperSubmit}));
 
   const handleFileChange = (material: Material, files: FileList | null) => {
     if (!files) return;
+
     if (files.length > material.limits) {
       toast.warning(`Maximum ${material.limits} files allowed`);
       const fileNames = Array.from(files).map(file => file.name).join(", ");
       toast.info(`Selected files: ${fileNames}`);
     }
+
     fileInputsRef.current[material.title] = files;
     setFileChangeCounter(prev => prev + 1);
   };
@@ -139,8 +150,8 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
   const removeUploadedFile = (material: Material, fileId: string) => {
     setUploadedFiles(prev => {
       const updated = {...prev};
-      const fileList = updated[material.type];
-      updated[material.type] = fileList.filter(file => file.file_id !== fileId)
+      const fileList = updated[material.type] || [];
+      updated[material.type] = fileList.filter(file => file.file_id !== fileId);
       return updated;
     });
 
@@ -150,6 +161,7 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
     );
     if (fileInput) fileInput.value = "";
     fileInputsRef.current[material.title] = undefined as unknown as FileList;
+
     toast.success(`Removed ${material.title}`);
     setFileChangeCounter(prev => prev + 1);
   };
@@ -157,15 +169,19 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
   const removePreparedFile = (material: Material, idx: number) => {
     const currentFiles = fileInputsRef.current[material.title];
     if (!currentFiles || currentFiles.length === 0) return;
+
     const dataTransfer = new DataTransfer();
     Array.from(currentFiles).forEach((file, i) => {
       if (i !== idx) dataTransfer.items.add(file);
     });
+
     fileInputsRef.current[material.title] = dataTransfer.files;
+
     const fileInput = document.querySelector<HTMLInputElement>(
       `input[type="file"][data-material="${material.documentId}"]`
     );
     if (fileInput) fileInput.files = dataTransfer.files;
+
     toast.success("Removed file from uploading list");
     setFileChangeCounter(prev => prev + 1);
   };
@@ -173,11 +189,12 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
   const renderFiles = (material: Material) => {
     const uploaded = uploadedFiles[material.type] || [];
     const prepared = fileInputsRef.current[material.title];
+
     if (uploaded.length === 0 && (!prepared || prepared.length === 0)) return null;
 
     return (
       <div className="uploaded-file-container mt-2 flex items-center flex-wrap gap-2">
-        {Array.from(uploaded).map(file => (
+        {uploaded.map(file => (
           <div key={file.file_id} className="flex items-center">
             <Link
               href="#"
@@ -221,21 +238,21 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
     <Card className="mb-4">
       <CardContent>
         <Form {...form}>
-          <form
-            className="flex flex-col justify-center"
-          >
+          <form className="flex flex-col justify-center">
             {materials.map(material => (
               <div key={`${material.documentId}-${fileChangeCounter}`} className="upload-section my-8">
                 <FormItem>
-                  <FormLabel>{material.title}</FormLabel>
+                  <FormLabel>
+                    {material.required && <span className="text-red-500">*</span>}
+                    {material.title}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type="file"
                       multiple
+                      required={material.required}
                       data-material={material.documentId}
-                      onChange={(e) => {
-                        handleFileChange(material, e.target.files);
-                      }}
+                      onChange={(e) => handleFileChange(material, e.target.files)}
                     />
                   </FormControl>
                   {renderFiles(material)}
@@ -250,4 +267,4 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
   );
 });
 
-Attachments.displayName = "Attachments"
+Attachments.displayName = "Attachments";

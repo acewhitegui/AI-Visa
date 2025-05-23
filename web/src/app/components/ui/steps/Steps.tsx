@@ -48,6 +48,7 @@ export function Steps({locale, productId, conversationId}: {
       description: "Upload documents",
       component: <Attachments userToken={userToken} productId={productId} conversationId={conversationId}
                               locale={locale} onStepChange={setCurrentStep} onLoadingChange={setIsLoading}
+                              onFileChange={setIsDisabledNext}
                               ref={attachmentsRef}/>,
       stepperRef:attachmentsRef
     },
