@@ -70,17 +70,17 @@ export function AppSidebar({defaultProductName, productList}: {
     },
   ]
 
-  const handleConversationList = async () => {
+  const handleConversationList = useCallback(async () => {
     const userToken = session?.user?.access_token;
     if (userToken) {
       const conversations = await getConversationList(userToken, productId)
       setConversationList(conversations)
     }
-  };
+  }, [productId, session?.user?.access_token]);
 
   useEffect(() => {
     handleConversationList();
-  }, [productId]);
+  }, [handleConversationList, productId]);
 
 
   function changeProduct(id: string, name: string) {
