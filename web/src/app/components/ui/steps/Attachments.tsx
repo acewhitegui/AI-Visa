@@ -234,6 +234,13 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
     );
   };
 
+  const isRequiredEmpty = (material: Material) => {
+    if (!material.required) return false;
+    const uploadedForType = uploadedFiles[material.type] || [];
+    const preparedFiles = fileInputsRef.current[material.title];
+    return uploadedForType.length === 0 && (!preparedFiles || preparedFiles.length === 0);
+  };
+
   return (
     <Card className="mb-4">
       <CardContent>
@@ -256,6 +263,11 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
                     />
                   </FormControl>
                   {renderFiles(material)}
+                  {isRequiredEmpty(material) && (
+                    <p className="text-red-500 text-sm mt-1">
+                      This document is required. Please upload at least one file.
+                    </p>
+                  )}
                   <FormMessage/>
                 </FormItem>
               </div>
