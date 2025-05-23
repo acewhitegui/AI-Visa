@@ -18,7 +18,8 @@ from common.logger import log
 from dao.ai import openai
 from dao.ai.openai import chat_messages_with_response_format
 from dao.aliyun import oss_service
-from models.ai.response import PassportDetails, ReportDetails
+from models.ai.cas import CASDetails
+from models.ai.passport import PassportDetails, ReportDetails
 from models.db import UploadFile
 from services import product_service, material_service
 from services.message_service import save_message
@@ -38,7 +39,8 @@ async def submit_ai_check(product_id: str, conversation_id: str, payment_intent_
     :param conversation_id:
     :return:
     """
-    passport_details = ""
+    passport_details = {}
+    cas_details = {}
     # 1. 读取材料
     with GLOBALS.get_postgres_wrapper().session_scope() as session:
         upload_obj_list: list[UploadFile] = session.query(UploadFile).filter(
@@ -75,6 +77,10 @@ async def submit_ai_check(product_id: str, conversation_id: str, payment_intent_
             # 护照信息只用解析，不用提交给AI
             continue
 
+        if CONST.CAS == file_type:
+            # cas信息需要提供给财务证明计算用
+            cas_details = extract_cas_info(file_id)
+
         file_id_list.append(file_id)
         file_description_list.append(
             f"file name: {upload_obj.name}, file type: {file_type}, check tips: ```{check_standard}```\n")
@@ -97,6 +103,8 @@ async def submit_ai_check(product_id: str, conversation_id: str, payment_intent_
         prefix_prompt = f"""
         The passport info are: 
             {passport_details}\n,
+        The CAS info are:
+            {cas_details}\n,
         The contents of the documents uploaded from then on must be proofread with reference to the passport information.
         \n
         """
@@ -116,6 +124,17 @@ async def submit_ai_check(product_id: str, conversation_id: str, payment_intent_
 
 async def convert_markdown_to_html(md_text: str):
     return markdown.markdown(md_text, extensions=['tables'])
+
+
+def extract_cas_info(file_id) -> dict:
+    file_id_list = [file_id]
+    log.info(f"Try to extract CAS info by openai file id: {file_id}")
+    prompt = (
+        ""
+    )
+    result = chat_messages_with_response_format(prompt, file_id_list, CASDetails)
+    cas_details = result.get(CONST.CHOICES, [])[0].get(CONST.MESSAGE, {}).get(CONST.PARSED, {})
+    return cas_details
 
 
 def extract_passport_info(file_id) -> dict:
