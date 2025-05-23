@@ -80,7 +80,7 @@ export function AppSidebar({defaultProductName, productList}: {
 
   useEffect(() => {
     handleConversationList();
-  }, []);
+  }, [productId]);
 
 
   function changeProduct(id: string, name: string) {
