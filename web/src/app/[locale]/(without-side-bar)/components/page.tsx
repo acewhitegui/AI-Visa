@@ -47,6 +47,7 @@ import {
 } from "@/app/components/ui/shadcn/sheet";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/app/components/ui/shadcn/tooltip";
 import {Stepper} from "@/app/components/ui/shadcn/stepper";
+import {Contact} from "@/app/components/ui/steps/Contact";
 
 export default function Components() {
 
@@ -256,6 +257,15 @@ export default function Components() {
                 <h2 className="text-lg font-semibold mb-2">Current Step Content</h2>
                 <p>{steps[currentStep].description}</p>
               </div>
+            </CardContent>
+          </Card>
+          {/* 联系方式组件 */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Contact</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col space-y-2">
+              <Contact/>
             </CardContent>
           </Card>
           {/* 按钮组件 */}
