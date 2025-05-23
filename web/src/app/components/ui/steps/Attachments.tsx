@@ -129,7 +129,7 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
     } finally {
       onLoadingChange(false);
     }
-  }, [materials, onLoadingChange, onStepChange]);
+  }, [materials, onLoadingChange, onStepChange, uploadMaterialFiles]);
 
   // Expose methods to parent component
   useImperativeHandle(ref, () => ({stepperSubmit}));
