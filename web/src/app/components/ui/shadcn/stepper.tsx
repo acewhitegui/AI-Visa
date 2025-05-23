@@ -44,6 +44,7 @@ interface StepperProps {
   steps: Array<{ title: string; description?: string }>
   currentStep: number
   isLoading?: boolean
+  isDisabledNext?: boolean
   onStepChange: (step: number) => void,
   stepperRef?:React.RefObject<any>
   children?: React.ReactNode
@@ -54,6 +55,7 @@ export function Stepper({
                           steps,
                           currentStep,
                           isLoading,
+                          isDisabledNext,
                           onStepChange,
                           stepperRef,
                           children,
@@ -72,7 +74,7 @@ export function Stepper({
       <Button onClick={() => {
         router.refresh()
         stepperRef?.current?.stepperSubmit()
-      }} disabled={currentStep === steps.length - 1 || isLoading}>
+      }} disabled={currentStep === steps.length - 1 || isLoading || isDisabledNext}>
         {isLoading ? "Loading..." : currentStep === steps.length - 1 ? "Finish" : "Next"}
       </Button>
     </div>

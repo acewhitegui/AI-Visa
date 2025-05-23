@@ -3,21 +3,16 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/app/components/ui/shadcn/card";
 import Image from "next/image";
 
-interface ContactProps {
-  isOpen?: boolean;
-  onClose?: () => void;
-}
-
-export function Contact({isOpen = true, onClose}: ContactProps) {
+export function Contact() {
   return (
-    <Card>
-      <CardHeader>
+    <Card className="mt-0 pt-0 border-none shadow-none">
+      <CardHeader className="px-0">
         <CardTitle>Contact us</CardTitle>
         <CardDescription>
           Your case involves more complex information. We recommend contacting our consultants for personalised support
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-0">
         <div className="grid gap-6">
           <Card>
             <CardHeader>

@@ -7,9 +7,10 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {toast} from "sonner";
 import {Card, CardContent} from "@/app/components/ui/shadcn/card";
 import {forwardRef, useCallback, useEffect, useImperativeHandle, useState} from "react";
-import {Conversation, Question,} from "@/app/library/objects/types";
+import {Choice, Conversation, Question,} from "@/app/library/objects/types";
 import {getQuestionList} from "@/app/library/services/question_service";
 import {updateConversation} from "@/app/library/services/conversation_service";
+import {Contact} from "@/app/components/ui/steps/Contact";
 
 const formSchema = z.object({
   answers: z.record(
@@ -37,6 +38,7 @@ interface QuestionsProps {
   conversation?: Conversation;
   locale: string;
   onConversationChange: (conversation: Conversation) => void,
+  onContactChange: (isDisabledNext: boolean) => void,
   onLoadingChange: (isLoading: boolean) => void;
   onStepChange: (step: number) => void;
 }
@@ -49,6 +51,7 @@ export const Questions = forwardRef<QuestionsRef, QuestionsProps>(({
                                                                      locale,
                                                                      onConversationChange,
                                                                      onLoadingChange,
+                                                                     onContactChange,
                                                                      onStepChange,
                                                                    }, ref) => {
   const [questionList, setQuestionList] = useState<Question[]>([]);
@@ -126,7 +129,8 @@ export const Questions = forwardRef<QuestionsRef, QuestionsProps>(({
 
   // Handle choice change
   const handleChoiceChange = useCallback(
-    (questionId: string, choiceId: string) => {
+    (question: Question, choiceId: string) => {
+      const questionId = question.documentId;
       const newChoices = {...selectedChoices, [questionId]: choiceId};
       clearDownstreamAnswers(questionId, newChoices);
 
@@ -154,14 +158,14 @@ export const Questions = forwardRef<QuestionsRef, QuestionsProps>(({
 
       setSelectedChoices(newChoices);
       setVisibleQuestions(newVisibleQuestions);
+      const disabledNext = !!question.choices?.find(choice =>
+        choice.id.toString() === newChoices[question.documentId] &&
+        choice.action === "contact"
+      );
+      console.log("disable next: ", disabledNext)
+      onContactChange(disabledNext);
     },
-    [
-      selectedChoices,
-      clearDownstreamAnswers,
-      form,
-      getRootQuestion,
-      getVisibleChain,
-    ]
+    [selectedChoices, clearDownstreamAnswers, form, getRootQuestion, getVisibleChain, onContactChange]
   );
 
   // Fetch questions and initialize state
@@ -259,7 +263,7 @@ export const Questions = forwardRef<QuestionsRef, QuestionsProps>(({
           <form
             className="w-2/3 space-y-6"
           >
-            {sortedQuestionList.map((question) =>
+            {sortedQuestionList.map((question: Question) =>
               visibleQuestions.has(question.documentId) ? (
                 <FormField
                   key={question.documentId}
@@ -271,12 +275,12 @@ export const Questions = forwardRef<QuestionsRef, QuestionsProps>(({
                       <FormControl>
                         <RadioGroup
                           onValueChange={(value) =>
-                            handleChoiceChange(question.documentId, value)
+                            handleChoiceChange(question, value)
                           }
                           value={field.value?.choice_id || ""}
                           className="flex flex-col space-y-1"
                         >
-                          {question.choices?.map((choice) => (
+                          {question.choices?.map((choice: Choice) => (
                             <FormItem
                               key={choice.id}
                               className="flex items-center space-x-3 space-y-0"
@@ -292,6 +296,12 @@ export const Questions = forwardRef<QuestionsRef, QuestionsProps>(({
                         </RadioGroup>
                       </FormControl>
                       <FormMessage/>
+                      {selectedChoices[question.documentId] &&
+                        question.choices?.find(choice =>
+                          choice.id.toString() === selectedChoices[question.documentId] &&
+                          choice.action === "contact"
+                        ) && <Contact/>
+                      }
                     </FormItem>
                   )}
                 />
