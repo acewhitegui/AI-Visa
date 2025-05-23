@@ -46,6 +46,7 @@ import {
 import {IoAddCircle} from "react-icons/io5";
 import Logo from "@/app/components/ui/Logo";
 import {env} from "next-runtime-env";
+import {setCookie,} from 'cookies-next/client';
 
 
 export function AppSidebar({defaultProductName, productList}: {
@@ -85,7 +86,9 @@ export function AppSidebar({defaultProductName, productList}: {
 
   function changeProduct(id: string, name: string) {
     setProductId(id);
+    setCookie("current_product", id)
     setProductName(name)
+    setCookie("current_product_name", name)
   }
 
   const createConversation = useCallback(async (name: string) => {
@@ -101,7 +104,7 @@ export function AppSidebar({defaultProductName, productList}: {
       return
     }
     await handleConversationList()
-  }, []);
+  }, [handleConversationList, productId, session?.user?.access_token]);
 
   const handleEditConversation = (conversationId: string, currentName: string) => {
     setEditingConversation(conversationId)
