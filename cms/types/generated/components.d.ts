@@ -1,4 +1,4 @@
-import type { Schema, Struct } from '@strapi/strapi';
+import type {Schema, Struct} from '@strapi/strapi';
 
 export interface ElementsChoice extends Struct.ComponentSchema {
   collectionName: 'components_elements_choices';
