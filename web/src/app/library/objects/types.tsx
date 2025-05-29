@@ -194,6 +194,20 @@ export type Page = {
   seo: SEO;
 }
 
+export type StrapiForm = {
+  id: number;
+  documentId: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  whatsapp?: string;
+  wechat?: string;
+  message?: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
 export type Pagination = {
   page: number;
   pageSize: number;

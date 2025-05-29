@@ -8,9 +8,11 @@ import {Button} from "@/app/components/ui/shadcn/button";
 import {AlertCircle} from "lucide-react";
 import {Alert, AlertDescription} from "@/app/components/ui/shadcn/alert";
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/app/components/ui/shadcn/card";
+import {submitFormData} from "@/app/library/services/form_service";
+import {StrapiForm} from "@/app/library/objects/types";
 
 export function Contact() {
-  let initialState = {
+  const initialState = {
     name: "",
     phone: "",
     whatsapp: "",
@@ -27,7 +29,7 @@ export function Contact() {
     setFormData((prev) => ({...prev, [name]: value}));
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
 
     // Validate that at least one contact method is provided
@@ -41,12 +43,15 @@ export function Contact() {
       return;
     }
 
+    const data: StrapiForm | null = await submitFormData(formData)
+    if (!data) {
+      setError("Something went wrong, please try again");
+      return;
+    }
     // Clear any previous errors
     setError("");
-
     // Here you would typically send the data to your backend
     console.log("Form submitted:", formData);
-
     // Show success message
     setSubmitted(true);
   };
@@ -91,7 +96,7 @@ export function Contact() {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="name">Name *</Label>
+            <Label htmlFor="name">Name <span className="text-red-500">*</span></Label>
             <Input
               id="name"
               name="name"
