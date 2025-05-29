@@ -22,7 +22,7 @@ export async function submitFormData(data: any): Promise<StrapiForm | null> {
 
   if (!response.ok) {
     const statusCode = response.status;
-    logger.error(`ERROR to get material list from url: ${url}, get status code: ${statusCode} resp info: " ${await response.text()}`);
+    logger.error(`ERROR to submit form to url: ${url}, get status code: ${statusCode} resp info: " ${await response.text()}`);
     return null;
   }
 
