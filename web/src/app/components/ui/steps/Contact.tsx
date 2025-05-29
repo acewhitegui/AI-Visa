@@ -7,17 +7,18 @@ import {Textarea} from "@/app/components/ui/shadcn/textarea";
 import {Button} from "@/app/components/ui/shadcn/button";
 import {AlertCircle} from "lucide-react";
 import {Alert, AlertDescription} from "@/app/components/ui/shadcn/alert";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/app/components/ui/shadcn/card";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/app/components/ui/shadcn/card";
 
 export function Contact() {
-  const [formData, setFormData] = useState({
+  let initialState = {
     name: "",
     phone: "",
     whatsapp: "",
     wechat: "",
     email: "",
     message: "",
-  });
+  };
+  const [formData, setFormData] = useState(initialState);
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
@@ -58,6 +59,14 @@ export function Contact() {
           <CardDescription>
             We have received your information and will get back to you shortly.
           </CardDescription>
+          <CardFooter>
+            <Button onClick={() => {
+              setSubmitted(false);
+              setFormData(initialState);
+            }}>
+              Back
+            </Button>
+          </CardFooter>
         </CardHeader>
       </Card>
     );
