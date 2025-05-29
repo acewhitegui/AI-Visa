@@ -11,6 +11,7 @@ import {createStripeSession} from "@/app/library/services/billing_service";
 import {env} from "next-runtime-env";
 import {loadStripe} from "@stripe/stripe-js";
 import {usePathname} from "next/navigation";
+import {CreditCard} from "lucide-react"; // Import payment icon
 
 interface MessageProps {
   userId: number;
@@ -132,15 +133,35 @@ export function Messages({userId, userToken, productId, conversationId}: Message
         {hasContent ? (
           <div className="markdown" dangerouslySetInnerHTML={{__html: htmlBuffer.toString()}}/>
         ) : (
-          <Button onClick={() => handlePayment(false)} disabled={isButtonDisabled}>
-            {getButtonText(false)}
-          </Button>
+          <div className="space-y-4">
+            <div className="bg-amber-50 p-4 rounded-md border border-amber-200">
+              <p className="text-amber-800 font-medium mb-2">Ready to generate your AI result</p>
+              <p className="text-amber-700 text-sm">
+                Clicking the button below will redirect you to our payment processor to complete your purchase.
+              </p>
+            </div>
+
+            <Button
+              onClick={() => handlePayment(false)}
+              disabled={isButtonDisabled}
+              className="w-full flex items-center justify-center gap-2"
+            >
+              <CreditCard className="h-4 w-4"/>
+              {getButtonText(false)} (Pay to proceed)
+            </Button>
+          </div>
         )}
       </CardContent>
       {hasContent && (
-        <CardFooter>
-          <Button onClick={() => handlePayment(true)} disabled={isButtonDisabled}>
-            {getButtonText(true)}
+        <CardFooter className="flex flex-col space-y-2">
+          <p className="text-sm text-gray-500 mb-1">Need a different result?</p>
+          <Button
+            onClick={() => handlePayment(true)}
+            disabled={isButtonDisabled}
+            className="flex items-center gap-2"
+          >
+            <CreditCard className="h-4 w-4"/>
+            {getButtonText(true)} (Additional charge)
           </Button>
         </CardFooter>
       )}
