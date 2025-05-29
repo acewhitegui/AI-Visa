@@ -1,10 +1,8 @@
 "use client";
 
 import {useState} from "react";
-import {useForm} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import * as z from "zod";
 import {Input} from "@/app/components/ui/shadcn/input";
+import {Label} from "@/app/components/ui/shadcn/label";
 import {Textarea} from "@/app/components/ui/shadcn/textarea";
 import {Button} from "@/app/components/ui/shadcn/button";
 import {AlertCircle} from "lucide-react";
@@ -12,61 +10,50 @@ import {Alert, AlertDescription} from "@/app/components/ui/shadcn/alert";
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/app/components/ui/shadcn/card";
 import {submitFormData} from "@/app/library/services/form_service";
 import {StrapiForm} from "@/app/library/objects/types";
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/app/components/ui/shadcn/form";
-
-// Define the form schema with Zod
-const formSchema = z.object({
-  name: z.string().min(1, {message: "Name is required"}),
-  phone: z.string().optional(),
-  whatsapp: z.string().optional(),
-  wechat: z.string().optional(),
-  email: z.string().email({message: "Invalid email address"}).optional(),
-  message: z.string().optional(),
-}).refine((data) => {
-  // Ensure at least one contact method is provided
-  return !!(data.phone || data.whatsapp || data.wechat || data.email);
-}, {
-  message: "Please provide at least one contact method (Phone, WhatsApp, WeChat, or Email)",
-  path: ["email"], // This will show the error under the email field
-});
-
-type FormValues = z.infer<typeof formSchema>;
 
 export function Contact() {
+  const initialState = {
+    name: "",
+    phone: "",
+    whatsapp: "",
+    wechat: "",
+    email: "",
+    message: "",
+  };
+  const [formData, setFormData] = useState(initialState);
+  const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [serverError, setServerError] = useState("");
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      phone: "",
-      whatsapp: "",
-      wechat: "",
-      email: "",
-      message: "",
-    },
-  });
-
-  const onSubmit = async (values: FormValues) => {
-    try {
-      const data: StrapiForm | null = await submitFormData(values);
-      if (!data) {
-        setServerError("Something went wrong, please try again");
-        return;
-      }
-
-      console.log("Form submitted:", values);
-      setSubmitted(true);
-    } catch (error) {
-      setServerError("An error occurred while submitting the form");
-      console.error(error);
-    }
+  const handleChange = (e: any) => {
+    const {name, value} = e.target;
+    setFormData((prev) => ({...prev, [name]: value}));
   };
 
-  const resetForm = () => {
-    setSubmitted(false);
-    form.reset();
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+
+    // Validate that at least one contact method is provided
+    if (!formData.phone && !formData.whatsapp && !formData.wechat && !formData.email) {
+      setError("Please provide at least one contact method (Phone, WhatsApp, WeChat, or Email)");
+      return;
+    }
+
+    if (!formData.name) {
+      setError("Please provide your name");
+      return;
+    }
+
+    const data: StrapiForm | null = await submitFormData(formData)
+    if (!data) {
+      setError("Something went wrong, please try again");
+      return;
+    }
+    // Clear any previous errors
+    setError("");
+    // Here you would typically send the data to your backend
+    console.log("Form submitted:", formData);
+    // Show success message
+    setSubmitted(true);
   };
 
   if (submitted) {
@@ -79,7 +66,10 @@ export function Contact() {
           </CardDescription>
         </CardHeader>
         <CardFooter className="px-0">
-          <Button onClick={resetForm}>
+          <Button onClick={() => {
+            setSubmitted(false);
+            setFormData(initialState);
+          }}>
             Back
           </Button>
         </CardFooter>
@@ -97,114 +87,93 @@ export function Contact() {
         </CardDescription>
       </CardHeader>
       <CardContent className="px-0">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {serverError && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4"/>
-                <AlertDescription>{serverError}</AlertDescription>
-              </Alert>
-            )}
+        <div className="space-y-6">
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4"/>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-            <FormField
-              control={form.control}
+          <div className="space-y-2">
+            <Label htmlFor="name">Name <span className="text-red-500">*</span></Label>
+            <Input
+              id="name"
               name="name"
-              render={({field}) => (
-                <FormItem className="space-y-2">
-                  <FormLabel>Name <span className="text-red-500">*</span></FormLabel>
-                  <FormControl>
-                    <Input placeholder="Your full name" {...field} />
-                  </FormControl>
-                  <FormMessage/>
-                </FormItem>
-              )}
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Your full name"
+              required
             />
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
                 name="phone"
-                render={({field}) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel>Phone Number</FormLabel>
-                    <FormControl>
-                      <Input placeholder="+44 1234 567890" {...field} />
-                    </FormControl>
-                    <FormMessage/>
-                  </FormItem>
-                )}
+                value={formData.phone}
+                onChange={handleChange}
+                placeholder="+44 1234 567890"
               />
+            </div>
 
-              <FormField
-                control={form.control}
+            <div className="space-y-2">
+              <Label htmlFor="whatsapp">WhatsApp Number</Label>
+              <Input
+                id="whatsapp"
                 name="whatsapp"
-                render={({field}) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel>WhatsApp Number</FormLabel>
-                    <FormControl>
-                      <Input placeholder="+44 1234 567890" {...field} />
-                    </FormControl>
-                    <FormMessage/>
-                  </FormItem>
-                )}
+                value={formData.whatsapp}
+                onChange={handleChange}
+                placeholder="+44 1234 567890"
               />
             </div>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="wechat">WeChat ID</Label>
+              <Input
+                id="wechat"
                 name="wechat"
-                render={({field}) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel>WeChat ID</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Your WeChat ID" {...field} />
-                    </FormControl>
-                    <FormMessage/>
-                  </FormItem>
-                )}
+                value={formData.wechat}
+                onChange={handleChange}
+                placeholder="Your WeChat ID"
               />
+            </div>
 
-              <FormField
-                control={form.control}
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
                 name="email"
-                render={({field}) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="your.email@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage/>
-                  </FormItem>
-                )}
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="your.email@example.com"
               />
             </div>
+          </div>
 
-            <FormField
-              control={form.control}
+          <div className="space-y-2">
+            <Label htmlFor="message">Message</Label>
+            <Textarea
+              id="message"
               name="message"
-              render={({field}) => (
-                <FormItem className="space-y-2">
-                  <FormLabel>Message</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Please describe your situation or any questions you have"
-                      rows={4}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage/>
-                </FormItem>
-              )}
+              value={formData.message}
+              onChange={handleChange}
+              placeholder="Please describe your situation or any questions you have"
+              rows={4}
             />
+          </div>
 
-            <div className="text-sm text-gray-500">
-              * Required field. At least one contact method (Phone, WhatsApp, WeChat, or Email) must be provided.
-            </div>
+          <div className="text-sm text-gray-500">
+            * Required field. At least one contact method (Phone, WhatsApp, WeChat, or Email) must be provided.
+          </div>
 
-            <Button type="submit" variant="default" className="w-full">Submit</Button>
-          </form>
-        </Form>
+          <Button variant="default" className="w-full" onClick={handleSubmit}>Submit</Button>
+        </div>
       </CardContent>
     </Card>
   );
