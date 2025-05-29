@@ -28,5 +28,7 @@ export async function getQuestionList(productId: string, locale: string): Promis
     locale: locale,
   };
   const resp = await fetchAPI(path, urlParamsObject, options);
-  return resp?.data.questions;
+  const questions = resp?.data.questions;
+  console.log("SUCCESS to get question from server, resp data: ", JSON.stringify(questions, null, 2));
+  return questions;
 }

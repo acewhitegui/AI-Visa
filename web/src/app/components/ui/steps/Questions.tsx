@@ -162,7 +162,6 @@ export const Questions = forwardRef<QuestionsRef, QuestionsProps>(({
         choice.id.toString() === newChoices[question.documentId] &&
         choice.action === "contact"
       );
-      console.log("disable next: ", disabledNext)
       onContactChange(disabledNext);
     },
     [selectedChoices, clearDownstreamAnswers, form, getRootQuestion, getVisibleChain, onContactChange]
