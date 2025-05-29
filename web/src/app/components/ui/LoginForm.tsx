@@ -2,7 +2,7 @@
 import {useActionState, useEffect, useState} from "react";
 import {useRouter} from "@/i18n/routing";
 import {useSearchParams} from 'next/navigation';
-import {ExclamationCircleIcon,} from '@heroicons/react/24/outline';
+import {ExclamationCircleIcon, EyeIcon, EyeSlashIcon} from '@heroicons/react/24/outline';
 import {ArrowRightIcon} from '@heroicons/react/20/solid';
 import {authenticate} from "@/app/library/services/auth_service";
 import {signOut, useSession} from "next-auth/react";
@@ -19,6 +19,7 @@ export function LoginForm() {
   });
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const {data: session, update: updateSession} = useSession();
 
@@ -54,6 +55,10 @@ export function LoginForm() {
     router.push("/auth/register");
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 p-10 rounded-lg shadow-md">
@@ -74,15 +79,28 @@ export function LoginForm() {
             </div>
             <div className="mb-4">
               <label htmlFor="password" className="block text-sm font-bold mb-2">Password</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                className="rounded-md relative block w-full px-3 py-2 border sm:text-sm"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="rounded-md relative block w-full px-3 py-2 border sm:text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showPassword ? (
+                    <EyeSlashIcon className="h-5 w-5 text-primary"/>
+                  ) : (
+                    <EyeIcon className="h-5 w-5 text-gray-400"/>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
           <input type="hidden" name="callbackUrl" value={callbackUrl}/>
