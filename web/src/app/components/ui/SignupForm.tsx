@@ -3,6 +3,7 @@ import {useActionState, useState} from 'react'
 import {signup} from "@/app/library/services/auth_service";
 import {FormState} from "@/app/library/definitions/form";
 import {Button} from "@/app/components/ui/shadcn/button";
+import {EyeIcon, EyeSlashIcon} from '@heroicons/react/24/outline';
 
 async function signupReducer(prevState: FormState, formData: FormData): Promise<FormState> {
   return await signup(prevState, formData);
@@ -14,6 +15,16 @@ export function SignUpForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -53,15 +64,28 @@ export function SignUpForm() {
             )}
             <div className="mb-4">
               <label htmlFor="password" className="block text-sm font-bold mb-2">Password</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                className="rounded-md relative block w-full px-3 py-2 border"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="rounded-md relative block w-full px-3 py-2 border"
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showPassword ? (
+                    <EyeSlashIcon className="h-5 w-5 text-primary"/>
+                  ) : (
+                    <EyeIcon className="h-5 w-5 text-gray-400"/>
+                  )}
+                </button>
+              </div>
             </div>
             {state?.errors?.password && Array.isArray(state.errors.password) && (
               <div className="text-red-500">
@@ -76,15 +100,28 @@ export function SignUpForm() {
             <div className="mb-4">
               <label htmlFor="confirm_password" className="block text-sm font-bold mb-2">Confirm
                 Password</label>
-              <input
-                type="password"
-                id="confirm_password"
-                name="confirm_password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm your password"
-                className="rounded-md relative block w-full px-3 py-2 border"
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirm_password"
+                  name="confirm_password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm your password"
+                  className="rounded-md relative block w-full px-3 py-2 border"
+                />
+                <button
+                  type="button"
+                  onClick={toggleConfirmPasswordVisibility}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showConfirmPassword ? (
+                    <EyeSlashIcon className="h-5 w-5 text-primary"/>
+                  ) : (
+                    <EyeIcon className="h-5 w-5 text-gray-400"/>
+                  )}
+                </button>
+              </div>
             </div>
             {state?.errors?.confirm_password && Array.isArray(state.errors.confirm_password) && (
               <p className="text-red-500">{state.errors.confirm_password.join(', ')}</p>
