@@ -721,6 +721,62 @@ export interface ApiCertificationCertification
   };
 }
 
+export interface ApiFormForm extends Struct.CollectionTypeSchema {
+  collectionName: 'forms';
+  info: {
+    description: '';
+    displayName: 'Form';
+    pluralName: 'forms';
+    singularName: 'form';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 128;
+        minLength: 2;
+      }>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::form.form'> &
+      Schema.Attribute.Private;
+    message: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 102400;
+        minLength: 1;
+      }>;
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 128;
+        minLength: 1;
+      }>;
+    phone: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 32;
+        minLength: 1;
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    wechat: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 32;
+        minLength: 1;
+      }>;
+    whatsapp: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 32;
+        minLength: 1;
+      }>;
+  };
+}
+
 export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
   collectionName: 'globals';
   info: {
@@ -1914,6 +1970,7 @@ declare module '@strapi/strapi' {
       'api::case-study.case-study': ApiCaseStudyCaseStudy;
       'api::category.category': ApiCategoryCategory;
       'api::certification.certification': ApiCertificationCertification;
+      'api::form.form': ApiFormForm;
       'api::global.global': ApiGlobalGlobal;
       'api::homepage.homepage': ApiHomepageHomepage;
       'api::material.material': ApiMaterialMaterial;
