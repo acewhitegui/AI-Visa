@@ -36,6 +36,7 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
   const [materials, setMaterials] = useState<Material[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, UploadFile[]>>({});
   const [fileChangeCounter, setFileChangeCounter] = useState(0);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Store selected files outside of react-hook-form
   const fileInputsRef = useRef<Record<string, FileList>>({});
@@ -71,15 +72,19 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
 
     const fetchUploadedFiles = async () => {
       try {
+        onLoadingChange(true);
         const fileMap = await getUploadedFiles(userToken, conversationId);
         setUploadedFiles(fileMap);
         setFileChangeCounter(prev => prev + 1);
+        setIsInitialized(true);
       } catch (error) {
         console.error("Failed to fetch uploaded files:", error);
+      } finally {
+        onLoadingChange(false);
       }
     };
     fetchUploadedFiles();
-  }, [conversationId, userToken]);
+  }, [conversationId, userToken, onLoadingChange]);
 
   // Update next button state when files or materials change
   useEffect(() => {
@@ -122,6 +127,19 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
       }
 
       if (allSuccessful) {
+        // Refresh uploaded files after successful upload
+        const fileMap = await getUploadedFiles(userToken, conversationId);
+        setUploadedFiles(fileMap);
+
+        // Clear file inputs after successful upload
+        materials.forEach(material => {
+          const fileInput = document.querySelector<HTMLInputElement>(
+            `input[type="file"][data-material="${material.documentId}"]`
+          );
+          if (fileInput) fileInput.value = "";
+          fileInputsRef.current[material.title] = undefined as unknown as FileList;
+        });
+        
         toast.success("Successfully uploaded!");
         onStepChange(2);
       }
@@ -129,41 +147,78 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
     } finally {
       onLoadingChange(false);
     }
-  }, [materials, onLoadingChange, onStepChange, uploadMaterialFiles]);
+  }, [materials, onLoadingChange, onStepChange, userToken, conversationId]);
 
   // Expose methods to parent component
   useImperativeHandle(ref, () => ({stepperSubmit}));
 
   const handleFileChange = (material: Material, files: FileList | null) => {
-    if (!files) return;
+    if (!files || files.length === 0) return;
 
-    if (files.length > material.limits) {
-      toast.warning(`Maximum ${material.limits} files allowed`);
-      const fileNames = Array.from(files).map(file => file.name).join(", ");
-      toast.info(`Selected files: ${fileNames}`);
+    // Create a DataTransfer object to combine existing and new files
+    let dataTransfer = new DataTransfer();
+
+    // Add existing files if any
+    const existingFiles = fileInputsRef.current[material.title];
+    if (existingFiles) {
+      Array.from(existingFiles).forEach(file => {
+        dataTransfer.items.add(file);
+      });
     }
 
-    fileInputsRef.current[material.title] = files;
-    setFileChangeCounter(prev => prev + 1);
-  };
-
-  const removeUploadedFile = (material: Material, fileId: string) => {
-    setUploadedFiles(prev => {
-      const updated = {...prev};
-      const fileList = updated[material.type] || [];
-      updated[material.type] = fileList.filter(file => file.file_id !== fileId);
-      return updated;
+    // Add new files
+    Array.from(files).forEach(file => {
+      dataTransfer.items.add(file);
     });
 
-    // Reset file input
+    // Check if total files exceed the limit
+    if (dataTransfer.files.length > material.limits) {
+      toast.warning(`Maximum ${material.limits} files allowed. Only the first ${material.limits} files will be used.`);
+      // If exceeding limit, create a new DataTransfer with only the allowed number of files
+      const limitedDataTransfer = new DataTransfer();
+      for (let i = 0; i < Math.min(dataTransfer.files.length, material.limits); i++) {
+        limitedDataTransfer.items.add(dataTransfer.files[i]);
+      }
+      dataTransfer = limitedDataTransfer;
+    }
+
+    // Update the file input element to show the combined files
     const fileInput = document.querySelector<HTMLInputElement>(
       `input[type="file"][data-material="${material.documentId}"]`
     );
-    if (fileInput) fileInput.value = "";
-    fileInputsRef.current[material.title] = undefined as unknown as FileList;
+    if (fileInput) fileInput.files = dataTransfer.files;
 
-    toast.success(`Removed ${material.title}`);
+    // Update our reference
+    fileInputsRef.current[material.title] = dataTransfer.files;
+
+    // Show selected files in toast notification
+    const fileNames = Array.from(dataTransfer.files).map(file => file.name).join(", ");
+    toast.info(`Selected files: ${fileNames}`);
+  
     setFileChangeCounter(prev => prev + 1);
+  };
+
+  const removeUploadedFile = async (material: Material, fileId: string) => {
+    try {
+      onLoadingChange(true);
+      // Here you would typically call an API to delete the file
+      // For now, we'll just update the local state
+
+      setUploadedFiles(prev => {
+        const updated = {...prev};
+        const fileList = updated[material.type] || [];
+        updated[material.type] = fileList.filter(file => file.file_id !== fileId);
+        return updated;
+      });
+
+      toast.success(`Removed ${material.title}`);
+      setFileChangeCounter(prev => prev + 1);
+    } catch (error) {
+      console.error("Error removing file:", error);
+      toast.error("Failed to remove file");
+    } finally {
+      onLoadingChange(false);
+    }
   };
 
   const removePreparedFile = (material: Material, idx: number) => {
@@ -193,9 +248,9 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
     if (uploaded.length === 0 && (!prepared || prepared.length === 0)) return null;
 
     return (
-      <div className="uploaded-file-container mt-2 flex items-center flex-wrap gap-2">
+      <div className="uploaded-file-container mt-2 flex flex-wrap gap-2">
         {uploaded.map(file => (
-          <div key={file.file_id} className="flex items-center">
+          <div key={file.file_id} className="flex items-center mb-2">
             <Link
               href="#"
               onClick={e => {
@@ -218,7 +273,7 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
         ))}
         {prepared &&
           Array.from(prepared).map((file, idx) => (
-            <div key={file.name + idx} className="flex items-center">
+            <div key={file.name + idx} className="flex items-center mb-2">
               <span className="uploaded-file-name text-gray-700 mr-2">{file.name}</span>
               <Button
                 type="button"
@@ -241,39 +296,61 @@ export const Attachments = forwardRef<AttachmentsRef, AttachmentProps>(function 
     return uploadedForType.length === 0 && (!preparedFiles || preparedFiles.length === 0);
   };
 
+  // Calculate remaining file slots for each material
+  const getRemainingSlots = (material: Material) => {
+    const uploaded = uploadedFiles[material.type] || [];
+    const prepared = fileInputsRef.current[material.title];
+    const preparedCount = prepared ? prepared.length : 0;
+    return material.limits - uploaded.length - preparedCount;
+  };
+
   return (
     <Card className="mb-4">
       <CardContent>
-        <Form {...form}>
-          <form className="flex flex-col justify-center">
-            {materials.map(material => (
-              <div key={`${material.documentId}-${fileChangeCounter}`} className="upload-section my-8">
-                <FormItem>
-                  <FormLabel>
-                    {material.required && <span className="text-red-500">*</span>}
-                    {material.title}
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="file"
-                      multiple
-                      required={material.required}
-                      data-material={material.documentId}
-                      onChange={(e) => handleFileChange(material, e.target.files)}
-                    />
-                  </FormControl>
-                  {renderFiles(material)}
-                  {isRequiredEmpty(material) && (
-                    <p className="text-red-500 text-sm mt-1">
-                      This document is required. Please upload at least one file.
-                    </p>
-                  )}
-                  <FormMessage/>
-                </FormItem>
-              </div>
-            ))}
-          </form>
-        </Form>
+        {!isInitialized ? (
+          <div className="flex justify-center py-8">
+            <p>Loading documents...</p>
+          </div>
+        ) : (
+          <Form {...form}>
+            <form className="flex flex-col justify-center">
+              {materials.map(material => (
+                <div key={`${material.documentId}-${fileChangeCounter}`} className="upload-section my-8">
+                  <FormItem>
+                    <FormLabel>
+                      {material.required && <span className="text-red-500">*</span>}
+                      {material.title}
+                    </FormLabel>
+                    <div className="text-sm text-gray-500 mb-2">
+                      {material.required ? "Required" : "Optional"} -
+                      You can upload up to {material.limits} file(s).
+                      {getRemainingSlots(material) > 0
+                        ? ` ${getRemainingSlots(material)} slot(s) remaining.`
+                        : " No slots remaining."}
+                    </div>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        multiple
+                        required={material.required}
+                        data-material={material.documentId}
+                        onChange={(e) => handleFileChange(material, e.target.files)}
+                        disabled={getRemainingSlots(material) <= 0}
+                      />
+                    </FormControl>
+                    {renderFiles(material)}
+                    {isRequiredEmpty(material) && (
+                      <p className="text-red-500 text-sm mt-1">
+                        This document is required. Please upload at least one file.
+                      </p>
+                    )}
+                    <FormMessage/>
+                  </FormItem>
+                </div>
+              ))}
+            </form>
+          </Form>
+        )}
       </CardContent>
     </Card>
   );
