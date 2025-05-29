@@ -29,6 +29,11 @@ export function Contact() {
     setFormData((prev) => ({...prev, [name]: value}));
   };
 
+  // Email and phone validation regex
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // Accepts numbers, spaces, dashes, parentheses, and optional leading +
+  const phoneRegex = /^\+?[\d\s\-()]{7,20}$/;
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
@@ -40,6 +45,18 @@ export function Contact() {
 
     if (!formData.name) {
       setError("Please provide your name");
+      return;
+    }
+
+    // Validate email if provided
+    if (formData.email && !emailRegex.test(formData.email)) {
+      setError("Please provide a valid email address");
+      return;
+    }
+
+    // Validate phone if provided
+    if (formData.phone && !phoneRegex.test(formData.phone)) {
+      setError("Please provide a valid phone number");
       return;
     }
 

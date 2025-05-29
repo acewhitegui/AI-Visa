@@ -9,14 +9,22 @@ export async function submitFormData(data: any): Promise<StrapiForm | null> {
 
   if (!token) throw new Error("The Strapi API Token environment variable is not set.");
 
-  const url = `${strapiUrl}/forms`;
+  const newObj: Record<string, any> = {};
+  Object.keys(data).forEach(function (key) {
+    if (data[key])
+      newObj[key] = data[key];
+  });
+
+  const url = `${strapiUrl}/api/forms`;
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'bearer ' + token
+      Authorization: 'Bearer ' + token
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify({
+      data: newObj
+    })
   });
 
 
